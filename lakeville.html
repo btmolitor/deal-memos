@@ -602,11 +602,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $8.50M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$8.50M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $9.00M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$9.00M</div>
       </div>
-      <input type="range" id="priceSlider" min="7000000" max="10000000" step="25000" value="8500000" class="price-slider" />
-      <div class="price-control-ticks"><span>$7.00M</span><span>baseline $8.50M</span><span>$10.00M</span></div>
+      <input type="range" id="priceSlider" min="7000000" max="10000000" step="25000" value="9000000" class="price-slider" />
+      <div class="price-control-ticks"><span>$7.00M</span><span>baseline $9.00M</span><span>$10.00M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -659,10 +659,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">16.12%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">15.22%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="3102500" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="3285000" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks">
             <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.55M</span><span>$3.10M (full)</span>
           </div>
@@ -897,7 +897,7 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 8500000,
+  basePrice: 9000000,
   units: 32,
 
   // Ratios applied to purchase price
