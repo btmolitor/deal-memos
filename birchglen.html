@@ -594,7 +594,7 @@ body {
     </div>
     <h1 class="mast-title">Birch Glen Apartments</h1>
     <p class="mast-subtitle">60-unit apartment portfolio &middot; Maplewood, MN</p>
-    
+    <div class="caution-banner">⚠ Caution — Year 1 DSCR below target. See Section 08.</div>
   </header>
 
   <!-- 01 ANALYSIS -->
@@ -631,10 +631,15 @@ body {
   <section class="section">
     <div class="section-label">02 — Overview</div>
     <h2 class="section-title">Deal description</h2>
-    
+    <div class="story">
+        <div class="story-body">
+        <p>Birch Glen is a 60-unit Class B apartment property in Maplewood, Minnesota — fully leased, built in 2002, renovated in 2004, and producing $509K of Year 1 NOI against a $9.75M basis. The unit mix is 1 one-bedroom, 49 two-bedrooms, and 10 three-bedrooms; in-place rents average $1,540/month against a market median of $1,633 (5.7% mark-to-market upside on natural turnover).</p>
+        <p>The return composition is appreciation-weighted. Over ten years, 15% of total return comes from operating cash flow, 12% from depreciation tax shield, and 74% from exit equity at sale. This is not a cash flow story — Year 1 cash-on-cash is 1.7% and ramps to 6.5% by Year 10. The structure depends on disciplined hold and rent growth in the Twin Cities suburban Class B market, which posted 4.5% YoY rent growth and the lowest supply pipeline since 2019 in Q1 2026.</p>
+      </div>
+    </div>
     <div class="hold-philosophy">
       <div class="hold-philosophy-label">Hold philosophy</div>
-      <div class="hold-philosophy-body"></div>
+      <div class="hold-philosophy-body">Our exit philosophy is to not exit. We build long-term portfolios that produce recurring monthly income into the future. Our preferred path is to refinance at Year 5 and Year 10, pull cash out tax-free where the rate environment permits, and keep operating the asset at a consistent cashflow. Please review return scenarios below for a specific cash investment.</div>
     </div>
   </section>
 
@@ -653,14 +658,14 @@ body {
       </div>
       <div class="lever-control">
         <div class="lever-display">
-          <div class="lever-amount" id="leverAmount">$1,500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">42.15%</strong></div>
+          <div class="lever-amount" id="leverAmount">$500,000</div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">14.05%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="3558750" step="10000" value="1500000" class="slider" id="capitalSlider">
-          
+          <input type="range" min="100000" max="3558750" step="10000" value="500000" class="slider" id="capitalSlider">
+          <div class="slider-ticks"><span>$100K</span><span>$500K</span><span>$1M</span><span>$1.78M</span><span>$3.56M (full)</span></div>
         </div>
-        
+        <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn active" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn" data-val="1000000">$1M</button></div>
       </div>
       <div class="partner-outputs">
         <div class="partner-cell"><div class="partner-label">1st Year Monthly Draw</div><div class="partner-value" id="outY1Monthly">—</div></div>
@@ -853,9 +858,19 @@ body {
     <div class="section-label">09 — What could go wrong</div>
     <h2 class="section-title">Risks &amp; constraints</h2>
     <div class="story" style="border-left-color: var(--gold); background: rgba(198,146,20,0.08);">
-      
+      <p class="story-headline" style="color: var(--gold);">A constraint to note.</p>
+      <div class="story-body">
+        <p>This deal fails multiple structure-dependent hurdles. <strong>Year 1 DSCR of 1.13x</strong> (target 1.25x — off by 12 bps), <strong>Year 1 cash-on-cash of 1.70%</strong> (target band 3-6%), and <strong>conservative-exit IRR of 7.73%</strong> (target 10%, Scenario B exit). The base-case exit IRR sits at exactly 10.00% — at the threshold, not through it.</p>
+        <p>The structure-independent test — going-in cap rate of 5.22% vs. our 5.0% floor — passes with 22 bps of margin.</p>
+        <p><em>Read this carefully. The clean version of this deal is at $8.5M, not $9.75M. If the failed hurdles disqualify the deal for you, that's a reasonable read of the math. Let us know.</em></p>
+      </div>
     </div>
-    
+    <div class="risk-grid">
+      <div class="risk-card"><div class="risk-title">Year 1 DSCR below lender threshold</div><div class="risk-body">At $9.75M / 35% down, our 5.85% loan produces Year 1 DSCR of 1.13x — 12 bps below the 1.25x most agency lenders want. By Year 5 we're at 1.26x and Year 10 at 1.55x as NOI grows, so the structure improves materially over time. The risk is at closing: lender may require more equity (40% would lift Y1 DSCR to ~1.23x — still tight) or push us to renegotiate price. A drop to $8.5M would clear the hurdle cleanly.</div></div>
+      <div class="risk-card"><div class="risk-title">Property tax reassessment after sale</div><div class="risk-body">Ramsey County reassesses on transfer and tends to come in 5-15% above the prior owner's assessed value. Our model uses the broker's $187K Year 1 RE tax — a conservative reassessment ($25K incremental) drops Y1 NOI to $484K and adds 0.04 to expense ratio. Mitigation: pull the parcel's assessed history before LOI, and budget a 10% reassessment line item in the underwriting.</div></div>
+      <div class="risk-card"><div class="risk-title">Exit cap rate uncertainty</div><div class="risk-body">74% of total return at Year 10 comes from selling the asset. Our base case assumes a 5.0% exit cap; a 50bp expansion to 5.5% drops net equity by ~$1.3M and 10-year IRR from 10% to ~6.5%. The 50bp move is roughly today's national average vs. where suburban Class B traded in 2023. Mitigation: hold flexibility (12-15 years) lets us wait out a bad exit window, and refinancing in Year 10 produces tax-free cash without forcing the sale.</div></div>
+      <div class="risk-card"><div class="risk-title">Negative leverage in Year 1</div><div class="risk-body">Going-in cap rate is 5.22%; borrowing rate is 5.85%. We're paying 63 bps more for debt than the asset yields in Year 1, which is why cash-on-cash starts at 1.7%. Rent growth and the Year 5 refi compress the negative leverage over time, but Year 1 is structurally tight. If rent growth softens below 2% or refi rates don't ease by Year 5, the deal stays in the negative-leverage window longer than modeled.</div></div>
+      </div>
   </section>
 
   <footer class="footer">
@@ -918,7 +933,7 @@ const BASE = {
 // ================================================================
 let currentPrice = BASE.basePrice;
 let currentScenario = 'A';
-let currentCapital = 1500000;
+let currentCapital = 500000;
 let currentYearIdx = 0;
 let currentRefiRate = 0.0585;
 
