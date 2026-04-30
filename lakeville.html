@@ -1,26 +1,25 @@
 <!--
 ================================================================================
-  TEMPLATE FILE — DO NOT OPEN DIRECTLY IN A BROWSER
-
-  This file contains {{TOKEN}} placeholders that are not valid JavaScript.
-  Opening it directly will produce: SyntaxError: Unexpected token '{'
-
-  This file is a SOURCE ARTIFACT for Prompt 5 (Story & Memo). The expected
-  workflow is:
-
-    1. Run Prompts 1-4 to populate the deal's xlsx with verified numbers
-    2. Prompt 5 reads this template and fills every {{TOKEN}} with the
-       corresponding value from the xlsx + story/risks content
-    3. The filled-in result is the deal-specific deliverable file
-       (e.g., dealname_deal_EOY_sens.html), which DOES open and run
-       cleanly in a browser
-
-  To inspect this template's structure, open it in a text editor (VS Code,
-  Notepad++, BBEdit, etc.) — not a browser.
-
-  Round-trip verification: this template, filled with the canonical Lakeville
-  values, produces a byte-identical match to the original Lakeville deliverable.
-  Tokenization is provably structure-preserving.
+  LAKEVILLE DEAL TEMPLATE — Block tokens pre-filled
+  
+  This file is a Lakeville-specific copy of 10c_html_reference_dual_lane_EOY_sens.
+  The 6 block tokens have been pre-filled with Lakeville content:
+    - DUAL_STORY_BLOCK_HTML
+    - DUAL_RISK_CARDS_HTML
+    - DUAL_CAUTION_BANNER_HTML
+    - DUAL_CAUTION_BLOCK_HTML
+    - DUAL_HOLD_PHILOSOPHY_TEXT
+    - DUAL_CAPITAL_TICKS_HTML
+    - DUAL_CAPITAL_PRESETS_HTML
+    
+  47 scalar/array tokens remain as {{DUAL_*}} placeholders. The Apps Script
+  pipeline fills these from the Sheet at regeneration time.
+  
+  This is the file to upload to Drive and reference as TEMPLATE_FILE_ID.
+  
+  For Deal #2, you'll need a new pre-filled template with that deal's story,
+  risks, caution, and capital tier content. Path B (block tokens promoted to
+  RenderConfig) eliminates the per-deal template editing.
 ================================================================================
 -->
 <!DOCTYPE html>
@@ -660,10 +659,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">14.52%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">16.12%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="3442500" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="3102500" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks">
             <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.55M</span><span>$3.10M (full)</span>
           </div>
@@ -760,8 +759,8 @@ body {
 
     <div class="refi-rate-control">
       <div class="refi-rate-label">PROJECTED<br/>MARKET RATE<br/>AT REFI</div>
-      <input type="range" min="450" max="750" step="5" value="585" class="slider refi-slider" id="refiRateSlider">
-      <div class="refi-rate-value" id="refiRateDisplay">5.85%</div>
+      <input type="range" min="450" max="750" step="5" value="575" class="slider refi-slider" id="refiRateSlider">
+      <div class="refi-rate-value" id="refiRateDisplay">5.75%</div>
     </div>
 
     <div class="refi-fixed">
@@ -902,40 +901,40 @@ const BASE = {
   units: 32,
 
   // Ratios applied to purchase price
-  downPct: 0.39,
+  downPct: 0.35,
   closingReservesPct: 0.015,  // combined closing + reserves = 1.5% of price
-  loanPct: 0.61,              // = 1 - downPct
-  cashInPct: 0.405,           // = down + closing/reserves
-  depShieldPerDollar: 0.01145455,  // annual dep tax shield per $ of price
+  loanPct: 0.65,              // = 1 - downPct
+  cashInPct: 0.365,           // = down + closing/reserves
+  depShieldPerDollar: 1e-8,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
-  dsRatioY1Y5: 0.07079291,   // 0.07002877828
-  dsRatioY6Y10: 0.06575258,  // 0.06495109502
+  dsRatioY1Y5: 0.07002874,   // 0.07002877828
+  dsRatioY6Y10: 0.06496019,  // 0.06495109502
 
   // Mortgage balance decay — Y1-Y10 balance ÷ initial loan
-  balRatios: [0.61, 0.60229696, 0.59413102, 0.58547434, 0.57629745, 0.56656908, 0.55941449, 0.55182994, 0.54378961, 0.5352661],
+  balRatios: [0.65, 0.64163823, 0.63278279, 0.62340452, 0.61347256, 0.60295421, 0.59519766, 0.58698315, 0.57828366, 0.56907056],
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.00770304, 0.00816595, 0.00865667, 0.00917689, 0.00972837, 0.0071546, 0.00758455, 0.00804033, 0.00852351, 0.00903573],
+  wfPrincRatios: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
-  ioBalRatios: [0.61, 0.61, 0.61, 0.61, 0.61, 0.59889646, 0.58712566, 0.5746475, 0.56141947, 0.54739652],
-  ioWfPrincRatios: [0, 0, 0, 0, 0, 0.01110354, 0.0117708, 0.01247816, 0.01322802, 0.01402295],
-  ioDsByYearRatios: [0.0585, 0.0585, 0.0585, 0.0585, 0.0585, 0.07621961, 0.07621961, 0.07621961, 0.07621961, 0.07621961],
+  ioBalRatios: [0.65, 0.65, 0.65, 0.65, 0.65, 0.6379915, 0.62527403, 0.61180572, 0.59754224, 0.58243664],
+  ioWfPrincRatios: [0, 0, 0, 0, 0, 0.0120085, 0.01271748, 0.01346831, 0.01426348, 0.01510559],
+  ioDsByYearRatios: [0.0575, 0.0575, 0.0575, 0.0575, 0.0575, 0.07549277, 0.07549277, 0.07549277, 0.07549277, 0.07549277],
 
   // FIXED operating data — does NOT scale with price (same building)
-  gpr:     [798037, 821558.68, 845786.01, 870740.16, 896442.94, 922916.79, 950184.87, 978270.98, 1007199.68, 1036996.24],
+  gpr:     [825390.56, 848912.24, 873139.57, 898093.72, 923796.5, 950270.35, 977538.43, 1005624.54, 1034553.24, 1064349.8],
   vacancy: [39202.8, 40378.88, 41590.25, 42837.96, 44123.1, 45446.79, 46810.19, 48214.5, 49660.93, 51150.76],
-  egi:     [758834.2, 781179.8, 804195.76, 827902.2, 852319.84, 877470, 903374.67, 930056.48, 957538.75, 985845.48],
-  opex:    [289844.28, 299138.64, 308742.82, 318667.69, 328924.47, 339524.85, 350480.92, 361805.23, 373510.82, 385611.2],
-  noi:     [468989.92, 482041.16, 495452.94, 509234.51, 523395.36, 537945.15, 552893.75, 568251.25, 584027.93, 600234.28],
+  egi:     [786187.76, 808533.36, 831549.32, 855255.76, 879673.4, 904823.56, 930728.23, 957410.04, 984892.31, 1013199.04],
+  opex:    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  noi:     [315833.78, 311637.52, 307193.51, 302487.14, 297502.9, 292974.32, 289081.78, 284959.42, 280593.68, 275970.19],
 
   // Market & exit assumptions
   marketGrowth: 0.015,
   exitCap: 0.05,
   exitSellingCostPct: 0,  // backed out: exit A net / gross → 2% of sale price
-  mortgageRate: 0.0585,
+  mortgageRate: 0.0575,
   amortYears: 30
 };
 
@@ -946,7 +945,7 @@ let currentPrice = BASE.basePrice;
 let currentScenario = 'A';
 let currentCapital = 500000;
 let currentYearIdx = 0;
-let currentRefiRate = 0.0585;
+let currentRefiRate = 0.0575;
 
 // ================================================================
 // UTILITIES
@@ -1079,8 +1078,8 @@ function renderSnapshot(D) {
   capCell.classList.toggle('pos', D.goingInCap >= 0.05);
   capCell.classList.toggle('neg', D.goingInCap < 0.05);
   document.getElementById('sCashIn').textContent = fmt$(D.cashIn, { compact: true });
-  document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (39%)';
-  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 5.85% · 30yr';
+  document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (35%)';
+  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 5.75% · 30yr';
   // Expense ratio = OpEx / EGI where EGI = NOI + OpEx (OpEx stored as positive in this BASE)
   const y1NOI = BASE.noi[0];
   const y1OpEx = Math.abs(BASE.opex[0]);
@@ -1236,13 +1235,13 @@ function renderProjection(D) {
     { label: 'Net Operating Income', values: BASE.noi, kind: 'single', fmt: 'k' },
     { label: 'Expense Ratio', values: expenseRatios, kind: 'single', fmt: 'pct' },
     { label: 'Debt Service', values: D.debtService.map(d => -d), ioValues: D.ioDebtService.map(d => -d), kind: 'dual', fmt: 'k' },
-    { label: 'DSCR', values: D.dscr, ioValues: D.ioDscr, kind: 'dual', fmt: 'dscr' },
-    { label: 'Cash Flow (pre-tax)', values: D.cashFlow, ioValues: D.ioCashFlow, kind: 'dual', fmt: 'k' },
-    { label: 'Cash-on-Cash', values: D.coc, ioValues: D.ioCoc, kind: 'dual', fmt: 'pct' },
     { label: 'Principal Paid', values: D.balance.map((b, i) => i === 0 ? (D.loan - b) : (D.balance[i-1] - b)), ioValues: D.ioBalance.map((b, i) => i === 0 ? (D.loan - b) : (D.ioBalance[i-1] - b)), kind: 'dual', fmt: 'k' },
-    { label: `Property Value (${(BASE.marketGrowth * 100).toFixed(1)}% growth)`, values: D.propertyValue, kind: 'single', fmt: 'k' },
+    { label: 'Cash Flow (pre-tax)', values: D.cashFlow, ioValues: D.ioCashFlow, kind: 'dual', fmt: 'k' },
+    { label: 'DSCR', values: D.dscr, ioValues: D.ioDscr, kind: 'dual', fmt: 'dscr' },
+    { label: 'Cash-on-Cash', values: D.coc, ioValues: D.ioCoc, kind: 'dual', fmt: 'pct' },
     { label: 'Mortgage Balance (EOY)', values: D.balance, ioValues: D.ioBalance, kind: 'dual', fmt: 'k' },
     { label: 'Equity Position', values: D.equityPosition, ioValues: ioEquityPosition, kind: 'dual', fmt: 'k' },
+    { label: `Property Value (${(BASE.marketGrowth * 100).toFixed(1)}% growth)`, values: D.propertyValue, kind: 'single', fmt: 'k' },
     { label: 'LTV', values: D.ltv, ioValues: ioLtv, kind: 'dual', fmt: 'pct' }
   ];
 
