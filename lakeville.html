@@ -659,10 +659,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">16.12%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">14.52%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="3102500" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="3442500" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks">
             <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.55M</span><span>$3.10M (full)</span>
           </div>
@@ -901,34 +901,34 @@ const BASE = {
   units: 32,
 
   // Ratios applied to purchase price
-  downPct: 0.35,
+  downPct: 0.39,
   closingReservesPct: 0.015,  // combined closing + reserves = 1.5% of price
-  loanPct: 0.65,              // = 1 - downPct
-  cashInPct: 0.365,           // = down + closing/reserves
-  depShieldPerDollar: 0.01145455,  // annual dep tax shield per $ of price
+  loanPct: 0.61,              // = 1 - downPct
+  cashInPct: 0.405,           // = down + closing/reserves
+  depShieldPerDollar: 1e-8,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
   dsRatioY1Y5: 0.07002874,   // 0.07002877828
   dsRatioY6Y10: 0.06496019,  // 0.06495109502
 
   // Mortgage balance decay — Y1-Y10 balance ÷ initial loan
-  balRatios: [0.65, 0.64163823, 0.63278279, 0.62340452, 0.61347256, 0.60295421, 0.59519766, 0.58698315, 0.57828366, 0.56907056],
+  balRatios: [0.61, 0.6021528, 0.59384231, 0.58504116, 0.5757204, 0.56584934, 0.55857011, 0.55086111, 0.54269698, 0.53405083],
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.00836177, 0.00885545, 0.00937827, 0.00993196, 0.01051834, 0.00775656, 0.0082145, 0.00869949, 0.0092131, 0.00975704],
+  wfPrincRatios: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
-  ioBalRatios: [0.65, 0.65, 0.65, 0.65, 0.65, 0.6379915, 0.62527403, 0.61180572, 0.59754224, 0.58243664],
-  ioWfPrincRatios: [0, 0, 0, 0, 0, 0.0120085, 0.01271748, 0.01346831, 0.01426348, 0.01510559],
+  ioBalRatios: [0.61, 0.61, 0.61, 0.61, 0.61, 0.59873049, 0.58679563, 0.57415613, 0.56077041, 0.54659439],
+  ioWfPrincRatios: [0, 0, 0, 0, 0, 0.01126951, 0.01193486, 0.01263949, 0.01338573, 0.01417602],
   ioDsByYearRatios: [0.0575, 0.0575, 0.0575, 0.0575, 0.0575, 0.07549277, 0.07549277, 0.07549277, 0.07549277, 0.07549277],
 
   // FIXED operating data — does NOT scale with price (same building)
-  gpr:     [825390.56, 848912.24, 873139.57, 898093.72, 923796.5, 950270.35, 977538.43, 1005624.54, 1034553.24, 1064349.8],
+  gpr:     [798037, 821558.68, 845786.01, 870740.16, 896442.94, 922916.79, 950184.87, 978270.98, 1007199.68, 1036996.24],
   vacancy: [39202.8, 40378.88, 41590.25, 42837.96, 44123.1, 45446.79, 46810.19, 48214.5, 49660.93, 51150.76],
-  egi:     [786187.76, 808533.36, 831549.32, 855255.76, 879673.4, 904823.56, 930728.23, 957410.04, 984892.31, 1013199.04],
-  opex:    [305024.06, 315245.1, 325829.38, 336790.65, 348143.17, 359901.8, 372082.01, 384699.89, 397772.17, 411316.29],
-  noi:     [481163.7, 493288.26, 505719.93, 518465.12, 531530.23, 544921.76, 558646.22, 572710.15, 587120.14, 601882.75],
+  egi:     [758834.2, 781179.8, 804195.76, 827902.2, 852319.84, 877470, 903374.67, 930056.48, 957538.75, 985845.48],
+  opex:    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  noi:     [296397.85, 292459.82, 288289.3, 283872.54, 279195.03, 274945.13, 271292.13, 267423.46, 263326.38, 258987.41],
 
   // Market & exit assumptions
   marketGrowth: 0.015,
@@ -1078,7 +1078,7 @@ function renderSnapshot(D) {
   capCell.classList.toggle('pos', D.goingInCap >= 0.05);
   capCell.classList.toggle('neg', D.goingInCap < 0.05);
   document.getElementById('sCashIn').textContent = fmt$(D.cashIn, { compact: true });
-  document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (35%)';
+  document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (39%)';
   document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 5.75% · 30yr';
   // Expense ratio = OpEx / EGI where EGI = NOI + OpEx (OpEx stored as positive in this BASE)
   const y1NOI = BASE.noi[0];
