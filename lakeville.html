@@ -880,7 +880,7 @@ const BASE = {
   closingReservesPct: 0.015,  // combined closing + reserves = 1.5% of price
   loanPct: 0.65,              // = 1 - downPct
   cashInPct: 0.365,           // = down + closing/reserves
-  depShieldPerDollar: 1e-8,  // annual dep tax shield per $ of price
+  depShieldPerDollar: 0.01145455,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
   dsRatioY1Y5: 0.07002874,   // 0.07002877828
@@ -891,7 +891,7 @@ const BASE = {
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  wfPrincRatios: [0.02290895, 0.0242615, 0.02569389, 0.02721085, 0.02881738, 0.02125085, 0.02250549, 0.02383421, 0.02524138, 0.02673163],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1, 1, 0.98517932, 0.96948364, 0.95286128, 0.94060342, 0.92762187, 0.91387388, 0.89931422, 0.88389496],
@@ -902,8 +902,8 @@ const BASE = {
   gpr:     [825390.56, 848912.24, 873139.57, 898093.72, 923796.5, 950270.35, 977538.43, 1005624.54, 1034553.24, 1064349.8],
   vacancy: [-39202.8, -40378.88, -41590.25, -42837.96, -44123.1, -45446.79, -46810.19, -48214.5, -49660.93, -51150.76],
   egi:     [786187.76, 808533.36, 831549.32, 855255.76, 879673.4, 904823.56, 930728.23, 957410.04, 984892.31, 1013199.04],
-  opex:    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  noi:     [315833.78, 311637.52, 307193.51, 302487.14, 297502.9, 292974.32, 289081.78, 284959.42, 280593.68, 275970.19],
+  opex:    [-305024.06, -315245.1, -325829.38, -336790.65, -348143.17, -359901.8, -372082.01, -384699.89, -397772.17, -411316.29],
+  noi:     [481163.7, 493288.26, 505719.93, 518465.12, 531530.23, 544921.76, 558646.22, 572710.15, 587120.14, 601882.75],
 
   // Market & exit assumptions
   marketGrowth: 0.015,
