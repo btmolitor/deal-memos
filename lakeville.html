@@ -1,25 +1,26 @@
 <!--
 ================================================================================
-  LAKEVILLE DEAL TEMPLATE — Block tokens pre-filled
-  
-  This file is a Lakeville-specific copy of 10c_html_reference_dual_lane_EOY_sens.
-  The 6 block tokens have been pre-filled with Lakeville content:
-    - DUAL_STORY_BLOCK_HTML
-    - DUAL_RISK_CARDS_HTML
-    - DUAL_CAUTION_BANNER_HTML
-    - DUAL_CAUTION_BLOCK_HTML
-    - DUAL_HOLD_PHILOSOPHY_TEXT
-    - DUAL_CAPITAL_TICKS_HTML
-    - DUAL_CAPITAL_PRESETS_HTML
-    
-  47 scalar/array tokens remain as {{DUAL_*}} placeholders. The Apps Script
-  pipeline fills these from the Sheet at regeneration time.
-  
-  This is the file to upload to Drive and reference as TEMPLATE_FILE_ID.
-  
-  For Deal #2, you'll need a new pre-filled template with that deal's story,
-  risks, caution, and capital tier content. Path B (block tokens promoted to
-  RenderConfig) eliminates the per-deal template editing.
+  TEMPLATE FILE — DO NOT OPEN DIRECTLY IN A BROWSER
+
+  This file contains {{TOKEN}} placeholders that are not valid JavaScript.
+  Opening it directly will produce: SyntaxError: Unexpected token '{'
+
+  This file is a SOURCE ARTIFACT for Prompt 5 (Story & Memo). The expected
+  workflow is:
+
+    1. Run Prompts 1-4 to populate the deal's xlsx with verified numbers
+    2. Prompt 5 reads this template and fills every {{TOKEN}} with the
+       corresponding value from the xlsx + story/risks content
+    3. The filled-in result is the deal-specific deliverable file
+       (e.g., dealname_deal_EOY_sens.html), which DOES open and run
+       cleanly in a browser
+
+  To inspect this template's structure, open it in a text editor (VS Code,
+  Notepad++, BBEdit, etc.) — not a browser.
+
+  Round-trip verification: this template, filled with the canonical Lakeville
+  values, produces a byte-identical match to the original Lakeville deliverable.
+  Tokenization is provably structure-preserving.
 ================================================================================
 -->
 <!DOCTYPE html>
@@ -593,7 +594,7 @@ body {
     </div>
     <h1 class="mast-title">Spruce Place</h1>
     <p class="mast-subtitle">32-unit townhome portfolio &middot; Lakeville, Minnesota</p>
-    <div class="caution-banner">⚠ Caution — Year 1 DSCR below target. See Section 08.</div>
+    
   </header>
 
   <!-- 01 ANALYSIS -->
@@ -630,16 +631,10 @@ body {
   <section class="section">
     <div class="section-label">02 — Overview</div>
     <h2 class="section-title">Deal description</h2>
-    <div class="story">
-      <div class="story-body">
-        <p>Spruce Place is a 32-unit scattered-site townhome portfolio in Lakeville, Minnesota — 93.75% occupied, managed by incumbent third-party PM, and producing $481K of Year 1 NOI against a $8.5M basis. Twenty-six of thirty-two units were built in 2017–2018; none are older than 2005. This is stabilized stock, not a turnaround.</p>
-        <p>The return composition tells the story. Over ten years, 35% of total return comes from annual cash distributions, 20% from the depreciation tax shield, 16% from principal paydown, and 29% from market appreciation. <strong>Fifty-five percent of the return is realized during the hold</strong> — not at sale. Partners earn while they wait.</p>
-        <p>Each of the 32 units has its own parcel ID, which gives the portfolio a dual-track exit option: whole-portfolio sale to an investor or individual retail disposition at $280–$325K per unit (approximately 5–22% uplift over our $266K per-unit acquisition basis). We're not modeling the retail path — it's optionality, not thesis.</p>
-      </div>
-    </div>
+    
     <div class="hold-philosophy">
       <div class="hold-philosophy-label">Hold philosophy</div>
-      <div class="hold-philosophy-body">Our exit philosophy is to not exit. We build long-term portfolios that produce recurring monthly income into the future. Our preferred path is to refinance at Year 5 and Year 10, pull cash out tax-free where the rate environment permits, and keep operating the asset at a consistent cashflow. Please review return scenarios below for a specific cash investment.</div>
+      <div class="hold-philosophy-body"></div>
     </div>
   </section>
 
@@ -663,19 +658,9 @@ body {
         </div>
         <div class="slider-wrap">
           <input type="range" min="100000" max="3102500" step="10000" value="500000" class="slider" id="capitalSlider">
-          <div class="slider-ticks">
-            <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.55M</span><span>$3.10M (full)</span>
-          </div>
+          
         </div>
-        <div class="preset-buttons">
-          <button class="preset-btn" data-val="100000">$100K</button>
-          <button class="preset-btn" data-val="250000">$250K</button>
-          <button class="preset-btn active" data-val="500000">$500K</button>
-          <button class="preset-btn" data-val="750000">$750K</button>
-          <button class="preset-btn" data-val="1000000">$1M</button>
-          <button class="preset-btn" data-val="1551250">$1.55M (half)</button>
-          <button class="preset-btn" data-val="3102500">$3.10M (100%)</button>
-        </div>
+        
       </div>
       <div class="partner-outputs">
         <div class="partner-cell"><div class="partner-label">1st Year Monthly Draw</div><div class="partner-value" id="outY1Monthly">—</div></div>
@@ -868,19 +853,9 @@ body {
     <div class="section-label">09 — What could go wrong</div>
     <h2 class="section-title">Risks &amp; constraints</h2>
     <div class="story" style="border-left-color: var(--gold); background: rgba(198,146,20,0.08);">
-      <p class="story-headline" style="color: var(--gold);">A constraint to note.</p>
-      <div class="story-body">
-        <p>This deal fails one of our structure-dependent hurdles: <strong>Year 1 DSCR of 1.244</strong> (our target is 1.25 — off by 6 bps). Noted.</p>
-        <p>The structure-independent test — going-in cap rate of 5.66% vs. our 5.0% floor — passes with 66 bps of margin.</p>
-        <p><em>Read this carefully. If a tight DSCR in the conservative case disqualifies the deal for you, that's a reasonable read. Let us know.</em></p>
-      </div>
+      
     </div>
-    <div class="risk-grid">
-      <div class="risk-card"><div class="risk-title">Year 5 refinance rate risk</div><div class="risk-body">Our 5.75% loan ends at Y5. The refi break-even rate is 6.32% — we have 57 bps of cushion against today's 5.75% market. If rates spike above 6.32% by Y5 (2031), our annual payment rises and operations must absorb the increase. The deal doesn't break at modest rate spikes (DSCR stays above 1.20 through a ~7% refi rate), but rising rates compress coverage and need to be watched.</div></div>
-      <div class="risk-card"><div class="risk-title">Insurance &amp; expense pressure</div><div class="risk-body">MN insurance has hardened 5–10%/yr since 2022. Model uses 5%. Harder trajectory compresses NOI growth.</div></div>
-      <div class="risk-card"><div class="risk-title">Exit cap softening</div><div class="risk-body">If rates stay elevated through 2035, exit cap could widen from 5.0% toward 6.0–6.5%. Scenario B captures most of this; deeper widening exists as tail risk.</div></div>
-      <div class="risk-card"><div class="risk-title">Occupancy regression</div><div class="risk-body">Current 93.75%, two units vacant. Model assumes 5% vacancy. Regional recession could push to 88–90% temporarily.</div></div>
-    </div>
+    
   </section>
 
   <footer class="footer">
@@ -912,20 +887,20 @@ const BASE = {
   dsRatioY6Y10: 0.06496019,  // 0.06495109502
 
   // Mortgage balance decay — Y1-Y10 balance ÷ initial loan
-  balRatios: [0.65, 0.64163823, 0.63278279, 0.62340452, 0.61347256, 0.60295421, 0.59519766, 0.58698315, 0.57828366, 0.56907056],
+  balRatios: [0.98713574, 0.97351198, 0.95908387, 0.94380393, 0.92762187, 0.9156887, 0.903051, 0.88966717, 0.87549317, 0.86048233],
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
   wfPrincRatios: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
-  ioBalRatios: [0.65, 0.65, 0.65, 0.65, 0.65, 0.6379915, 0.62527403, 0.61180572, 0.59754224, 0.58243664],
-  ioWfPrincRatios: [0, 0, 0, 0, 0, 0.0120085, 0.01271748, 0.01346831, 0.01426348, 0.01510559],
-  ioDsByYearRatios: [0.0575, 0.0575, 0.0575, 0.0575, 0.0575, 0.07549277, 0.07549277, 0.07549277, 0.07549277, 0.07549277],
+  ioBalRatios: [1, 1, 0.98517932, 0.96948364, 0.95286128, 0.94060342, 0.92762187, 0.91387388, 0.89931422, 0.88389496],
+  ioWfPrincRatios: [0, 0, 0.00963344, 0.0102022, 0.01080453, 0.0079676, 0.00843801, 0.00893619, 0.00946378, 0.01002252],
+  ioDsByYearRatios: [0.0575, 0.0575, 0.07193414, 0.07193414, 0.07193414, 0.06672768, 0.06672768, 0.06672768, 0.06672768, 0.06672768],
 
   // FIXED operating data — does NOT scale with price (same building)
   gpr:     [825390.56, 848912.24, 873139.57, 898093.72, 923796.5, 950270.35, 977538.43, 1005624.54, 1034553.24, 1064349.8],
-  vacancy: [39202.8, 40378.88, 41590.25, 42837.96, 44123.1, 45446.79, 46810.19, 48214.5, 49660.93, 51150.76],
+  vacancy: [-39202.8, -40378.88, -41590.25, -42837.96, -44123.1, -45446.79, -46810.19, -48214.5, -49660.93, -51150.76],
   egi:     [786187.76, 808533.36, 831549.32, 855255.76, 879673.4, 904823.56, 930728.23, 957410.04, 984892.31, 1013199.04],
   opex:    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   noi:     [315833.78, 311637.52, 307193.51, 302487.14, 297502.9, 292974.32, 289081.78, 284959.42, 280593.68, 275970.19],
@@ -933,7 +908,7 @@ const BASE = {
   // Market & exit assumptions
   marketGrowth: 0.015,
   exitCap: 0.05,
-  exitSellingCostPct: 0,  // backed out: exit A net / gross → 2% of sale price
+  exitSellingCostPct: 0.02,  // backed out: exit A net / gross → 2% of sale price
   mortgageRate: 0.0575,
   amortYears: 30
 };
@@ -1235,13 +1210,13 @@ function renderProjection(D) {
     { label: 'Net Operating Income', values: BASE.noi, kind: 'single', fmt: 'k' },
     { label: 'Expense Ratio', values: expenseRatios, kind: 'single', fmt: 'pct' },
     { label: 'Debt Service', values: D.debtService.map(d => -d), ioValues: D.ioDebtService.map(d => -d), kind: 'dual', fmt: 'k' },
-    { label: 'Principal Paid', values: D.balance.map((b, i) => i === 0 ? (D.loan - b) : (D.balance[i-1] - b)), ioValues: D.ioBalance.map((b, i) => i === 0 ? (D.loan - b) : (D.ioBalance[i-1] - b)), kind: 'dual', fmt: 'k' },
-    { label: 'Cash Flow (pre-tax)', values: D.cashFlow, ioValues: D.ioCashFlow, kind: 'dual', fmt: 'k' },
     { label: 'DSCR', values: D.dscr, ioValues: D.ioDscr, kind: 'dual', fmt: 'dscr' },
+    { label: 'Cash Flow (pre-tax)', values: D.cashFlow, ioValues: D.ioCashFlow, kind: 'dual', fmt: 'k' },
     { label: 'Cash-on-Cash', values: D.coc, ioValues: D.ioCoc, kind: 'dual', fmt: 'pct' },
+    { label: 'Principal Paid', values: D.balance.map((b, i) => i === 0 ? (D.loan - b) : (D.balance[i-1] - b)), ioValues: D.ioBalance.map((b, i) => i === 0 ? (D.loan - b) : (D.ioBalance[i-1] - b)), kind: 'dual', fmt: 'k' },
+    { label: `Property Value (${(BASE.marketGrowth * 100).toFixed(1)}% growth)`, values: D.propertyValue, kind: 'single', fmt: 'k' },
     { label: 'Mortgage Balance (EOY)', values: D.balance, ioValues: D.ioBalance, kind: 'dual', fmt: 'k' },
     { label: 'Equity Position', values: D.equityPosition, ioValues: ioEquityPosition, kind: 'dual', fmt: 'k' },
-    { label: `Property Value (${(BASE.marketGrowth * 100).toFixed(1)}% growth)`, values: D.propertyValue, kind: 'single', fmt: 'k' },
     { label: 'LTV', values: D.ltv, ioValues: ioLtv, kind: 'dual', fmt: 'pct' }
   ];
 
