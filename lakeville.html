@@ -594,7 +594,7 @@ body {
     </div>
     <h1 class="mast-title">Spruce Place</h1>
     <p class="mast-subtitle">32-unit townhome portfolio &middot; Lakeville, Minnesota</p>
-    
+    <div class="caution-banner">⚠ Caution — Year 1 DSCR below target. See Section 08.</div>
   </header>
 
   <!-- 01 ANALYSIS -->
@@ -631,10 +631,16 @@ body {
   <section class="section">
     <div class="section-label">02 — Overview</div>
     <h2 class="section-title">Deal description</h2>
-    
+    <div class="story">
+      <div class="story-body">
+        <p>Spruce Place is a 32-unit scattered-site townhome portfolio in Lakeville, Minnesota — 93.75% occupied, managed by incumbent third-party PM, and producing $481K of Year 1 NOI against a $8.5M basis. Twenty-six of thirty-two units were built in 2017–2018; none are older than 2005. This is stabilized stock, not a turnaround.</p>
+        <p>The return composition tells the story. Over ten years, 35% of total return comes from annual cash distributions, 20% from the depreciation tax shield, 16% from principal paydown, and 29% from market appreciation. <strong>Fifty-five percent of the return is realized during the hold</strong> — not at sale. Partners earn while they wait.</p>
+        <p>Each of the 32 units has its own parcel ID, which gives the portfolio a dual-track exit option: whole-portfolio sale to an investor or individual retail disposition at $280–$325K per unit (approximately 5–22% uplift over our $266K per-unit acquisition basis). We're not modeling the retail path — it's optionality, not thesis.</p>
+      </div>
+    </div>
     <div class="hold-philosophy">
       <div class="hold-philosophy-label">Hold philosophy</div>
-      <div class="hold-philosophy-body"></div>
+      <div class="hold-philosophy-body">Our exit philosophy is to not exit. We build long-term portfolios that produce recurring monthly income into the future. Our preferred path is to refinance at Year 5 and Year 10, pull cash out tax-free where the rate environment permits, and keep operating the asset at a consistent cashflow. Please review return scenarios below for a specific cash investment.</div>
     </div>
   </section>
 
@@ -654,13 +660,23 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">16.12%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">14.52%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="3102500" step="10000" value="500000" class="slider" id="capitalSlider">
-          
+          <input type="range" min="100000" max="3442500" step="10000" value="500000" class="slider" id="capitalSlider">
+          <div class="slider-ticks">
+            <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.55M</span><span>$3.10M (full)</span>
+          </div>
         </div>
-        
+        <div class="preset-buttons">
+          <button class="preset-btn" data-val="100000">$100K</button>
+          <button class="preset-btn" data-val="250000">$250K</button>
+          <button class="preset-btn active" data-val="500000">$500K</button>
+          <button class="preset-btn" data-val="750000">$750K</button>
+          <button class="preset-btn" data-val="1000000">$1M</button>
+          <button class="preset-btn" data-val="1551250">$1.55M (half)</button>
+          <button class="preset-btn" data-val="3102500">$3.10M (100%)</button>
+        </div>
       </div>
       <div class="partner-outputs">
         <div class="partner-cell"><div class="partner-label">1st Year Monthly Draw</div><div class="partner-value" id="outY1Monthly">—</div></div>
@@ -744,8 +760,8 @@ body {
 
     <div class="refi-rate-control">
       <div class="refi-rate-label">PROJECTED<br/>MARKET RATE<br/>AT REFI</div>
-      <input type="range" min="450" max="750" step="5" value="575" class="slider refi-slider" id="refiRateSlider">
-      <div class="refi-rate-value" id="refiRateDisplay">5.75%</div>
+      <input type="range" min="450" max="750" step="5" value="585" class="slider refi-slider" id="refiRateSlider">
+      <div class="refi-rate-value" id="refiRateDisplay">5.85%</div>
     </div>
 
     <div class="refi-fixed">
@@ -853,9 +869,19 @@ body {
     <div class="section-label">09 — What could go wrong</div>
     <h2 class="section-title">Risks &amp; constraints</h2>
     <div class="story" style="border-left-color: var(--gold); background: rgba(198,146,20,0.08);">
-      
+      <p class="story-headline" style="color: var(--gold);">A constraint to note.</p>
+      <div class="story-body">
+        <p>This deal fails one of our structure-dependent hurdles: <strong>Year 1 DSCR of 1.244</strong> (our target is 1.25 — off by 6 bps). Noted.</p>
+        <p>The structure-independent test — going-in cap rate of 5.66% vs. our 5.0% floor — passes with 66 bps of margin.</p>
+        <p><em>Read this carefully. If a tight DSCR in the conservative case disqualifies the deal for you, that's a reasonable read. Let us know.</em></p>
+      </div>
     </div>
-    
+    <div class="risk-grid">
+      <div class="risk-card"><div class="risk-title">Year 5 refinance rate risk</div><div class="risk-body">Our 5.75% loan ends at Y5. The refi break-even rate is 6.32% — we have 57 bps of cushion against today's 5.75% market. If rates spike above 6.32% by Y5 (2031), our annual payment rises and operations must absorb the increase. The deal doesn't break at modest rate spikes (DSCR stays above 1.20 through a ~7% refi rate), but rising rates compress coverage and need to be watched.</div></div>
+      <div class="risk-card"><div class="risk-title">Insurance &amp; expense pressure</div><div class="risk-body">MN insurance has hardened 5–10%/yr since 2022. Model uses 5%. Harder trajectory compresses NOI growth.</div></div>
+      <div class="risk-card"><div class="risk-title">Exit cap softening</div><div class="risk-body">If rates stay elevated through 2035, exit cap could widen from 5.0% toward 6.0–6.5%. Scenario B captures most of this; deeper widening exists as tail risk.</div></div>
+      <div class="risk-card"><div class="risk-title">Occupancy regression</div><div class="risk-body">Current 93.75%, two units vacant. Model assumes 5% vacancy. Regional recession could push to 88–90% temporarily.</div></div>
+    </div>
   </section>
 
   <footer class="footer">
@@ -876,40 +902,40 @@ const BASE = {
   units: 32,
 
   // Ratios applied to purchase price
-  downPct: 0.35,
+  downPct: 0.39,
   closingReservesPct: 0.015,  // combined closing + reserves = 1.5% of price
-  loanPct: 0.65,              // = 1 - downPct
-  cashInPct: 0.365,           // = down + closing/reserves
+  loanPct: 0.61,              // = 1 - downPct
+  cashInPct: 0.405,           // = down + closing/reserves
   depShieldPerDollar: 0.01145455,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
-  dsRatioY1Y5: 0.07002874,   // 0.07002877828
-  dsRatioY6Y10: 0.06496019,  // 0.06495109502
+  dsRatioY1Y5: 0.07079291,   // 0.07002877828
+  dsRatioY6Y10: 0.06575258,  // 0.06495109502
 
   // Mortgage balance decay — Y1-Y10 balance ÷ initial loan
-  balRatios: [0.98713574, 0.97351198, 0.95908387, 0.94380393, 0.92762187, 0.9156887, 0.903051, 0.88966717, 0.87549317, 0.86048233],
+  balRatios: [0.98737207, 0.97398527, 0.959794, 0.94474992, 0.92880177, 0.91707293, 0.90463925, 0.89145837, 0.8774854, 0.86267274],
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.02290895, 0.0242615, 0.02569389, 0.02721085, 0.02881738, 0.02125085, 0.02250549, 0.02383421, 0.02524138, 0.02673163],
+  wfPrincRatios: [0.01901985, 0.02016283, 0.0213745, 0.02265899, 0.02402067, 0.01766567, 0.01872727, 0.01985268, 0.02104571, 0.02231043],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
-  ioBalRatios: [1, 1, 0.98517932, 0.96948364, 0.95286128, 0.94060342, 0.92762187, 0.91387388, 0.89931422, 0.88389496],
-  ioWfPrincRatios: [0, 0, 0.00963344, 0.0102022, 0.01080453, 0.0079676, 0.00843801, 0.00893619, 0.00946378, 0.01002252],
-  ioDsByYearRatios: [0.0575, 0.0575, 0.07193414, 0.07193414, 0.07193414, 0.06672768, 0.06672768, 0.06672768, 0.06672768, 0.06672768],
+  ioBalRatios: [1, 1, 0.98542969, 0.96998379, 0.95360967, 0.94156755, 0.92880177, 0.91526884, 0.90092266, 0.88571436],
+  ioWfPrincRatios: [0, 0, 0.00888789, 0.009422, 0.00998821, 0.00734569, 0.00778713, 0.00825509, 0.00875117, 0.00927707],
+  ioDsByYearRatios: [0.0585, 0.0585, 0.07268376, 0.07268376, 0.07268376, 0.06750881, 0.06750881, 0.06750881, 0.06750881, 0.06750881],
 
   // FIXED operating data — does NOT scale with price (same building)
-  gpr:     [825390.56, 848912.24, 873139.57, 898093.72, 923796.5, 950270.35, 977538.43, 1005624.54, 1034553.24, 1064349.8],
+  gpr:     [798037, 821558.68, 845786.01, 870740.16, 896442.94, 922916.79, 950184.87, 978270.98, 1007199.68, 1036996.24],
   vacancy: [-39202.8, -40378.88, -41590.25, -42837.96, -44123.1, -45446.79, -46810.19, -48214.5, -49660.93, -51150.76],
-  egi:     [786187.76, 808533.36, 831549.32, 855255.76, 879673.4, 904823.56, 930728.23, 957410.04, 984892.31, 1013199.04],
-  opex:    [-305024.06, -315245.1, -325829.38, -336790.65, -348143.17, -359901.8, -372082.01, -384699.89, -397772.17, -411316.29],
-  noi:     [481163.7, 493288.26, 505719.93, 518465.12, 531530.23, 544921.76, 558646.22, 572710.15, 587120.14, 601882.75],
+  egi:     [758834.2, 781179.8, 804195.76, 827902.2, 852319.84, 877470, 903374.67, 930056.48, 957538.75, 985845.48],
+  opex:    [-289844.28, -299138.64, -308742.82, -318667.69, -328924.47, -339524.85, -350480.92, -361805.23, -373510.82, -385611.2],
+  noi:     [468989.92, 482041.16, 495452.94, 509234.51, 523395.36, 537945.15, 552893.75, 568251.25, 584027.93, 600234.28],
 
   // Market & exit assumptions
   marketGrowth: 0.015,
   exitCap: 0.05,
   exitSellingCostPct: 0.02,  // backed out: exit A net / gross → 2% of sale price
-  mortgageRate: 0.0575,
+  mortgageRate: 0.0585,
   amortYears: 30
 };
 
@@ -920,7 +946,7 @@ let currentPrice = BASE.basePrice;
 let currentScenario = 'A';
 let currentCapital = 500000;
 let currentYearIdx = 0;
-let currentRefiRate = 0.0575;
+let currentRefiRate = 0.0585;
 
 // ================================================================
 // UTILITIES
@@ -1053,8 +1079,8 @@ function renderSnapshot(D) {
   capCell.classList.toggle('pos', D.goingInCap >= 0.05);
   capCell.classList.toggle('neg', D.goingInCap < 0.05);
   document.getElementById('sCashIn').textContent = fmt$(D.cashIn, { compact: true });
-  document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (35%)';
-  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 5.75% · 30yr';
+  document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (39%)';
+  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 5.85% · 30yr';
   // Expense ratio = OpEx / EGI where EGI = NOI + OpEx (OpEx stored as positive in this BASE)
   const y1NOI = BASE.noi[0];
   const y1OpEx = Math.abs(BASE.opex[0]);
