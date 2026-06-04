@@ -603,11 +603,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.00M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$6.00M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.72M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$6.72M</div>
       </div>
-      <input type="range" id="priceSlider" min="5000000" max="7500000" step="25000" value="6000000" class="price-slider" />
-      <div class="price-control-ticks"><span>$5.00M</span><span>baseline $6.00M</span><span>$7.50M</span></div>
+      <input type="range" id="priceSlider" min="5000000" max="7500000" step="25000" value="6720000" class="price-slider" />
+      <div class="price-control-ticks"><span>$5.00M</span><span>baseline $6.72M</span><span>$7.50M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -654,10 +654,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">22.83%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">17.93%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="2190000" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="2788800" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks"><span>$100K</span><span>$622K</span><span>$1.1M</span><span>$1.7M</span><span>$2.2M</span></div>
         </div>
         <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn active" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn" data-val="1000000">$1.00M</button><button class="preset-btn" data-val="1500000">$1.50M</button><button class="preset-btn" data-val="2190000">$2.19M</button></div>
@@ -880,14 +880,14 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 6000000,
+  basePrice: 6720000,
   units: 64,
 
   // Ratios applied to purchase price
-  downPct: 0.35,
+  downPct: 0.4,
   closingReservesPct: 0.015,  // combined closing + reserves = 1.5% of price
-  loanPct: 0.65,              // = 1 - downPct
-  cashInPct: 0.365,           // = down + closing/reserves
+  loanPct: 0.6,              // = 1 - downPct
+  cashInPct: 0.415,           // = down + closing/reserves
   depShieldPerDollar: 0.01145455,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
@@ -895,23 +895,23 @@ const BASE = {
   dsRatioY6Y10: 0.06654913,  // 0.06495109502
 
   // Mortgage balance decay — Y1-Y10 balance ÷ initial loan
-  balRatios: [0.98760483, 0.9744517, 0.96049426, 0.94568332, 0.9299667, 0.9184396, 0.90620763, 0.89322767, 0.87945399, 0.86483806],
+  balRatios: [0.98760483, 0.9744517, 0.96049426, 0.94568332, 0.9299667, 0.9184396, 0.90620763, 0.89322767, 0.879454, 0.86483806],
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.02207359, 0.02342338, 0.02485572, 0.02637564, 0.0279885, 0.0205277, 0.02178297, 0.02311499, 0.02452847, 0.02602837],
+  wfPrincRatios: [0.01792073, 0.01901658, 0.02017944, 0.0214134, 0.02272283, 0.01666568, 0.01768478, 0.0187662, 0.01991375, 0.02113147],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1, 1, 0.98567662, 0.97047737, 0.95434869, 0.94251937, 0.9299667, 0.91664643, 0.90251163, 0.8875125],
-  ioWfPrincRatios: [0, 0, 0.0093102, 0.00987951, 0.01048364, 0.00768905, 0.00815924, 0.00865817, 0.00918762, 0.00974944],
+  ioWfPrincRatios: [0, 0, 0.00859403, 0.00911955, 0.00967721, 0.00709759, 0.0075316, 0.00799216, 0.00848088, 0.00899948],
   ioDsByYearRatios: [0.0595, 0.0595, 0.07343696, 0.07343696, 0.07343696, 0.06829392, 0.06829392, 0.06829392, 0.06829392, 0.06829392],
 
   // FIXED operating data — does NOT scale with price (same building)
-  gpr:     [882396, 908867.88, 936133.92, 964217.93, 993144.47, 1022938.81, 1053626.97, 1085235.78, 1117792.85, 1151326.64],
-  vacancy: [-44119.8, -45443.39, -46806.7, -48210.9, -49657.22, -51146.94, -52681.35, -54261.79, -55889.64, -57566.33],
-  egi:     [838276.2, 863424.49, 889327.22, 916007.04, 943487.25, 971791.87, 1000945.62, 1030973.99, 1061903.21, 1093760.31],
-  opex:    [-506368.81, -522659.75, -539494.42, -556891.87, -574871.88, -593454.94, -612662.35, -632516.16, -653039.29, -674255.49],
-  noi:     [331907.39, 340764.73, 349832.8, 359115.17, 368615.37, 378336.92, 388283.27, 398457.83, 408863.92, 419504.81],
+  gpr:     [899196, 926171.88, 953957.04, 982575.75, 1012053.02, 1042414.61, 1073687.05, 1105897.66, 1139074.59, 1173246.83],
+  vacancy: [-44959.8, -46308.59, -47697.85, -49128.79, -50602.65, -52120.73, -53684.35, -55294.88, -56953.73, -58662.34],
+  egi:     [854236.2, 879863.29, 906259.18, 933446.96, 961450.37, 990293.88, 1020002.7, 1050602.78, 1082120.86, 1114584.49],
+  opex:    [-507166.81, -523481.69, -540341.02, -557763.87, -575770.03, -594380.04, -613615.2, -633497.6, -654050.17, -675296.7],
+  noi:     [347069.39, 356381.59, 365918.17, 375683.09, 385680.34, 395913.84, 406387.49, 417105.17, 428070.69, 439287.79],
 
   // Market & exit assumptions
   marketGrowth: 0.015,
@@ -1061,7 +1061,7 @@ function renderSnapshot(D) {
   capCell.classList.toggle('pos', D.goingInCap >= 0.05);
   capCell.classList.toggle('neg', D.goingInCap < 0.05);
   document.getElementById('sCashIn').textContent = fmt$(D.cashIn, { compact: true });
-  document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (35%)';
+  document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (40%)';
   document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 5.95% · 30yr';
   // Expense ratio = OpEx / EGI where EGI = NOI + OpEx (OpEx stored as positive in this BASE)
   const y1NOI = BASE.noi[0];
