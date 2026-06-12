@@ -603,11 +603,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.72M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$6.72M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.53M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$6.53M</div>
       </div>
-      <input type="range" id="priceSlider" min="5000000" max="7500000" step="25000" value="6720000" class="price-slider" />
-      <div class="price-control-ticks"><span>$5.00M</span><span>baseline $6.72M</span><span>$7.50M</span></div>
+      <input type="range" id="priceSlider" min="5000000" max="7500000" step="25000" value="6528000" class="price-slider" />
+      <div class="price-control-ticks"><span>$5.00M</span><span>baseline $6.53M</span><span>$7.50M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -654,10 +654,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">17.93%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">18.46%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="2788800" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="2709120" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks"><span>$100K</span><span>$622K</span><span>$1.1M</span><span>$1.7M</span><span>$2.2M</span></div>
         </div>
         <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn active" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn" data-val="1000000">$1.00M</button><button class="preset-btn" data-val="1500000">$1.50M</button><button class="preset-btn" data-val="2190000">$2.19M</button></div>
@@ -856,14 +856,14 @@ body {
       <p class="caution-headline"><em>A constraint to flag.</em></p>
 <div class="caution-body"><p>Year 1 DSCR comes in at 1.19, below the 1.25 standard agency threshold, and Year 1 cash-on-cash at 2.41% sits below our 3% floor. The deal becomes financeable and attractive by Year 3 mechanically, and the 4d enrollment lever moves it to comfortable by Year 2. We are proceeding on this constraint with the operator playbook explicitly committed.</p><p>If this constraint is one you would rather not own, opt out — there is no penalty for sitting this one out, and your capital comes back clean.</p></div>
     </div>
-    <div class="risk-grid">
-<div class="risk-card"><h4>Year 1 financing tightness (override)</h4><p>Year 1 DSCR comes in at 1.19 vs the 1.25 agency standard, and Year 1 cash-on-cash at 2.41% sits below our 3% floor. Both clear by Year 3 as rent growth outpaces expense growth, but the early window is structurally tight. We are proceeding on a documented exception, anchored on the 4d enrollment playbook in tile 2.</p></div>
-<div class="risk-card"><h4>4d1 affordability enrollment is load-bearing</h4><p>At 100% unit enrollment in St. Paul's 4d Affordable Housing Incentive Program, we save approximately $115K per year in property tax starting Year 2. That single line moves the deal from 'below target' to 'comfortable.' The rent roll already qualifies under the 60% AMI ceiling; the enrollment is operator-execution dependent. Walk condition: 4d denial by HRA pre-LOI.</p></div>
-<div class="risk-card"><h4>1972 / 1967 vintage capex pipeline</h4><p>These are mid-century brick walkups. The seller's books show repairs at $1,542 per unit per year — about double the Class B norm. We carry a $200-400K reserve through Year 5. Walk condition: capex pipeline above $500K through Year 5 found during inspection.</p></div>
-<div class="risk-card"><h4>Year 6 refinance rate risk</h4><p>Financing is 5-year fixed term on a 30-year amortization, refinancing at Year 6. We underwrite the refi at the same 5.95% to stay conservative. If rates at Year 6 settle 50-100 bps higher, debt service rises and cash flow compresses just as the heaviest capex window opens. We negotiate for a 7-year fixed term during LOI to push refi past the capex pipeline.</p></div>
-<div class="risk-card"><h4>Inner-ring St. Paul demand depth</h4><p>Hamline-Midway and Frogtown trade wider on cap rate (6.25-7.50%) than core metro Class B because the buyer and renter pools are both narrower. We accept this in pricing and underwrite to a 1.5% market growth assumption rather than the metro 2.5%.</p></div>
-<div class="risk-card"><h4>Long-tenured tenancy and mark-to-market friction</h4><p>Rent roll shows $83K of embedded mark-to-market upside but several tenants have been in place since pre-2015. Long tenancy produces durable cash flow but in-place rents lag market and the gap closes slowly because tenants do not churn. We do not underwrite a mark-to-market lift in the base case.</p></div>
-</div>
+    "<div class=""risk-grid"">
+<div class=""risk-card""><h4>Year 1 financing tightness (override)</h4><p>Year 1 DSCR comes in at 1.19 vs the 1.25 agency standard, and Year 1 cash-on-cash at 2.41% sits below our 3% floor. Both clear by Year 3 as rent growth outpaces expense growth, but the early window is structurally tight. We are proceeding on a documented exception, anchored on the 4d enrollment playbook in tile 2.</p></div>
+<div class=""risk-card""><h4>4d1 affordability enrollment is load-bearing</h4><p>Underwritten annual property tax is $151,062. St. Paul's 4d program cuts the tax class rate from 1.25% to 0.25% on enrolled units (verified per MN Statute 273.13 subd. 25; St. Paul 4d Program Guidelines page 2). Savings scale linearly with the % of units enrolled: 50% of units saves ~$58K/yr, 75% saves ~$87K/yr, 100% saves ~$115K/yr — beginning Year 2 of hold. At 100% enrollment the bill drops to ~$36K, and the deal moves from 'below target' to 'comfortable.' All 64 units qualify under the 60% AMI ceiling and existing tenants grandfather from income verification at enrollment. Operator-execution dependent. Walk condition: 4d denial by HRA pre-LOI.</p></div>
+<div class=""risk-card""><h4>1972 / 1967 vintage capex pipeline</h4><p>These are mid-century brick walkups. The seller's books show repairs at $1,542 per unit per year — about double the Class B norm. We carry a $200-400K reserve through Year 5. Walk condition: capex pipeline above $500K through Year 5 found during inspection.</p></div>
+<div class=""risk-card""><h4>Year 6 refinance rate risk</h4><p>Financing is 5-year fixed term on a 30-year amortization, refinancing at Year 6. We underwrite the refi at the same 5.95% to stay conservative. If rates at Year 6 settle 50-100 bps higher, debt service rises and cash flow compresses just as the heaviest capex window opens. We negotiate for a 7-year fixed term during LOI to push refi past the capex pipeline.</p></div>
+<div class=""risk-card""><h4>Inner-ring St. Paul demand depth</h4><p>Hamline-Midway and Frogtown trade wider on cap rate (6.25-7.50%) than core metro Class B because the buyer and renter pools are both narrower. We accept this in pricing and underwrite to a 1.5% market growth assumption rather than the metro 2.5%.</p></div>
+<div class=""risk-card""><h4>Long-tenured tenancy and mark-to-market friction</h4><p>Rent roll shows $83K of embedded mark-to-market upside but several tenants have been in place since pre-2015. Long tenancy produces durable cash flow but in-place rents lag market and the gap closes slowly because tenants do not churn. We do not underwrite a mark-to-market lift in the base case.</p></div>
+</div>"
   </section>
 
   <footer class="footer">
@@ -880,7 +880,7 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 6720000,
+  basePrice: 6528000,
   units: 64,
 
   // Ratios applied to purchase price
@@ -899,7 +899,7 @@ const BASE = {
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.01792073, 0.01901658, 0.02017944, 0.0214134, 0.02272283, 0.01666568, 0.01768478, 0.0187662, 0.01991375, 0.02113147],
+  wfPrincRatios: [0.01792073, 0.01901658, 0.02017943, 0.0214134, 0.02272283, 0.01666568, 0.01768478, 0.0187662, 0.01991375, 0.02113147],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1, 1, 0.98567662, 0.97047737, 0.95434869, 0.94251937, 0.9299667, 0.91664643, 0.90251163, 0.8875125],
