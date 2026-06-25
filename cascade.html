@@ -603,11 +603,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $7.00M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$7.00M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $7.25M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$7.25M</div>
       </div>
-      <input type="range" id="priceSlider" min="6112699.2" max="8140000" step="25000" value="7000000" class="price-slider" />
-      <div class="price-control-ticks"><span>$6.11M</span><span>baseline $7.00M</span><span>$8.14M</span></div>
+      <input type="range" id="priceSlider" min="6112699.2" max="8140000" step="25000" value="7250000" class="price-slider" />
+      <div class="price-control-ticks"><span>$6.11M</span><span>baseline $7.25M</span><span>$8.14M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -654,10 +654,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">17.21%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">16.62%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="2905000" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="3008750" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks"><span>$100K</span><span>$801K</span><span>$1.5M</span><span>$2.2M</span><span>$2.9M</span></div>
         </div>
         <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn active" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn" data-val="1000000">$1.00M</button><button class="preset-btn" data-val="1500000">$1.50M</button><button class="preset-btn" data-val="2905000">$2.90M</button></div>
@@ -744,8 +744,8 @@ body {
 
     <div class="refi-rate-control">
       <div class="refi-rate-label">PROJECTED<br/>MARKET RATE<br/>AT REFI</div>
-      <input type="range" min="450" max="750" step="5" value="600" class="slider refi-slider" id="refiRateSlider">
-      <div class="refi-rate-value" id="refiRateDisplay">6.00%</div>
+      <input type="range" min="450" max="750" step="5" value="615" class="slider refi-slider" id="refiRateSlider">
+      <div class="refi-rate-value" id="refiRateDisplay">6.15%</div>
     </div>
 
     <div class="refi-fixed">
@@ -878,7 +878,7 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 7000000,
+  basePrice: 7250000,
   units: 44,
 
   // Ratios applied to purchase price
@@ -889,20 +889,20 @@ const BASE = {
   depShieldPerDollar: 0.01145455,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
-  dsRatioY1Y5: 0.07194606,   // 0.07002877828
-  dsRatioY6Y10: 0.06694895,  // 0.06495109502
+  dsRatioY1Y5: 0.07310738,   // 0.07002877828
+  dsRatioY6Y10: 0.0681545,  // 0.06495109502
 
   // Mortgage balance decay — Y1-Y10 balance ÷ initial loan
-  balRatios: [0.98771988, 0.97468235, 0.9608407, 0.94614532, 0.93054357, 0.91911638, 0.9069844, 0.89410413, 0.88042945, 0.86591133],
+  balRatios: [0.98805978, 0.97536419, 0.96186542, 0.94751268, 0.93225193, 0.92112064, 0.90928515, 0.8967009, 0.88332053, 0.86909367],
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.01775439, 0.01884944, 0.02001203, 0.02124633, 0.02255675, 0.01652123, 0.01754022, 0.01862207, 0.01977063, 0.02099004],
+  wfPrincRatios: [0.01726296, 0.01835508, 0.01951628, 0.02075095, 0.02206373, 0.01609343, 0.01711156, 0.01819409, 0.01934512, 0.02056896],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
-  ioBalRatios: [1, 1, 0.98579881, 0.97072171, 0.9547147, 0.94299069, 0.93054357, 0.91732874, 0.90329885, 0.88840362],
-  ioWfPrincRatios: [0, 0, 0.00852072, 0.00904626, 0.00960421, 0.0070344, 0.00746827, 0.0079289, 0.00841794, 0.00893714],
-  ioDsByYearRatios: [0.06, 0.06, 0.07381488, 0.07381488, 0.07381488, 0.06868796, 0.06868796, 0.06868796, 0.06868796, 0.06868796],
+  ioBalRatios: [1, 1, 0.98616028, 0.97144502, 0.95579881, 0.94438637, 0.93225193, 0.91934983, 0.9056315, 0.89104529],
+  ioWfPrincRatios: [0, 0, 0.00830383, 0.00882916, 0.00938772, 0.00684747, 0.00728066, 0.00774126, 0.008231, 0.00875172],
+  ioDsByYearRatios: [0.0615, 0.0615, 0.07495393, 0.07495393, 0.07495393, 0.06987595, 0.06987595, 0.06987595, 0.06987595, 0.06987595],
 
   // FIXED operating data — does NOT scale with price (same building)
   gpr:     [776926, 799215.4, 822173.48, 845820.31, 870176.54, 895263.45, 921102.98, 947717.68, 975130.84, 1003366.38],
@@ -915,7 +915,7 @@ const BASE = {
   marketGrowth: 0.015,
   exitCap: 0.05,
   exitSellingCostPct: 0.02,  // backed out: exit A net / gross → 2% of sale price
-  mortgageRate: 0.06,
+  mortgageRate: 0.0615,
   amortYears: 30
 };
 
@@ -926,7 +926,7 @@ let currentPrice = BASE.basePrice;
 let currentScenario = 'A';
 let currentCapital = 500000;
 let currentYearIdx = 0;
-let currentRefiRate = 0.06;
+let currentRefiRate = 0.0615;
 
 // ================================================================
 // UTILITIES
@@ -1060,7 +1060,7 @@ function renderSnapshot(D) {
   capCell.classList.toggle('neg', D.goingInCap < 0.05);
   document.getElementById('sCashIn').textContent = fmt$(D.cashIn, { compact: true });
   document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (40%)';
-  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 6.00% · 30yr';
+  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 6.15% · 30yr';
   // Expense ratio = OpEx / EGI where EGI = NOI + OpEx (OpEx stored as positive in this BASE)
   const y1NOI = BASE.noi[0];
   const y1OpEx = Math.abs(BASE.opex[0]);
