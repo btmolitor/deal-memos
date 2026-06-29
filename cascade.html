@@ -628,6 +628,10 @@ body {
 .mmkt-controls input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--paper); border: 2px solid var(--accent); cursor: pointer; }
 .mmkt-ticks { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--ink); opacity: 0.5; margin-top: 4px; }
 .mmkt-foot { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink); opacity: 0.5; line-height: 1.7; padding-top: 16px; border-top: 1px solid var(--rule); }
+.mmkt-cost-band { background: var(--ink); color: var(--paper); padding: 22px 30px; margin-bottom: 8px; }
+.mmkt-cost-lab { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-soft); margin-bottom: 6px; }
+.mmkt-cost-num { font-family: 'Fraunces', serif; font-size: clamp(30px, 6vw, 46px); font-weight: 900; line-height: 1; letter-spacing: -0.02em; }
+.mmkt-cost-sub { font-size: 13px; opacity: 0.78; margin-top: 10px; line-height: 1.5; }
 @media (max-width: 620px) { .mmkt-hero-row { grid-template-columns: 1fr; gap: 14px; } .mmkt-hero-second { border-left: none; border-top: 1px solid rgba(247,244,237,0.2); padding-left: 0; padding-top: 14px; } .mmkt-cmp { grid-template-columns: 1fr; } }
 
 </style>
@@ -921,20 +925,10 @@ body {
       <h2 class="mmkt-title">Act now, or wait for the next deal?</h2>
       <p class="mmkt-lede">Deploying capital into this property now captures ten years of ownership. Waiting parks the cash at a money-market rate and buys a comparable building later &mdash; after it has appreciated. This compares the two on net present value, using the price and capital set in the analyzer above. Appreciation grows from the underwritten baseline, so overpaying is penalized.</p>
 
-      <div class="mmkt-hero">
-        <div class="mmkt-hero-row">
-          <div>
-            <div class="mmkt-hero-label">Most you can bid &amp; still beat waiting</div>
-            <div class="mmkt-hero-num" id="mmBep">&mdash;</div>
-            <div class="mmkt-hero-sub" id="mmBepSub">&mdash;</div>
-          </div>
-          <div class="mmkt-hero-second">
-            <div class="mmkt-s-lab">Cost of waiting</div>
-            <div class="mmkt-s-num" id="mmCost">&mdash;</div>
-            <div class="mmkt-s-lab" style="margin-top:12px">Headroom over current price</div>
-            <div class="mmkt-s-num" id="mmHead">&mdash;</div>
-          </div>
-        </div>
+      <div class="mmkt-cost-band">
+        <div class="mmkt-cost-lab">Cost of waiting</div>
+        <div class="mmkt-cost-num" id="mmCost">&mdash;</div>
+        <div class="mmkt-cost-sub" id="mmCostSub">&mdash;</div>
       </div>
       <p class="mmkt-verdict" id="mmVerdict">&mdash;</p>
 
@@ -1848,8 +1842,8 @@ refiSlider.addEventListener('input', (e) => {
       cumCash += cf + shield;
       v += (cf + shield)/Math.pow(1+disc, i+1);
     }
-    // Accumulated equity at Y10: property value (grown from WORTH baseline 10 yrs) minus loan balance, * share
-    const y10Val = BASE.basePrice*Math.pow(1+BASE.marketGrowth,10);
+    // Accumulated equity at Y10: value grows from the BID you actually paid (not baseline), minus loan, * share.
+    const y10Val = price*Math.pow(1+BASE.marketGrowth,10);  // `price` here is the BID
     const bal10 = mmLoanBalE(price, 10);
     const accumEq = (y10Val - bal10)*share;
     return {npv:v, cumCash, accumEq};
@@ -1858,9 +1852,9 @@ refiSlider.addEventListener('input', (e) => {
   // Once bought, same buy-&-hold treatment (cash flow + shield, no sale).
   function mmWait(cap, N, mm, disc, anchor){
     const grown = mmGrowNet(cap, mm, N);
-    const mmInterestNet = grown - cap; // money-market interest earned over the wait, net of annual tax
+    const mmInterestNet = grown - cap; // money-market interest earned over the wait, net of annual tax (tracked in cash return, NOT added to down payment)
     const Pf = anchor*Math.pow(1+BASE.marketGrowth, N); // pay the appreciated PREFERRED UNDERWRITING price
-    const share = grown/(Pf*BASE.cashInPct), ds = mmDS(Pf), hold = 10-N;
+    const share = cap/(Pf*BASE.cashInPct), ds = mmDS(Pf), hold = 10-N; // OPTION A: deploy the same $1M PRINCIPAL later (not the grown cash)
     let v=0, cumCash=mmInterestNet; // start the 10-yr cash tally WITH the net interest earned while waiting
     for(let i=0;i<hold;i++){
       const cf = (BASE.noi[i]-ds[i])*share;
@@ -1886,7 +1880,7 @@ refiSlider.addEventListener('input', (e) => {
   const fD = v => '$'+Math.round(v).toLocaleString('en-US'); // full dollars w/ commas
 
   function mmRender(){
-    if(!$m('mmBep')) return;
+    if(!$m('mmCost')) return;
     mmPrice = +$m('mmPrice').value;            // WORTH — anchors waiting
     mmBid   = +$m('mmBid').value;              // BID — what you deploy at now
     const cap = currentCapital, worth = mmPrice, bid = mmBid;
@@ -1899,9 +1893,7 @@ refiSlider.addEventListener('input', (e) => {
 
     const B = mmActNow(cap, bid, disc);          // act now at your BID  -> {npv,cumCash,accumEq}
     const A = mmWait(cap, N, mm, disc, worth);   // waiter buys the building (grown from WORTH)
-    const be = mmBeprice(cap, N, mm, disc, worth); // highest BID that still beats waiting
     const cost = B.npv - A.npv;
-    const head = be - bid;                        // headroom over your current BID
 
     $m('mmNpvB').textContent = fD(B.npv);
     $m('mmNpvA').textContent = fD(A.npv);
@@ -1909,9 +1901,7 @@ refiSlider.addEventListener('input', (e) => {
     $m('mmEqB').textContent = fD(B.accumEq);
     $m('mmCashA').textContent = fD(A.cumCash);
     $m('mmEqA').textContent = fD(A.accumEq);
-    $m('mmBep').textContent = fM(be);
-    $m('mmCost').textContent = (cost<0?'-':'')+fK(Math.abs(cost));
-    $m('mmHead').textContent = (head<0?'-':'')+fK(Math.abs(head));
+    $m('mmCost').textContent = (cost<0?'-':'')+fD(Math.abs(cost));
     $m('mmDragTitle').textContent = 'Wait '+N+' yr'+(N>1?'s':'')+', then buy';
 
     const shareB = cap/(bid*BASE.cashInPct);
@@ -1923,12 +1913,12 @@ refiSlider.addEventListener('input', (e) => {
     $m('mmCardB').classList.toggle('win', bWins);
     $m('mmCardA').classList.toggle('win', !bWins);
 
-    $m('mmBepSub').textContent = bid<=be
-      ? 'A '+fM(bid)+' bid is under the '+fM(be)+' ceiling \u2014 paying that to win still beats waiting '+N+' yr'+(N>1?'s':'')+'.'
-      : 'A '+fM(bid)+' bid is over the '+fM(be)+' ceiling \u2014 at that price, waiting '+N+' yr'+(N>1?'s':'')+' would win.';
-    $m('mmVerdict').textContent = 'You value it at '+fM(worth)+'. You could bid up to '+fM(be)+' to win \u2014 '+(head>=0?fK(head)+' over':fK(-head)+' under')+' your current '+fM(bid)+' bid \u2014 and deploying now still beats waiting '+N+' yr'+(N>1?'s':'')+' (which forfeits '+fK(Math.abs(cost))+' of NPV). The waiter buys the same building grown from your '+fM(worth)+' worth, so overpaying on the bid is what erodes the act-now edge. Both paths are buy & hold (no sale); the money-market path carries real '+(MM_TAX*100)+'% annual tax on interest, which the property does not.';
+    $m('mmCostSub').textContent = cost>=0
+      ? 'NPV you forfeit by waiting '+N+' yr'+(N>1?'s':'')+' instead of deploying now at your '+fM(bid)+' bid.'
+      : 'Waiting '+N+' yr'+(N>1?'s':'')+' adds '+fD(Math.abs(cost))+' of NPV at your '+fM(bid)+' bid.';
+    $m('mmVerdict').textContent = 'You value it at '+fM(worth)+' and would bid '+fM(bid)+' to win. Deploying now '+(cost>=0?'beats':'trails')+' waiting '+N+' yr'+(N>1?'s':'')+' by '+fD(Math.abs(cost))+' of NPV. The waiter deploys the same capital later into the same building (grown from your '+fM(worth)+' worth), so paying more on the bid is what erodes the act-now edge. Both paths are buy & hold (no sale); the money-market path carries real '+(MM_TAX*100)+'% annual tax on interest, which the property does not.';
 
-    $m('mmFoot').textContent = 'Two prices: WORTH ('+fM(worth)+') anchors what waiting buys and how appreciation grows; BID ('+fM(bid)+') is what you deploy at now and sets your share. The ceiling is the highest BID that still beats waiting. Buy & hold, 10-yr horizon, NO sale (cash flow + depreciation shield only; no recapture, no capital gains). Money-market interest taxed at '+(MM_TAX*100)+'% annually. Capital ('+fK(cap)+') from the analyzer above; appreciation = '+(BASE.marketGrowth*100).toFixed(1)+'%/yr. Decision-support estimate \u2014 confirm tax treatment with your CPA. Not investment advice.';
+    $m('mmFoot').textContent = 'Two prices: WORTH ('+fM(worth)+') anchors what waiting buys and how appreciation grows; BID ('+fM(bid)+') is what you deploy at now and sets your share. Buy & hold, 10-yr horizon, NO sale (cash flow + depreciation shield only; no recapture, no capital gains). Money-market interest taxed at '+(MM_TAX*100)+'% annually. Capital ('+fK(cap)+') from the analyzer above; appreciation = '+(BASE.marketGrowth*100).toFixed(1)+'%/yr. Decision-support estimate \u2014 confirm tax treatment with your CPA. Not investment advice.';
   }
 
   ['mmPrice','mmBid','mmYears','mmMM','mmDisc'].forEach(function(id){ const el=document.getElementById(id); if(el) el.addEventListener('input', mmRender); });
