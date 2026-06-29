@@ -647,11 +647,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.78M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$6.78M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $7.00M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$7.00M</div>
       </div>
-      <input type="range" id="priceSlider" min="6112699.2" max="8140000" step="10000" value="6775000" class="price-slider" />
-      <div class="price-control-ticks"><span>$6.11M</span><span>baseline $6.78M</span><span>$8.14M</span></div>
+      <input type="range" id="priceSlider" min="6112699.2" max="8140000" step="10000" value="7000000" class="price-slider" />
+      <div class="price-control-ticks"><span>$6.11M</span><span>baseline $7.00M</span><span>$8.14M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -698,10 +698,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$1,000,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">35.57%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">34.42%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="2811625" step="10000" value="1000000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="2905000" step="10000" value="1000000" class="slider" id="capitalSlider">
           <div class="slider-ticks"><span>$100K</span><span>$801K</span><span>$1.5M</span><span>$2.2M</span><span>$2.9M</span></div>
         </div>
         <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn active" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn" data-val="1000000">$1.00M</button><button class="preset-btn" data-val="1500000">$1.50M</button><button class="preset-btn" data-val="2905000">$2.90M</button></div>
@@ -952,6 +952,11 @@ body {
 
       <div class="mmkt-controls">
         <div class="mmkt-ctl star">
+          <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Preferred underwriting price <span style="font-weight:400;opacity:0.6">(anchors this section)</span></span><span class="mmkt-ctl-val" id="mmvPrice">&mdash;</span></div>
+          <input type="range" id="mmPrice" min="6112699.2" max="8140000" step="10000" value="7000000">
+          <div class="mmkt-ticks"><span>$6.11M</span><span>baseline $7.00M</span><span>$8.14M</span></div>
+        </div>
+        <div class="mmkt-ctl">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Years you wait</span><span class="mmkt-ctl-val" id="mmvYears">2 years</span></div>
           <input type="range" id="mmYears" min="1" max="5" step="1" value="2">
           <div class="mmkt-ticks"><span>1 yr</span><span>2 yr</span><span>3 yr</span><span>4 yr</span><span>5 yr</span></div>
@@ -986,7 +991,7 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 6775000,
+  basePrice: 7000000,
   units: 44,
 
   // Ratios applied to purchase price
@@ -1005,7 +1010,7 @@ const BASE = {
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.01726296, 0.01835508, 0.01951629, 0.02075095, 0.02206373, 0.01609343, 0.01711156, 0.01819409, 0.01934512, 0.02056896],
+  wfPrincRatios: [0.01726296, 0.01835508, 0.01951629, 0.02075095, 0.02206373, 0.01609343, 0.01711156, 0.0181941, 0.01934512, 0.02056896],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1, 1, 0.98616028, 0.97144502, 0.95579881, 0.94438637, 0.93225193, 0.91934983, 0.9056315, 0.89104529],
@@ -1719,8 +1724,7 @@ function recompute() {
   renderPartner(D, currentCapital, currentScenario);
   renderWaterfall(D, currentYearIdx);
   renderProjection(D);
-  renderRefi(D, currentRefiRate); renderRateSensitivity(D); renderExpenseSensitivity(D);
-  if (typeof window.mmRenderHook === 'function') window.mmRenderHook(); }
+  renderRefi(D, currentRefiRate); renderRateSensitivity(D); renderExpenseSensitivity(D); }
 
 // ================================================================
 // EVENT HANDLERS
@@ -1794,6 +1798,7 @@ refiSlider.addEventListener('input', (e) => {
 // ============================================================
 (function(){
   const MM_TAX = 0.35; // annual tax on money-market interest (TAX_BRACKET_PCT)
+  let mmPrice = BASE.basePrice; // Preferred Underwriting Price — the ONLY anchor for this section.
 
   function mmDS(price){
     const loan = price*BASE.loanPct, d1 = loan*BASE.dsRatioY1Y5, d2 = loan*BASE.dsRatioY6Y10;
@@ -1817,9 +1822,9 @@ refiSlider.addEventListener('input', (e) => {
   }
   // WAIT N yrs: cash sits in money market (interest taxed annually), THEN buy and hold to yr 10.
   // Once bought, same buy-&-hold treatment (cash flow + shield, no sale).
-  function mmWait(cap, N, mm, disc){
+  function mmWait(cap, N, mm, disc, anchor){
     const grown = mmGrowNet(cap, mm, N);
-    const Pf = BASE.basePrice*Math.pow(1+BASE.marketGrowth, N); // pay the appreciated baseline value
+    const Pf = anchor*Math.pow(1+BASE.marketGrowth, N); // pay the appreciated PREFERRED UNDERWRITING price
     const share = grown/(Pf*BASE.cashInPct), ds = mmDS(Pf), hold = 10-N;
     let v=0;
     for(let i=0;i<hold;i++){
@@ -1829,8 +1834,8 @@ refiSlider.addEventListener('input', (e) => {
     }
     return {npv:v, grown, Pf, share};
   }
-  function mmBeprice(cap, N, mm, disc){
-    let lo=BASE.basePrice*0.40, hi=BASE.basePrice*2.2, tgt=mmWait(cap,N,mm,disc).npv;
+  function mmBeprice(cap, N, mm, disc, anchor){
+    let lo=anchor*0.40, hi=anchor*2.2, tgt=mmWait(cap,N,mm,disc,anchor).npv;
     for(let i=0;i<90;i++){ const mid=(lo+hi)/2; (mmActNow(cap,mid,disc)>tgt)?lo=mid:hi=mid; }
     return (lo+hi)/2;
   }
@@ -1841,15 +1846,17 @@ refiSlider.addEventListener('input', (e) => {
 
   function mmRender(){
     if(!$m('mmBep')) return;
-    const cap = currentCapital, price = currentPrice;
+    mmPrice = +$m('mmPrice').value;            // Preferred Underwriting Price (this section's anchor)
+    const cap = currentCapital, price = mmPrice;
     const N = +$m('mmYears').value, mm = +$m('mmMM').value/10000, disc = +$m('mmDisc').value/10000;
+    $m('mmvPrice').textContent = fM(mmPrice);
     $m('mmvYears').textContent = N+(N===1?' year':' years');
     $m('mmvMM').textContent = (mm*100).toFixed(2)+'%';
     $m('mmvDisc').textContent = (disc*100).toFixed(2)+'%';
 
     const B = mmActNow(cap, price, disc);
-    const A = mmWait(cap, N, mm, disc);
-    const be = mmBeprice(cap, N, mm, disc);
+    const A = mmWait(cap, N, mm, disc, price);
+    const be = mmBeprice(cap, N, mm, disc, price);
     const cost = B - A.npv;
     const head = be - price;
 
@@ -1876,7 +1883,7 @@ refiSlider.addEventListener('input', (e) => {
     $m('mmFoot').textContent = 'Buy & hold, 10-year horizon, NO sale assumed: property return = cash flow + depreciation tax shield each year (no recapture, no capital gains). Money-market interest taxed at '+(MM_TAX*100)+'% annually. Price ('+fM(price)+') and capital ('+fK(cap)+') from the analyzer above; appreciation = model market growth ('+(BASE.marketGrowth*100).toFixed(1)+'%/yr) off the '+fM(BASE.basePrice)+' baseline (the wait-then-buy entry price only). Decision-support estimate \u2014 confirm tax treatment with your CPA. Not investment advice.';
   }
 
-  ['mmYears','mmMM','mmDisc'].forEach(function(id){ const el=document.getElementById(id); if(el) el.addEventListener('input', mmRender); });
+  ['mmPrice','mmYears','mmMM','mmDisc'].forEach(function(id){ const el=document.getElementById(id); if(el) el.addEventListener('input', mmRender); });
 
   // Expose hook so the memo's recompute() pushes price/capital changes into this section.
   window.mmRenderHook = mmRender;
