@@ -582,6 +582,11 @@ body {
 .proj-dual-io td { background: rgba(143, 58, 32, 0.025); border-bottom: none; padding-top: 2px; padding-bottom: 2px; }
 .proj-dual-diff td { padding-top: 2px; padding-bottom: 8px; font-size: 12px; opacity: 0.7; border-bottom: 1px solid rgba(0,0,0,0.08); }
 
+
+.mmkt-card .mmkt-subgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.mmkt-sub-lab { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); opacity: 0.55; line-height: 1.3; }
+.mmkt-sub-val { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-size: 17px; font-weight: 700; color: var(--ink); margin-top: 2px; }
+
 /* ============ SECTION 10 — Act now vs. wait (money-market timing) ============ */
 .mmkt-details { margin-bottom: 56px; border: 1px solid var(--rule-strong); background: var(--paper); }
 .mmkt-summary { padding: 18px 24px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; }
@@ -940,6 +945,10 @@ body {
           <div class="mmkt-npv" id="mmNpvB">&mdash;</div>
           <div class="mmkt-npv-lab">Net present value of your position</div>
           <div class="mmkt-detail" id="mmDetB"></div>
+          <div class="mmkt-subgrid">
+            <div><div class="mmkt-sub-lab">10-yr Cash Return + Dep Shield</div><div class="mmkt-sub-val" id="mmCashB">&mdash;</div></div>
+            <div><div class="mmkt-sub-lab">Accumulated Equity (Y10)</div><div class="mmkt-sub-val" id="mmEqB">&mdash;</div></div>
+          </div>
         </div>
         <div class="mmkt-card" id="mmCardA">
           <div class="mmkt-tag">Wait</div>
@@ -947,6 +956,10 @@ body {
           <div class="mmkt-npv" id="mmNpvA">&mdash;</div>
           <div class="mmkt-npv-lab">Net present value of the wait-then-buy path</div>
           <div class="mmkt-detail" id="mmDetA"></div>
+          <div class="mmkt-subgrid">
+            <div><div class="mmkt-sub-lab">10-yr Cash Return + Dep Shield</div><div class="mmkt-sub-val" id="mmCashA">&mdash;</div></div>
+            <div><div class="mmkt-sub-lab">Accumulated Equity (Y10)</div><div class="mmkt-sub-val" id="mmEqA">&mdash;</div></div>
+          </div>
         </div>
       </div>
 
@@ -1808,6 +1821,14 @@ refiSlider.addEventListener('input', (e) => {
   let mmPrice = BASE.basePrice; // WORTH — anchors the wait side + appreciation.
   let mmBid   = BASE.basePrice; // BID — what you deploy at now (defaults equal to worth).
 
+  function mmLoanBalE(price, years){
+    const loan = price*BASE.loanPct, m = BASE.mortgageRate/12;
+    const ds1 = loan*(m/(1-Math.pow(1+m,-360)));
+    let b = loan; const y5 = Math.min(years,5);
+    for(let i=0;i<y5*12;i++) b -= (ds1 - b*m);
+    if(years>5){ const ds2 = b*(m/(1-Math.pow(1+m,-360))); for(let i=0;i<(years-5)*12;i++) b -= (ds2 - b*m); }
+    return b;
+  }
   function mmDS(price){
     const loan = price*BASE.loanPct, d1 = loan*BASE.dsRatioY1Y5, d2 = loan*BASE.dsRatioY6Y10;
     return [d1,d1,d1,d1,d1,d2,d2,d2,d2,d2];
@@ -1820,31 +1841,42 @@ refiSlider.addEventListener('input', (e) => {
   // No sale, no exit equity, no exit tax.
   function mmActNow(cap, price, disc){
     const share = cap/(price*BASE.cashInPct), ds = mmDS(price);
-    let v=0;
+    let v=0, cumCash=0;
     for(let i=0;i<10;i++){
       const cf = (BASE.noi[i]-ds[i])*share;          // pre-tax operating cash flow
       const shield = (price*BASE.depShieldPerDollar)*share; // depreciation tax shield (a benefit)
+      cumCash += cf + shield;
       v += (cf + shield)/Math.pow(1+disc, i+1);
     }
-    return v;
+    // Accumulated equity at Y10: property value (grown from WORTH baseline 10 yrs) minus loan balance, * share
+    const y10Val = BASE.basePrice*Math.pow(1+BASE.marketGrowth,10);
+    const bal10 = mmLoanBalE(price, 10);
+    const accumEq = (y10Val - bal10)*share;
+    return {npv:v, cumCash, accumEq};
   }
   // WAIT N yrs: cash sits in money market (interest taxed annually), THEN buy and hold to yr 10.
   // Once bought, same buy-&-hold treatment (cash flow + shield, no sale).
   function mmWait(cap, N, mm, disc, anchor){
     const grown = mmGrowNet(cap, mm, N);
+    const mmInterestNet = grown - cap; // money-market interest earned over the wait, net of annual tax
     const Pf = anchor*Math.pow(1+BASE.marketGrowth, N); // pay the appreciated PREFERRED UNDERWRITING price
     const share = grown/(Pf*BASE.cashInPct), ds = mmDS(Pf), hold = 10-N;
-    let v=0;
+    let v=0, cumCash=mmInterestNet; // start the 10-yr cash tally WITH the net interest earned while waiting
     for(let i=0;i<hold;i++){
       const cf = (BASE.noi[i]-ds[i])*share;
       const shield = (Pf*BASE.depShieldPerDollar)*share;
+      cumCash += cf + shield;
       v += (cf + shield)/Math.pow(1+disc, N+i+1);
     }
-    return {npv:v, grown, Pf, share};
+    // Accumulated equity at Y10: same building grown from WORTH to Y10, minus loan bal after `hold` yrs of pay-down, * share
+    const y10Val = anchor*Math.pow(1+BASE.marketGrowth,10);
+    const bal = mmLoanBalE(Pf, hold);
+    const accumEq = (y10Val - bal)*share;
+    return {npv:v, grown, Pf, share, cumCash, accumEq};
   }
   function mmBeprice(cap, N, mm, disc, anchor){
     let lo=anchor*0.40, hi=anchor*2.2, tgt=mmWait(cap,N,mm,disc,anchor).npv;
-    for(let i=0;i<90;i++){ const mid=(lo+hi)/2; (mmActNow(cap,mid,disc)>tgt)?lo=mid:hi=mid; }
+    for(let i=0;i<90;i++){ const mid=(lo+hi)/2; (mmActNow(cap,mid,disc).npv>tgt)?lo=mid:hi=mid; }
     return (lo+hi)/2;
   }
 
@@ -1865,14 +1897,18 @@ refiSlider.addEventListener('input', (e) => {
     $m('mmvMM').textContent = (mm*100).toFixed(2)+'%';
     $m('mmvDisc').textContent = (disc*100).toFixed(2)+'%';
 
-    const B = mmActNow(cap, bid, disc);          // act now at your BID
+    const B = mmActNow(cap, bid, disc);          // act now at your BID  -> {npv,cumCash,accumEq}
     const A = mmWait(cap, N, mm, disc, worth);   // waiter buys the building (grown from WORTH)
     const be = mmBeprice(cap, N, mm, disc, worth); // highest BID that still beats waiting
-    const cost = B - A.npv;
+    const cost = B.npv - A.npv;
     const head = be - bid;                        // headroom over your current BID
 
-    $m('mmNpvB').textContent = fD(B);
+    $m('mmNpvB').textContent = fD(B.npv);
     $m('mmNpvA').textContent = fD(A.npv);
+    $m('mmCashB').textContent = fD(B.cumCash);
+    $m('mmEqB').textContent = fD(B.accumEq);
+    $m('mmCashA').textContent = fD(A.cumCash);
+    $m('mmEqA').textContent = fD(A.accumEq);
     $m('mmBep').textContent = fM(be);
     $m('mmCost').textContent = (cost<0?'-':'')+fK(Math.abs(cost));
     $m('mmHead').textContent = (head<0?'-':'')+fK(Math.abs(head));
@@ -1883,7 +1919,7 @@ refiSlider.addEventListener('input', (e) => {
     $m('mmDetB').textContent = 'Deploy '+fK(cap)+' at a '+fM(bid)+' bid now \u00b7 '+(shareB*100).toFixed(1)+'% share'+overUnder+' \u00b7 holds 10 yrs (cash flow + depreciation shield, no sale).';
     $m('mmDetA').textContent = fK(cap)+' earns '+(mm*100).toFixed(1)+'% (taxed '+(MM_TAX*100)+'%/yr) for '+N+' yr'+(N>1?'s':'')+' \u2192 '+fK(A.grown)+', then buys the building (grown from your '+fM(worth)+' worth to '+fM(A.Pf)+') \u00b7 holds '+(10-N)+' yrs.';
 
-    const bWins = B >= A.npv;
+    const bWins = B.npv >= A.npv;
     $m('mmCardB').classList.toggle('win', bWins);
     $m('mmCardA').classList.toggle('win', !bWins);
 
