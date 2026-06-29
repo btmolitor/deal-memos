@@ -1,28 +1,3 @@
-<!--
-================================================================================
-  TEMPLATE FILE — DO NOT OPEN DIRECTLY IN A BROWSER
-
-  This file contains {{TOKEN}} placeholders that are not valid JavaScript.
-  Opening it directly will produce: SyntaxError: Unexpected token '{'
-
-  This file is a SOURCE ARTIFACT for Prompt 5 (Story & Memo). The expected
-  workflow is:
-
-    1. Run Prompts 1-4 to populate the deal's xlsx with verified numbers
-    2. Prompt 5 reads this template and fills every {{TOKEN}} with the
-       corresponding value from the xlsx + story/risks content
-    3. The filled-in result is the deal-specific deliverable file
-       (e.g., dealname_deal_EOY_sens.html), which DOES open and run
-       cleanly in a browser
-
-  To inspect this template's structure, open it in a text editor (VS Code,
-  Notepad++, BBEdit, etc.) — not a browser.
-
-  Round-trip verification: this template, filled with the canonical Lakeville
-  values, produces a byte-identical match to the original Lakeville deliverable.
-  Tokenization is provably structure-preserving.
-================================================================================
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -581,6 +556,44 @@ body {
 .proj-dual-std td { border-bottom: none; padding-bottom: 2px; }
 .proj-dual-io td { background: rgba(143, 58, 32, 0.025); border-bottom: none; padding-top: 2px; padding-bottom: 2px; }
 .proj-dual-diff td { padding-top: 2px; padding-bottom: 8px; font-size: 12px; opacity: 0.7; border-bottom: 1px solid rgba(0,0,0,0.08); }
+.mmkt-details{border:1px solid rgba(26,29,28,0.15);border-radius:2px;margin-top:8px}
+.mmkt-summary{padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.06em;cursor:pointer;background:var(--paper-soft,#efeae0);color:var(--accent);font-weight:500}
+.mmkt-body{padding:22px}
+.mmkt-lede{font-size:14px;color:rgba(26,29,28,0.8);margin-bottom:18px;line-height:1.5}
+.mmkt-tax-toggle{display:inline-flex;border:1px solid var(--ink);border-radius:2px;overflow:hidden;margin-bottom:14px}
+.mmkt-tax-toggle button{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:7px 15px;background:var(--paper);border:none;cursor:pointer;color:var(--ink)}
+.mmkt-tax-toggle button.active{background:var(--ink);color:var(--paper)}
+.mmkt-hero{background:var(--ink);color:var(--paper);padding:24px 26px;border-radius:2px;display:grid;grid-template-columns:1.3fr 1fr;gap:22px;align-items:center}
+@media(max-width:620px){.mmkt-hero{grid-template-columns:1fr;gap:14px}}
+.mmkt-hero-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#d4926d;margin-bottom:6px}
+.mmkt-hero-num{font-family:'Fraunces',serif;font-size:clamp(30px,6vw,48px);font-weight:900;line-height:1}
+.mmkt-hero-sub{font-size:12px;opacity:0.78;margin-top:9px}
+.mmkt-hero-side{border-left:1px solid rgba(255,255,255,0.2);padding-left:22px}
+@media(max-width:620px){.mmkt-hero-side{border-left:none;border-top:1px solid rgba(255,255,255,0.2);padding-left:0;padding-top:12px}}
+.mmkt-side-lab{font-size:10px;text-transform:uppercase;letter-spacing:0.09em;opacity:0.7;margin-bottom:3px}
+.mmkt-side-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700}
+.mmkt-verdict{font-size:12px;font-style:italic;color:rgba(26,29,28,0.72);margin-top:10px;line-height:1.5}
+.mmkt-cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+@media(max-width:620px){.mmkt-cmp{grid-template-columns:1fr}}
+.mmkt-card{border:1px solid rgba(26,29,28,0.15);padding:18px;background:var(--paper-soft,#efeae0)}
+.mmkt-card.win{border:2px solid var(--green)}
+.mmkt-tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.mmkt-card-h{font-family:'Fraunces',serif;font-size:17px;font-weight:600;margin-bottom:6px}
+.mmkt-npv{font-family:'JetBrains Mono',monospace;font-size:27px;font-weight:700;color:var(--ink)}
+.mmkt-npv-lab{font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(26,29,28,0.6);margin-top:2px}
+.mmkt-detail{font-size:11px;color:rgba(26,29,28,0.7);margin-top:9px;line-height:1.45}
+.mmkt-controls{background:var(--paper-soft,#efeae0);border:1px solid rgba(26,29,28,0.15);padding:20px;margin:16px 0}
+.mmkt-ctl{margin-bottom:16px}.mmkt-ctl:last-child{margin-bottom:0}
+.mmkt-star{background:rgba(199,146,20,0.12);margin:-6px -10px 16px;padding:12px 10px;border-radius:2px;border:1px solid rgba(199,146,20,0.3)}
+.mmkt-ctl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.mmkt-ctl-name{font-size:13px;font-weight:600}
+.mmkt-ctl-val{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--accent)}
+.mmkt-ctl input[type=range]{width:100%;-webkit-appearance:none;height:4px;background:rgba(26,29,28,0.18);border-radius:2px;outline:none}
+.mmkt-ctl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:19px;height:19px;border-radius:50%;background:var(--paper);border:2px solid var(--accent);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.mmkt-ctl input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;background:var(--paper);border:2px solid var(--accent);cursor:pointer}
+.mmkt-ticks{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(26,29,28,0.5);margin-top:4px}
+.mmkt-foot{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(26,29,28,0.5);line-height:1.6;margin-top:14px}
+
 </style>
 </head>
 <body>
@@ -593,7 +606,7 @@ body {
       <span>Apr. 2026</span>
     </div>
     <h1 class="mast-title">Cascade Apartments</h1>
-    <p class="mast-subtitle">44-unit apartment portfolio &middot; Rochester, MN 55901 (Olmsted County)</p>
+    <p class="mast-subtitle">44-unit apartment portfolio &middot; Rochester, Minnesota</p>
     <div class="caution-banner">⚠ Caution — at 5% vacancy, Year-1 cash-on-cash (2.7%) is below the 3% target and DSCR sits at the 1.25 floor. See Section 08.</div>
   </header>
 
@@ -603,11 +616,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.78M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$6.78M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $7.00M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$7.00M</div>
       </div>
-      <input type="range" id="priceSlider" min="6112699.2" max="8140000" step="25000" value="6775000" class="price-slider" />
-      <div class="price-control-ticks"><span>$6.11M</span><span>baseline $6.78M</span><span>$8.14M</span></div>
+      <input type="range" id="priceSlider" min="6000000" max="8000000" step="25000" value="7000000" class="price-slider" />
+      <div class="price-control-ticks"><span>$6.00M</span><span>baseline $7.00M</span><span>$8.00M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -631,7 +644,7 @@ body {
   <section class="section">
     <div class="section-label">02 — Overview</div>
     <h2 class="section-title">Deal description</h2>
-    <div class="story"><div class="story-body"><p>Cascade Apartments is a 44-unit multifamily property at 957 Pendant Lane NW in Rochester, Minnesota, built in 2016 and located roughly ten minutes from the Mayo Clinic. The unit mix is 6 studios, 20 one-bedrooms, and 18 two-bedrooms, averaging 839 square feet across 36,913 net rentable square feet on a 1.47-acre site, with in-unit laundry, underground parking, and a 2023 roof carrying a transferable warranty.</p><p>The property is 100% occupied. In-place rents average $1,416/unit ($1.69/SF) against a market-rent estimate of roughly $1,475/unit. Trailing operations show a ~49% expense ratio, in line with the underwritten figure — the trailing actuals and our model run within about a point of each other, so there is little gap between how the property operates today and how it is modeled. Tenants pay their own in-unit electric; the owner currently covers water, sewer, trash, gas, and bulk internet with no utility reimbursement in place.</p></div></div>
+    <div class="story"><div class="story-body"><p>Cascade Apartments is a 44-unit multifamily property at 957 Pendant Lane NW in Rochester, Minnesota, built in 2016 and located roughly ten minutes from the Mayo Clinic. The unit mix is 6 studios, 20 one-bedrooms, and 18 two-bedrooms, averaging 839 square feet across 36,913 net rentable square feet on a 1.47-acre site, with in-unit laundry, underground parking, and a 2023 roof carrying a transferable warranty.</p><p>The property is 100% occupied. In-place rents average $1,416/unit ($1.69/SF) against a market-rent estimate of roughly $1,475/unit, and trailing operations show a ~49% expense ratio. Tenants pay their own in-unit electric; the owner currently covers water, sewer, trash, gas, and bulk internet with no utility reimbursement in place. The acquisition is modeled at a $7,000,000 purchase price.</p></div></div>
     <div class="hold-philosophy">
       <div class="hold-philosophy-label">Hold philosophy</div>
       <div class="hold-philosophy-body">Our exit philosophy is to not exit. We build long-term portfolios that produce recurring monthly income into the future. Our preferred path is to refinance at Year 5 and Year 10, pull cash out tax-free where the rate environment permits, and keep operating the asset at a consistent cashflow. Please review return scenarios below for a specific cash investment.</div>
@@ -654,10 +667,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">17.78%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">17.21%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="2811625" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="2905000" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks"><span>$100K</span><span>$801K</span><span>$1.5M</span><span>$2.2M</span><span>$2.9M</span></div>
         </div>
         <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn active" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn" data-val="1000000">$1.00M</button><button class="preset-btn" data-val="1500000">$1.50M</button><button class="preset-btn" data-val="2905000">$2.90M</button></div>
@@ -744,8 +757,8 @@ body {
 
     <div class="refi-rate-control">
       <div class="refi-rate-label">PROJECTED<br/>MARKET RATE<br/>AT REFI</div>
-      <input type="range" min="450" max="750" step="5" value="615" class="slider refi-slider" id="refiRateSlider">
-      <div class="refi-rate-value" id="refiRateDisplay">6.15%</div>
+      <input type="range" min="450" max="750" step="5" value="600" class="slider refi-slider" id="refiRateSlider">
+      <div class="refi-rate-value" id="refiRateDisplay">6.00%</div>
     </div>
 
     <div class="refi-fixed">
@@ -853,15 +866,83 @@ body {
     <div class="section-label">09 — What could go wrong</div>
     <h2 class="section-title">Risks &amp; constraints</h2>
     <div class="story" style="border-left-color: var(--gold); background: rgba(198,146,20,0.08);">
-      <p class="story-headline" style="color: var(--gold);">A constraint to note.</p><div class="story-body"><p>At a $7.0M purchase with 40% down, this deal clears the structure-independent test — a 5.46% going-in cap beats our 5.0% floor — and finances at a 1.26 DSCR. Where it falls short is current cash yield: Year-1 cash-on-cash is 2.7% against our 3% target, and DSCR sits effectively at the 1.25 minimum with little cushion.</p><p>The building itself is sound — newer construction, fully occupied, a lean expense ratio. The tension is between the entry price and the Year-1 cash return: at this basis the deal leans on rent growth and the eventual exit rather than on day-one cash flow. That is a reasonable profile for a patient, stabilized hold, but partners should be comfortable with a thin early cash yield going in. If that profile does not fit, this is a reasonable deal to pass on without regret.</p></div>
+      <p class="story-headline" style="color: var(--gold);">A constraint to note.</p><div class="story-body"><p>At a $7.0M purchase with 40% down, this deal clears the structure-independent test (a 5.46% going-in cap beats the 5.0% floor) and reaches a 1.96–2.45x equity multiple. It does not clear two of our return hurdles at the base case: Year-1 cash-on-cash is 2.7% against a 3% target, and the conservative growth-exit IRR is 7.8% against a 10% target. DSCR sits at the 1.25 minimum with no cushion.</p><p>The shortfalls are price-driven, not fundamental — at roughly $6.0M the same building clears every hurdle (4.6% cash-on-cash, 1.36 DSCR, higher IRRs in both exit scenarios). This is offered as the basis for a $6.0–6.25M counter, not a $7.0M commitment. If the price cannot move, this is a reasonable deal to pass on without regret.</p></div>
     </div>
     <div class="risk-grid">
-<div class="risk-card"><h4>Vacancy assumption drives the cash hurdle</h4><p class="risk-detail">The model uses a 5% vacancy factor; at that level Year-1 cash-on-cash is 2.7% — below the 3% target. At 3% vacancy (still above the 1.2% trailing actual) NOI rises ~$14,100, cash-on-cash reaches 3.2%, and DSCR improves from 1.26 to 1.31.</p><p class="risk-conseq"><strong>Consequence:</strong> The deal's pass/fail on cash yield hinges almost entirely on this one input.</p><p class="risk-mit"><strong>Mitigation:</strong> Underwrite at 5% for conservatism given recent submarket supply; treat the 3% case as upside, not the base.</p></div>
-<div class="risk-card"><h4>Property-tax reassessment on sale</h4><p class="risk-detail">The 2026 county EMV is $6.37M and 2026 taxes are $106,382. A purchase at $7.0M sits well above assessed value, and Minnesota reassesses toward sale price.</p><p class="risk-conseq"><strong>Consequence:</strong> A reassessment toward a $7M basis could add ~$11,000–17,000/yr in taxes, pushing DSCR from 1.26 toward 1.18 — under the 1.25 line.</p><p class="risk-mit"><strong>Mitigation:</strong> The 2026 value held flat and a sale first hits the 2027 assessment (pay 2028), so model a pay-2028 step-up. The Rochester 4d program is a potential hedge: enrolling ~20% of units (9 of 44) at workforce rents the property's rents already meet drops those units' tax rate from 1.25% to 0.25%, an estimated ~$17,000/yr saving that largely offsets the reassessment exposure and lands on the same pay-2028 timeline.</p></div>
-<div class="risk-card"><h4>Exit-cap softening</h4><p class="risk-detail">The base case assumes the property sells at a 5.0% cap — tighter than the 5.46% going-in cap we are buying at. If exit caps rise 50bp to 5.5%, net sale proceeds fall by roughly $900,000.</p><p class="risk-conseq"><strong>Consequence:</strong> A meaningful share of the projected gain is realized at sale, so a higher exit cap directly erodes total proceeds.</p><p class="risk-mit"><strong>Mitigation:</strong> Underwrite to the conservative case — no cap compression, modest 1.5% annual value growth — and treat anything tighter as upside, not the plan.</p></div>
+<div class="risk-card"><h4>Vacancy assumption drives the cash hurdle</h4><p class="risk-detail">The model uses a 5% vacancy factor; at that level Year-1 cash-on-cash is 2.7% — below the 3% target. At the broker's 3% vacancy (still above the 1.2% trailing actual) NOI rises ~$14,100, cash-on-cash reaches 3.2%, and DSCR improves from 1.26 to 1.31.</p><p class="risk-conseq"><strong>Consequence:</strong> The deal's pass/fail on cash yield hinges almost entirely on this one input.</p><p class="risk-mit"><strong>Mitigation:</strong> Underwrite at 5% for conservatism given recent submarket supply; treat the 3% case as upside, not the base.</p></div>
+<div class="risk-card"><h4>Property-tax reassessment on sale</h4><p class="risk-detail">The 2026 county EMV is $6.37M and 2026 taxes are $106,382. A purchase at $7.0M sits well above assessed value, and Minnesota reassesses toward sale price.</p><p class="risk-conseq"><strong>Consequence:</strong> A reassessment toward a $7M basis could add ~$11,000–17,000/yr in taxes, pushing DSCR from 1.26 toward 1.18 — under the 1.25 line.</p><p class="risk-mit"><strong>Mitigation:</strong> Pull the Olmsted parcel history; the 2026 value held flat and a sale first hits the 2027 assessment (pay 2028), so model a pay-2028 step-up.</p></div>
+<div class="risk-card"><h4>Exit-cap softening</h4><p class="risk-detail">The 10.4% IRR case assumes a 5.0% terminal cap — tighter than the 5.46% going-in cap. If exit caps rise 50bp to 5.5%, net sale proceeds fall by roughly $900,000.</p><p class="risk-conseq"><strong>Consequence:</strong> Most of the projected return is realized at exit, so a higher exit cap erases a large share of the gain.</p><p class="risk-mit"><strong>Mitigation:</strong> Treat the 1.5% growth / no-cap-compression case (7.8% IRR) as the floor you must accept, not the upside.</p></div>
 <div class="risk-card"><h4>Rents are already at market</h4><p class="risk-detail">In-place rents (~$1,416) sit close to the market estimate (~$1,475), so there is no meaningful mark-to-market lever; Year-1 to Year-10 growth relies on ~3% annual submarket rent growth.</p><p class="risk-conseq"><strong>Consequence:</strong> If Rochester rents flatten for two to three years while recent supply absorbs, Year-10 NOI comes in $40,000–50,000 light.</p><p class="risk-mit"><strong>Mitigation:</strong> Pay a stabilized price for stabilized income — which is why basis discipline matters more here than on a value-add deal.</p></div>
-<div class="risk-card"><h4>Insurance &amp; expense pressure</h4><p class="risk-detail">The model carries insurance at the in-place premium growing 5% a year while all other expenses grow 3%. Insurance in this market has been rising faster than that, and the 2016 asset's premium could reset higher on a new policy at acquisition.</p><p class="risk-conseq"><strong>Consequence:</strong> Each $10,000 of unbudgeted annual expense reduces NOI dollar-for-dollar, pulling the 1.26 DSCR toward the 1.25 line and the 2.7% cash-on-cash lower.</p><p class="risk-mit"><strong>Mitigation:</strong> Bind a firm insurance quote during diligence rather than carrying the seller's premium; re-underwrite if it comes in above the modeled figure.</p></div>
+<div class="risk-card"><h4>Owner-paid utilities, no RUBS</h4><p class="risk-detail">The owner currently absorbs water, sewer, trash, and gas with no reimbursement; comparable Rochester properties run RUBS or utility/service fees of $8–80/unit/month.</p><p class="risk-conseq"><strong>Consequence:</strong> Roughly $36,000/yr of recoverable utility cost is being left unrecovered.</p><p class="risk-mit"><strong>Mitigation:</strong> Implementing RUBS or a flat utility fee could recover $15,000–25,000/yr — a low-capex NOI lever the broker pro forma did not model.</p></div>
 <div class="risk-card"><h4>Year-5 / Year-6 refinance exposure</h4><p class="risk-detail">Debt is a 5-year fixed at 6.0%; the model assumes a refinance holds near 6.0% at Year 6. The interest-only structure compounds this by carrying full principal into the refi.</p><p class="risk-conseq"><strong>Consequence:</strong> If rates sit at 7%+ in 2031, refinanced debt service rises and the post-refi cash-on-cash and DSCR compress.</p><p class="risk-mit"><strong>Mitigation:</strong> Stress the Year-6 refi rate to 7% before committing; favor the amortizing (standard) lane if rate risk is a concern.</p></div>
+</div>
+  </section>
+
+  <section class="section">
+    <div class="section-label">10 — Timing</div>
+    <h2 class="section-title">Act now vs. wait</h2>
+    <details class="mmkt-details">
+      <summary class="mmkt-summary">Should this capital buy in now, or wait in a money market? &#9662;</summary>
+      <div class="mmkt-body">
+        <p class="mmkt-lede">Acting now captures ten years of ownership; waiting parks the same capital in a money market and buys the building (or the next deal) later — older, and more expensive once it has appreciated. Uses the deal analyzer's price and capital above as the single source of truth; appreciation follows the model's market-growth rate.</p>
+
+        <div class="mmkt-tax-toggle" id="mmTaxToggle">
+          <button data-tax="0" class="active">Pre-tax</button>
+          <button data-tax="1">After-tax</button>
+        </div>
+
+        <div class="mmkt-hero">
+          <div class="mmkt-hero-main">
+            <div class="mmkt-hero-label">Most you can pay today &amp; still beat waiting</div>
+            <div class="mmkt-hero-num" id="mmBep">—</div>
+            <div class="mmkt-hero-sub" id="mmBepSub">—</div>
+          </div>
+          <div class="mmkt-hero-side">
+            <div class="mmkt-side-lab">Cost of waiting</div>
+            <div class="mmkt-side-num" id="mmCost">—</div>
+            <div class="mmkt-side-lab" style="margin-top:12px">Headroom over price</div>
+            <div class="mmkt-side-num" id="mmHead">—</div>
+          </div>
+        </div>
+        <p class="mmkt-verdict" id="mmVerdict">—</p>
+
+        <div class="mmkt-cmp">
+          <div class="mmkt-card" id="mmCardB">
+            <div class="mmkt-tag">Act now</div>
+            <div class="mmkt-card-h">Buy today</div>
+            <div class="mmkt-npv" id="mmNpvB">—</div>
+            <div class="mmkt-npv-lab">NPV of this capital position</div>
+            <div class="mmkt-detail" id="mmDetB">—</div>
+          </div>
+          <div class="mmkt-card" id="mmCardA">
+            <div class="mmkt-tag">Wait</div>
+            <div class="mmkt-card-h" id="mmDragTitle">Wait, then buy</div>
+            <div class="mmkt-npv" id="mmNpvA">—</div>
+            <div class="mmkt-npv-lab">NPV of the wait-then-buy path</div>
+            <div class="mmkt-detail" id="mmDetA">—</div>
+          </div>
+        </div>
+
+        <div class="mmkt-controls">
+          <div class="mmkt-ctl mmkt-star">
+            <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Years you wait</span><span class="mmkt-ctl-val" id="mmvYears">2 years</span></div>
+            <input type="range" id="mmYears" min="1" max="5" step="1" value="2">
+            <div class="mmkt-ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+          </div>
+          <div class="mmkt-ctl">
+            <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Money-market rate</span><span class="mmkt-ctl-val" id="mmvMM">4.00%</span></div>
+            <input type="range" id="mmMM" min="200" max="700" step="5" value="400">
+            <div class="mmkt-ticks"><span>2%</span><span>4.5%</span><span>7%</span></div>
+          </div>
+          <div class="mmkt-ctl">
+            <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Discount rate</span><span class="mmkt-ctl-val" id="mmvDisc">4.00%</span></div>
+            <input type="range" id="mmDisc" min="200" max="1000" step="5" value="400">
+            <div class="mmkt-ticks"><span>2%</span><span>6%</span><span>10%</span></div>
+          </div>
+        </div>
+        <p class="mmkt-foot" id="mmFoot">—</p>
+      </div>
+    </details>
   </section>
 
   <footer class="footer">
@@ -878,7 +959,7 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 6775000,
+  basePrice: 7000000,
   units: 44,
 
   // Ratios applied to purchase price
@@ -886,7 +967,7 @@ const BASE = {
   closingReservesPct: 0.015,  // combined closing + reserves = 1.5% of price
   loanPct: 0.6,              // = 1 - downPct
   cashInPct: 0.415,           // = down + closing/reserves
-  depShieldPerDollar: 0.01145455,  // annual dep tax shield per $ of price
+  depShieldPerDollar: 80181.82 / 7000000,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
   dsRatioY1Y5: 0.07310738,   // 0.07002877828
@@ -897,12 +978,12 @@ const BASE = {
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.01726296, 0.01835508, 0.01951629, 0.02075095, 0.02206373, 0.01609343, 0.01711156, 0.01819409, 0.01934512, 0.02056896],
+  wfPrincRatios: [0.01726296, 0.01835508, 0.01951628, 0.02075095, 0.02206373, 0.01609343, 0.01711156, 0.01819409, 0.01934512, 0.02056896],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1, 1, 0.98616028, 0.97144502, 0.95579881, 0.94438637, 0.93225193, 0.91934983, 0.9056315, 0.89104529],
   ioWfPrincRatios: [0, 0, 0.00830383, 0.00882916, 0.00938772, 0.00684747, 0.00728066, 0.00774126, 0.008231, 0.00875172],
-  ioDsByYearRatios: [0.0615, 0.0615, 0.07495393, 0.07495393, 0.07495393, 0.06987595, 0.06987595, 0.06987595, 0.06987595, 0.06987595],
+  ioDsByYearRatios: [0.060000, 0.060000, 0.073815, 0.073815, 0.073815, 0.068688, 0.068688, 0.068688, 0.068688, 0.068688],
 
   // FIXED operating data — does NOT scale with price (same building)
   gpr:     [776926, 799215.4, 822173.48, 845820.31, 870176.54, 895263.45, 921102.98, 947717.68, 975130.84, 1003366.38],
@@ -915,7 +996,7 @@ const BASE = {
   marketGrowth: 0.015,
   exitCap: 0.05,
   exitSellingCostPct: 0.02,  // backed out: exit A net / gross → 2% of sale price
-  mortgageRate: 0.0615,
+  mortgageRate: 0.06,
   amortYears: 30
 };
 
@@ -926,7 +1007,7 @@ let currentPrice = BASE.basePrice;
 let currentScenario = 'A';
 let currentCapital = 500000;
 let currentYearIdx = 0;
-let currentRefiRate = 0.0615;
+let currentRefiRate = 0.06;
 
 // ================================================================
 // UTILITIES
@@ -1060,7 +1141,7 @@ function renderSnapshot(D) {
   capCell.classList.toggle('neg', D.goingInCap < 0.05);
   document.getElementById('sCashIn').textContent = fmt$(D.cashIn, { compact: true });
   document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (40%)';
-  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 6.15% · 30yr';
+  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 6.00% · 30yr';
   // Expense ratio = OpEx / EGI where EGI = NOI + OpEx (OpEx stored as positive in this BASE)
   const y1NOI = BASE.noi[0];
   const y1OpEx = Math.abs(BASE.opex[0]);
@@ -1611,7 +1692,7 @@ function recompute() {
   renderPartner(D, currentCapital, currentScenario);
   renderWaterfall(D, currentYearIdx);
   renderProjection(D);
-  renderRefi(D, currentRefiRate); renderRateSensitivity(D); renderExpenseSensitivity(D); }
+  renderRefi(D, currentRefiRate); renderRateSensitivity(D); renderExpenseSensitivity(D); if(typeof window.mmRenderHook==="function") window.mmRenderHook(); }
 
 // ================================================================
 // EVENT HANDLERS
@@ -1675,6 +1756,111 @@ refiSlider.addEventListener('input', (e) => {
 // ================================================================
 recompute();
 setTimeout(() => recompute(), 300);
+
+// ============================================================
+// SECTION 10 — Act now vs. wait (money-market timing)
+// Reads from BASE + currentPrice + currentCapital (single source of truth)
+// ============================================================
+(function(){
+  const MM_TAX = 0.35; // money-market & exit tax rate (not a deal constant)
+  let mmAfterTax = false;
+
+  function mmLoanBal(price, years){
+    const loan = price * BASE.loanPct, m = BASE.mortgageRate/12;
+    const ds1 = loan*(m/(1-Math.pow(1+m,-360)));
+    let b = loan; const y5 = Math.min(years,5);
+    for(let i=0;i<y5*12;i++) b -= (ds1 - b*m);
+    if(years>5){ const ds2 = b*(m/(1-Math.pow(1+m,-360))); for(let i=0;i<(years-5)*12;i++) b -= (ds2 - b*m); }
+    return b;
+  }
+  function mmDS(price){
+    const loan = price*BASE.loanPct, d1 = loan*BASE.dsRatioY1Y5, d2 = loan*BASE.dsRatioY6Y10;
+    return [d1,d1,d1,d1,d1,d2,d2,d2,d2,d2];
+  }
+  function mmGrow(c, rate, yrs, after){ const r = after ? rate*(1-MM_TAX) : rate; return c*Math.pow(1+r,yrs); }
+  const ANCHOR = () => BASE.basePrice; // appreciation anchor = underwritten baseline value (fixed)
+
+  // Act now: pay `price` today, hold 10 yrs. Appreciation grows from ANCHOR.
+  function mmActNow(cap, price, disc, after){
+    const share = cap/(price*BASE.cashInPct), ds = mmDS(price), fl = {};
+    for(let i=0;i<10;i++){ let cf=(BASE.noi[i]-ds[i])*share; if(after) cf += (price*BASE.depShieldPerDollar)*share; fl[i+1]=cf; }
+    const g = ANCHOR()*Math.pow(1+BASE.marketGrowth,10), net = g*(1-BASE.exitSellingCostPct), bal = mmLoanBal(price,10);
+    let ne = net-bal, de = ne*share;
+    if(after){ const dep=(price*BASE.depShieldPerDollar/MM_TAX)*10, recap=dep*0.25, gain=Math.max(0,g-(price-dep)), cgt=gain*0.15; de=(ne-recap-cgt)*share; }
+    fl[10]+=de;
+    let v=0; for(const k in fl) v+=fl[k]/Math.pow(1+disc,+k); return v;
+  }
+  // Wait N yrs in money market, then buy at the appreciated value, hold to yr 10.
+  function mmWait(cap, N, mm, disc, after){
+    const grown = mmGrow(cap, mm, N, after), Pf = ANCHOR()*Math.pow(1+BASE.marketGrowth,N);
+    const share = grown/(Pf*BASE.cashInPct), ds = mmDS(Pf), hold = 10-N, fl = {};
+    for(let i=0;i<hold;i++){ let cf=(BASE.noi[i]-ds[i])*share; if(after) cf += (Pf*BASE.depShieldPerDollar)*share; fl[N+i+1]=cf; }
+    const g = ANCHOR()*Math.pow(1+BASE.marketGrowth,10), net = g*(1-BASE.exitSellingCostPct), bal = mmLoanBal(Pf,hold);
+    let ne = net-bal, de = ne*share;
+    if(after){ const dep=(Pf*BASE.depShieldPerDollar/MM_TAX)*hold, recap=dep*0.25, gain=Math.max(0,g-(Pf-dep)), cgt=gain*0.15; de=(ne-recap-cgt)*share; }
+    fl[10]=(fl[10]||0)+de;
+    let v=0; for(const k in fl) v+=fl[k]/Math.pow(1+disc,+k); return {npv:v, grown, Pf, share};
+  }
+  function mmBeprice(cap, N, mm, disc, after){
+    let lo=BASE.basePrice*0.55, hi=BASE.basePrice*1.8, tgt=mmWait(cap,N,mm,disc,after).npv;
+    for(let i=0;i<80;i++){ const mid=(lo+hi)/2; (mmActNow(cap,mid,disc,after)>tgt)?lo=mid:hi=mid; }
+    return (lo+hi)/2;
+  }
+
+  const $m = id => document.getElementById(id);
+  const fM = v => '$'+(v/1e6).toFixed(2)+'M';
+  const fK = v => Math.abs(v)>=1e6 ? '$'+(v/1e6).toFixed(2)+'M' : '$'+Math.round(v/1000)+'K';
+
+  function mmRender(){
+    if(!$m('mmBep')) return;
+    const cap = currentCapital, price = currentPrice;
+    const N = +$m('mmYears').value, mm = +$m('mmMM').value/10000, disc = +$m('mmDisc').value/10000;
+    $m('mmvYears').textContent = N+(N===1?' year':' years');
+    $m('mmvMM').textContent = (mm*100).toFixed(2)+'%';
+    $m('mmvDisc').textContent = (disc*100).toFixed(2)+'%';
+
+    const B = mmActNow(cap, price, disc, mmAfterTax);
+    const A = mmWait(cap, N, mm, disc, mmAfterTax);
+    const be = mmBeprice(cap, N, mm, disc, mmAfterTax);
+    const cost = B - A.npv;
+    const head = be - price;
+
+    $m('mmNpvB').textContent = fM(B);
+    $m('mmNpvA').textContent = fM(A.npv);
+    $m('mmBep').textContent = fM(be);
+    $m('mmCost').textContent = (cost<0?'-':'')+fK(Math.abs(cost));
+    $m('mmHead').textContent = (head<0?'-':'')+fK(Math.abs(head));
+    $m('mmDragTitle').textContent = 'Wait '+N+' yr'+(N>1?'s':'')+', then buy';
+
+    const shareB = cap/(price*BASE.cashInPct);
+    $m('mmDetB').textContent = 'Deploy '+fK(cap)+' at '+fM(price)+' now \u00b7 '+(shareB*100).toFixed(1)+'% share \u00b7 holds 10 yrs.';
+    $m('mmDetA').textContent = fK(cap)+' earns '+(mm*100).toFixed(1)+'% for '+N+' yr'+(N>1?'s':'')+' \u2192 '+fK(A.grown)+', then buys at '+fM(A.Pf)+' \u00b7 holds '+(10-N)+' yrs.';
+
+    const bWins = B >= A.npv;
+    $m('mmCardB').classList.toggle('win', bWins);
+    $m('mmCardA').classList.toggle('win', !bWins);
+
+    $m('mmBepSub').textContent = price<=be
+      ? 'At '+fM(price)+' you are under the '+fM(be)+' ceiling \u2014 acting now beats waiting '+N+' yr'+(N>1?'s':'')+'.'
+      : 'At '+fM(price)+' you are over the '+fM(be)+' ceiling \u2014 waiting '+N+' yr'+(N>1?'s':'')+' would win.';
+    $m('mmVerdict').textContent = 'Waiting '+N+' yr'+(N>1?'s':'')+' forfeits '+fK(Math.abs(cost))+' of NPV ('+(mmAfterTax?'after-tax':'pre-tax')+'). You could pay up to '+fM(be)+' \u2014 '+(head>=0?fK(head)+' over':fK(-head)+' under')+' the current '+fM(price)+' price \u2014 and acting now still wins. Appreciation grows from the '+fM(BASE.basePrice)+' underwritten baseline, so overpaying is penalized.';
+
+    $m('mmFoot').textContent = 'Single source of truth: price ('+fM(price)+') and capital ('+fK(cap)+') from the analyzer above; appreciation = model market growth ('+(BASE.marketGrowth*100).toFixed(1)+'%/yr) off the '+fM(BASE.basePrice)+' baseline; NOI, debt service, and balances from the deal model. Money-market interest taxed at '+(MM_TAX*100)+'% annually; exit applies 25% recapture + 15% capital gains in after-tax mode. Decision-support estimate \u2014 confirm tax treatment with your CPA. Not investment advice.';
+  }
+
+  document.querySelectorAll('#mmTaxToggle button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('#mmTaxToggle button').forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active'); mmAfterTax = btn.dataset.tax==='1'; mmRender();
+    });
+  });
+  ['mmYears','mmMM','mmDisc'].forEach(function(id){ const el=$m(id); if(el) el.addEventListener('input', mmRender); });
+
+  // Hook into the memo's recompute so price/capital changes flow in (single source of truth)
+  if(typeof window.mmRenderHook === 'undefined'){ window.mmRenderHook = mmRender; }
+  window.addEventListener('load', mmRender);
+})();
+
 </script>
 
 </body>
