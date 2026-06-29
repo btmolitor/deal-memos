@@ -1851,6 +1851,7 @@ refiSlider.addEventListener('input', (e) => {
   const $m = id => document.getElementById(id);
   const fM = v => '$'+(v/1e6).toFixed(2)+'M';
   const fK = v => Math.abs(v)>=1e6 ? '$'+(v/1e6).toFixed(2)+'M' : '$'+Math.round(v/1000)+'K';
+  const fD = v => '$'+Math.round(v).toLocaleString('en-US'); // full dollars w/ commas
 
   function mmRender(){
     if(!$m('mmBep')) return;
@@ -1870,8 +1871,8 @@ refiSlider.addEventListener('input', (e) => {
     const cost = B - A.npv;
     const head = be - bid;                        // headroom over your current BID
 
-    $m('mmNpvB').textContent = fM(B);
-    $m('mmNpvA').textContent = fM(A.npv);
+    $m('mmNpvB').textContent = fD(B);
+    $m('mmNpvA').textContent = fD(A.npv);
     $m('mmBep').textContent = fM(be);
     $m('mmCost').textContent = (cost<0?'-':'')+fK(Math.abs(cost));
     $m('mmHead').textContent = (head<0?'-':'')+fK(Math.abs(head));
