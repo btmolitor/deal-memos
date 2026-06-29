@@ -647,11 +647,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.78M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$6.78M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $7.25M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$7.25M</div>
       </div>
-      <input type="range" id="priceSlider" min="6112699.2" max="8140000" step="25000" value="6775000" class="price-slider" />
-      <div class="price-control-ticks"><span>$6.11M</span><span>baseline $6.78M</span><span>$8.14M</span></div>
+      <input type="range" id="priceSlider" min="6112699.2" max="8140000" step="25000" value="7250000" class="price-slider" />
+      <div class="price-control-ticks"><span>$6.11M</span><span>baseline $7.25M</span><span>$8.14M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -698,10 +698,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">17.78%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">16.62%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="2811625" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="3008750" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks"><span>$100K</span><span>$801K</span><span>$1.5M</span><span>$2.2M</span><span>$2.9M</span></div>
         </div>
         <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn active" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn" data-val="1000000">$1.00M</button><button class="preset-btn" data-val="1500000">$1.50M</button><button class="preset-btn" data-val="2905000">$2.90M</button></div>
@@ -986,7 +986,7 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 6775000,
+  basePrice: 7250000,
   units: 44,
 
   // Ratios applied to purchase price
@@ -1005,7 +1005,7 @@ const BASE = {
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.01726296, 0.01835508, 0.01951629, 0.02075095, 0.02206373, 0.01609343, 0.01711156, 0.01819409, 0.01934512, 0.02056896],
+  wfPrincRatios: [0.01726296, 0.01835508, 0.01951628, 0.02075095, 0.02206373, 0.01609343, 0.01711156, 0.01819409, 0.01934512, 0.02056896],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1, 1, 0.98616028, 0.97144502, 0.95579881, 0.94438637, 0.93225193, 0.91934983, 0.9056315, 0.89104529],
