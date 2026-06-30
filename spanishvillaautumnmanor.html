@@ -581,6 +581,60 @@ body {
 .proj-dual-std td { border-bottom: none; padding-bottom: 2px; }
 .proj-dual-io td { background: rgba(143, 58, 32, 0.025); border-bottom: none; padding-top: 2px; padding-bottom: 2px; }
 .proj-dual-diff td { padding-top: 2px; padding-bottom: 8px; font-size: 12px; opacity: 0.7; border-bottom: 1px solid rgba(0,0,0,0.08); }
+
+
+.mmkt-card .mmkt-subgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.mmkt-sub-lab { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); opacity: 0.55; line-height: 1.3; }
+.mmkt-sub-val-eq { font-size: 14px !important; }
+.mmkt-sub-val { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-size: 17px; font-weight: 700; color: var(--ink); margin-top: 2px; }
+
+/* ============ SECTION 10 — Act now vs. wait (money-market timing) ============ */
+.mmkt-details { margin-bottom: 56px; border: 1px solid var(--rule-strong); background: var(--paper); }
+.mmkt-summary { padding: 18px 24px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; }
+.mmkt-summary::-webkit-details-marker { display: none; }
+.mmkt-summary::after { content: '+'; font-size: 18px; opacity: 0.6; }
+.mmkt-details[open] .mmkt-summary::after { content: '\2212'; }
+.mmkt-summary:hover { color: var(--brick); }
+.mmkt-body { padding: 8px 28px 32px; }
+.mmkt-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 28px; letter-spacing: -0.01em; margin: 8px 0 16px; line-height: 1.2; }
+.mmkt-lede { font-size: 14px; line-height: 1.7; color: var(--ink); opacity: 0.85; max-width: 720px; margin-bottom: 20px; }
+.mmkt-toggle { display: inline-flex; border: 1px solid var(--ink); border-radius: 2px; overflow: hidden; margin-bottom: 18px; }
+.mmkt-toggle button { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 16px; background: var(--paper); border: none; cursor: pointer; color: var(--ink); }
+.mmkt-toggle button.active { background: var(--ink); color: var(--paper); }
+.mmkt-hero { background: var(--ink); color: var(--paper); padding: 28px 30px; margin-bottom: 8px; }
+.mmkt-hero-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: center; }
+.mmkt-hero-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-soft); margin-bottom: 6px; }
+.mmkt-hero-num { font-family: 'Fraunces', serif; font-size: clamp(34px, 7vw, 56px); font-weight: 900; line-height: 1; letter-spacing: -0.02em; }
+.mmkt-hero-sub { font-size: 13px; opacity: 0.78; margin-top: 10px; line-height: 1.5; }
+.mmkt-hero-second { border-left: 1px solid rgba(247,244,237,0.2); padding-left: 24px; }
+.mmkt-hero-second .mmkt-s-num { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-size: 24px; font-weight: 700; }
+.mmkt-hero-second .mmkt-s-lab { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.7; margin-bottom: 4px; }
+.mmkt-verdict { font-size: 13px; color: var(--ink); opacity: 0.8; font-style: italic; margin: 14px 0 24px; line-height: 1.6; }
+.mmkt-cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.mmkt-card { border: 1px solid var(--rule-strong); padding: 20px; background: var(--paper-soft); }
+.mmkt-card.win { border: 2px solid var(--green); }
+.mmkt-card h4 { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.mmkt-card .mmkt-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.mmkt-card .mmkt-npv { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-size: 30px; font-weight: 700; color: var(--ink); }
+.mmkt-card .mmkt-npv-lab { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink); opacity: 0.6; margin-top: 2px; }
+.mmkt-card .mmkt-detail { font-size: 12px; color: var(--ink); opacity: 0.7; margin-top: 10px; line-height: 1.45; }
+.mmkt-controls { background: var(--paper-soft); border: 1px solid var(--rule); padding: 22px 24px; margin-bottom: 18px; }
+.mmkt-ctl { margin-bottom: 18px; } .mmkt-ctl:last-child { margin-bottom: 0; }
+.mmkt-ctl.star { background: rgba(199,146,20,0.10); margin: -8px -12px 18px; padding: 14px 12px; border-radius: 2px; border: 1px solid rgba(199,146,20,0.3); }
+.mmkt-ctl-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.mmkt-ctl-name { font-size: 13px; font-weight: 600; }
+.mmkt-ctl-val { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-size: 16px; font-weight: 700; color: var(--accent); }
+.mmkt-controls input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; background: rgba(26,29,28,0.18); border-radius: 2px; outline: none; }
+.mmkt-controls input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--paper); border: 2px solid var(--accent); cursor: pointer; }
+.mmkt-controls input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--paper); border: 2px solid var(--accent); cursor: pointer; }
+.mmkt-ticks { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--ink); opacity: 0.5; margin-top: 4px; }
+.mmkt-foot { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink); opacity: 0.5; line-height: 1.7; padding-top: 16px; border-top: 1px solid var(--rule); }
+.mmkt-cost-band { background: var(--ink); color: var(--paper); padding: 22px 30px; margin-bottom: 8px; }
+.mmkt-cost-lab { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-soft); margin-bottom: 6px; }
+.mmkt-cost-num { font-family: 'Fraunces', serif; font-size: clamp(30px, 6vw, 46px); font-weight: 900; line-height: 1; letter-spacing: -0.02em; }
+.mmkt-cost-sub { font-size: 13px; opacity: 0.78; margin-top: 10px; line-height: 1.5; }
+@media (max-width: 620px) { .mmkt-hero-row { grid-template-columns: 1fr; gap: 14px; } .mmkt-hero-second { border-left: none; border-top: 1px solid rgba(247,244,237,0.2); padding-left: 0; padding-top: 14px; } .mmkt-cmp { grid-template-columns: 1fr; } }
+
 </style>
 </head>
 <body>
@@ -614,15 +668,15 @@ body {
     <div class="snapshot">
       <div class="snap-cell"><span class="snap-label">Purchase Price</span><span class="snap-value" id="sPrice">—</span></div>
       <div class="snap-cell"><span class="snap-label">Units / Price per Unit</span><span class="snap-value" id="sUnitsPPU">—</span></div>
-      <div class="snap-cell"><span class="snap-label">Loan / Rate / Amort</span><span class="snap-value" id="sLoan">—</span></div>
-      <div class="snap-cell"><span class="snap-label">Down Payment</span><span class="snap-value" id="sDown">—</span></div>
-      <div class="snap-cell"><span class="snap-label">Total Cash In</span><span class="snap-value" id="sCashIn">—</span><span class="snap-note">includes closing fees</span></div>
       <div class="snap-cell"><span class="snap-label">Going-In Cap Rate</span><span class="snap-value" id="sCap">—</span></div>
-      <div class="snap-cell"><span class="snap-label">Year 1 NOI / Expense Ratio</span><span class="snap-value" id="sNOI">—</span></div>
-      <div class="snap-cell"><span class="snap-label">Year 1 DSCR</span><span class="snap-value" id="sDSCR">—</span></div>
       <div class="snap-cell"><span class="snap-label">Year 1 Cash-on-Cash</span><span class="snap-value" id="sCoC">—</span></div>
       <div class="snap-cell"><span class="snap-label">Cash + Dep Shield (10-yr avg)</span><span class="snap-value" id="sCashTaxShield">—</span><span class="snap-note">35% tax bracket</span></div>
+      <div class="snap-cell"><span class="snap-label">Loan / Rate / Amort</span><span class="snap-value" id="sLoan">—</span></div>
+      <div class="snap-cell"><span class="snap-label">Year 1 NOI / Expense Ratio</span><span class="snap-value" id="sNOI">—</span></div>
+      <div class="snap-cell"><span class="snap-label">Year 1 DSCR</span><span class="snap-value" id="sDSCR">—</span></div>
       <div class="snap-cell"><span class="snap-label">Year 10 Property Value (1.5% growth)</span><span class="snap-value" id="sY10PV">—</span></div>
+      <div class="snap-cell"><span class="snap-label">Down Payment</span><span class="snap-value" id="sDown">—</span></div>
+      <div class="snap-cell"><span class="snap-label">Total Cash In</span><span class="snap-value" id="sCashIn">—</span><span class="snap-note">includes closing fees</span></div>
       <div class="snap-cell"><span class="snap-label">Simple Sale Return (10-yr avg)</span><span class="snap-value" id="sSimpleReturn">—</span></div>
     </div>
   </section>
@@ -744,8 +798,8 @@ body {
 
     <div class="refi-rate-control">
       <div class="refi-rate-label">PROJECTED<br/>MARKET RATE<br/>AT REFI</div>
-      <input type="range" min="450" max="750" step="5" value="595" class="slider refi-slider" id="refiRateSlider">
-      <div class="refi-rate-value" id="refiRateDisplay">5.95%</div>
+      <input type="range" min="450" max="750" step="5" value="615" class="slider refi-slider" id="refiRateSlider">
+      <div class="refi-rate-value" id="refiRateDisplay">6.15%</div>
     </div>
 
     <div class="refi-fixed">
@@ -859,6 +913,78 @@ body {
     <div class="risk-grid"> <div class="risk-card"><h4>Year 1 financing tightness (override)</h4><p>Year 1 DSCR comes in at 1.19 vs the 1.25 agency standard, and Year 1 cash-on-cash at 2.41% sits below our 3% floor. Both clear by Year 3 as rent growth outpaces expense growth, but the early window is structurally tight. We are proceeding on a documented exception, anchored on the 4d enrollment playbook in tile 2.</p></div> <div class="risk-card"><h4>4d1 affordability enrollment is load-bearing</h4><p>Underwritten annual property tax is $151,062. St. Paul's 4d program cuts the tax class rate from 1.25% to 0.25% on enrolled units (verified per MN Statute 273.13 subd. 25). Savings scale linearly with the % of units enrolled: 50% of units saves ~$58K/yr, 75% saves ~$87K/yr, 100% saves ~$115K/yr — beginning Year 2 of hold. At 100% the deal moves from 'below target' to 'comfortable.' All 64 units qualify under the 60% AMI ceiling and existing tenants grandfather from income verification at enrollment. Operator-execution dependent. Walk condition: 4d denial by HRA pre-LOI.</p></div> <div class="risk-card"><h4>1972 / 1967 vintage capex pipeline</h4><p>These are mid-century brick walkups. The seller's books show repairs at $1,542 per unit per year — about double the Class B norm. We carry a $200-400K reserve through Year 5. Walk condition: capex pipeline above $500K through Year 5 found during inspection.</p></div> <div class="risk-card"><h4>Year 6 refinance rate risk</h4><p>Financing is 5-year fixed term on a 30-year amortization, refinancing at Year 6. We underwrite the refi at the same 5.95% to stay conservative. If rates at Year 6 settle 50-100 bps higher, debt service rises and cash flow compresses just as the heaviest capex window opens. We negotiate for a 7-year fixed term during LOI to push refi past the capex pipeline.</p></div> <div class="risk-card"><h4>Inner-ring St. Paul demand depth</h4><p>Hamline-Midway and Frogtown trade wider on cap rate (6.25-7.50%) than core metro Class B because the buyer and renter pools are both narrower. We accept this in pricing and underwrite to a 1.5% market growth assumption rather than the metro 2.5%.</p></div> <div class="risk-card"><h4>Long-tenured tenancy and mark-to-market friction</h4><p>Rent roll shows $83K of embedded mark-to-market upside but several tenants have been in place since pre-2015. Long tenancy produces durable cash flow but in-place rents lag market and the gap closes slowly because tenants do not churn. We do not underwrite a mark-to-market lift in the base case.</p></div> </div>
   </section>
 
+
+  <!-- 10 TIMING — ACT NOW VS WAIT (money-market) -->
+  <details class="mmkt-details">
+    <summary class="mmkt-summary"><span>10 &mdash; Timing &middot; Act now vs. wait</span></summary>
+    <div class="mmkt-body">
+      <h2 class="mmkt-title">Act now, or wait for the next deal?</h2>
+      <p class="mmkt-lede">Deploying capital into this property now captures ten years of ownership. Waiting parks the cash at a money-market rate and buys a comparable building later &mdash; after it has appreciated. This compares the two on net present value, using the price and capital set in the analyzer above. Appreciation grows from the underwritten baseline, so overpaying is penalized.</p>
+
+      <div class="mmkt-cost-band">
+        <div class="mmkt-cost-lab">Cost of waiting</div>
+        <div class="mmkt-cost-num" id="mmCost">&mdash;</div>
+        <div class="mmkt-cost-sub" id="mmCostSub">&mdash;</div>
+      </div>
+      <p class="mmkt-verdict" id="mmVerdict">&mdash;</p>
+
+      <div class="mmkt-cmp">
+        <div class="mmkt-card" id="mmCardB">
+          <div class="mmkt-tag">Act now</div>
+          <h4>Buy now</h4>
+          <div class="mmkt-npv" id="mmNpvB">&mdash;</div>
+          <div class="mmkt-npv-lab">Net present value of your position</div>
+          <div class="mmkt-detail" id="mmDetB"></div>
+          <div class="mmkt-subgrid">
+            <div><div class="mmkt-sub-lab">10-yr Cash Return + Dep Shield</div><div class="mmkt-sub-val" id="mmCashB">&mdash;</div></div>
+            <div><div class="mmkt-sub-lab">Accumulated Equity (Y10)</div><div class="mmkt-sub-val mmkt-sub-val-eq" id="mmEqB">&mdash;</div></div>
+          </div>
+        </div>
+        <div class="mmkt-card" id="mmCardA">
+          <div class="mmkt-tag">Wait</div>
+          <h4 id="mmDragTitle">Wait, then buy</h4>
+          <div class="mmkt-npv" id="mmNpvA">&mdash;</div>
+          <div class="mmkt-npv-lab">Net present value of the wait-then-buy path</div>
+          <div class="mmkt-detail" id="mmDetA"></div>
+          <div class="mmkt-subgrid">
+            <div><div class="mmkt-sub-lab">10-yr Cash Return + Dep Shield</div><div class="mmkt-sub-val" id="mmCashA">&mdash;</div></div>
+            <div><div class="mmkt-sub-lab">Accumulated Equity (Y10)</div><div class="mmkt-sub-val mmkt-sub-val-eq" id="mmEqA">&mdash;</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mmkt-controls">
+        <div class="mmkt-ctl star">
+          <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Preferred underwriting price <span style="font-weight:400;opacity:0.6">(what it&rsquo;s worth &mdash; anchors waiting)</span></span><span class="mmkt-ctl-val" id="mmvPrice">&mdash;</span></div>
+          <input type="range" id="mmPrice" min="5000000" max="7500000" step="25000" value="6528000">
+          <div class="mmkt-ticks"><span>$5.00M</span><span>baseline $6.53M</span><span>$7.50M</span></div>
+        </div>
+        <div class="mmkt-ctl star">
+          <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Bid price <span style="font-weight:400;opacity:0.6">(what you&rsquo;d pay to win &mdash; what you deploy at)</span></span><span class="mmkt-ctl-val" id="mmvBid">&mdash;</span></div>
+          <input type="range" id="mmBid" min="5000000" max="7500000" step="25000" value="6528000">
+          <div class="mmkt-ticks"><span>$5.00M</span><span>worth $6.53M</span><span>$7.50M</span></div>
+        </div>
+        <div class="mmkt-ctl">
+          <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Years you wait</span><span class="mmkt-ctl-val" id="mmvYears">2 years</span></div>
+          <input type="range" id="mmYears" min="1" max="5" step="1" value="2">
+          <div class="mmkt-ticks"><span>1 yr</span><span>2 yr</span><span>3 yr</span><span>4 yr</span><span>5 yr</span></div>
+        </div>
+        <div class="mmkt-ctl">
+          <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Money-market rate (cash while you wait)</span><span class="mmkt-ctl-val" id="mmvMM">4.00%</span></div>
+          <input type="range" id="mmMM" min="200" max="700" step="5" value="400">
+          <div class="mmkt-ticks"><span>2.0%</span><span>4.5%</span><span>7.0%</span></div>
+        </div>
+        <div class="mmkt-ctl">
+          <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Discount rate (NPV hurdle)</span><span class="mmkt-ctl-val" id="mmvDisc">4.00%</span></div>
+          <input type="range" id="mmDisc" min="200" max="1000" step="5" value="400">
+          <div class="mmkt-ticks"><span>2.0%</span><span>6.0%</span><span>10.0%</span></div>
+        </div>
+      </div>
+
+      <div class="mmkt-foot" id="mmFoot"></div>
+    </div>
+  </details>
+
   <footer class="footer">
     Generated from SpanishVillaAutumnManor_INTAKE_Ready_for_prompt5.xlsx &middot; Snapshot April 2026 &middot; Not investment advice
   </footer>
@@ -884,20 +1010,20 @@ const BASE = {
   depShieldPerDollar: 0.01145455,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
-  dsRatioY1Y5: 0.07156077,   // 0.07002877828
-  dsRatioY6Y10: 0.06654913,  // 0.06495109502
+  dsRatioY1Y5: 0.07310738,   // 0.07002877828
+  dsRatioY6Y10: 0.0681545,  // 0.06495109502
 
   // Mortgage balance decay — Y1-Y10 balance ÷ initial loan
-  balRatios: [0.98760483, 0.9744517, 0.96049426, 0.94568332, 0.9299667, 0.9184396, 0.90620763, 0.89322767, 0.879454, 0.86483806],
+  balRatios: [0.98805978, 0.97536419, 0.96186542, 0.94751268, 0.93225193, 0.92112064, 0.90928515, 0.8967009, 0.88332053, 0.86909367],
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.01792073, 0.01901658, 0.02017943, 0.0214134, 0.02272283, 0.01666568, 0.01768478, 0.0187662, 0.01991375, 0.02113147],
+  wfPrincRatios: [0.01726296, 0.01835508, 0.01951629, 0.02075095, 0.02206373, 0.01609343, 0.01711156, 0.0181941, 0.01934512, 0.02056896],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
-  ioBalRatios: [1, 1, 0.98567662, 0.97047737, 0.95434869, 0.94251937, 0.9299667, 0.91664643, 0.90251163, 0.8875125],
-  ioWfPrincRatios: [0, 0, 0.00859403, 0.00911955, 0.00967721, 0.00709759, 0.0075316, 0.00799216, 0.00848088, 0.00899948],
-  ioDsByYearRatios: [0.0595, 0.0595, 0.07343696, 0.07343696, 0.07343696, 0.06829392, 0.06829392, 0.06829392, 0.06829392, 0.06829392],
+  ioBalRatios: [1, 1, 0.98616028, 0.97144502, 0.95579881, 0.94438637, 0.93225193, 0.91934983, 0.9056315, 0.89104529],
+  ioWfPrincRatios: [0, 0, 0.00830383, 0.00882916, 0.00938772, 0.00684747, 0.00728066, 0.00774126, 0.008231, 0.00875172],
+  ioDsByYearRatios: [0.0615, 0.0615, 0.07495393, 0.07495393, 0.07495393, 0.06987595, 0.06987595, 0.06987595, 0.06987595, 0.06987595],
 
   // FIXED operating data — does NOT scale with price (same building)
   gpr:     [899196, 926171.88, 953957.04, 982575.75, 1012053.02, 1042414.61, 1073687.05, 1105897.66, 1139074.59, 1173246.83],
@@ -910,7 +1036,7 @@ const BASE = {
   marketGrowth: 0.015,
   exitCap: 0.05,
   exitSellingCostPct: 0.02,  // backed out: exit A net / gross → 2% of sale price
-  mortgageRate: 0.0595,
+  mortgageRate: 0.0615,
   amortYears: 30
 };
 
@@ -921,7 +1047,7 @@ let currentPrice = BASE.basePrice;
 let currentScenario = 'A';
 let currentCapital = 500000;
 let currentYearIdx = 0;
-let currentRefiRate = 0.0595;
+let currentRefiRate = 0.0615;
 
 // ================================================================
 // UTILITIES
@@ -1055,7 +1181,7 @@ function renderSnapshot(D) {
   capCell.classList.toggle('neg', D.goingInCap < 0.05);
   document.getElementById('sCashIn').textContent = fmt$(D.cashIn, { compact: true });
   document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (40%)';
-  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 5.95% · 30yr';
+  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 6.15% · 30yr';
   // Expense ratio = OpEx / EGI where EGI = NOI + OpEx (OpEx stored as positive in this BASE)
   const y1NOI = BASE.noi[0];
   const y1OpEx = Math.abs(BASE.opex[0]);
@@ -1138,7 +1264,7 @@ function renderPartner(D, capital, scenario) {
   document.getElementById('leverShare').textContent = fmtPct(share);
   document.getElementById('outY1Monthly').textContent = y1Display;
   document.getElementById('outBenefits').textContent = fmt$(cumulativeBenefits, { compact: true });
-  document.getElementById('outAccumEquity').textContent = fmt$(accumulatedEquity, { compact: true });
+  document.getElementById('outAccumEquity').textContent = fmt$(accumulatedEquity, { compact: true }) + ' total · +' + fmt$(accumulatedEquity - capital, { compact: true }) + ' gain';
   document.getElementById('outPrincPaydown').textContent = fmt$(principalPaydown, { compact: true });
   document.getElementById('outIRR').textContent = fmtPct(simpleReturn, 2);
   document.getElementById('outSimpleYield').textContent = fmtPct(D.cashPlusTaxShield, 2);
@@ -1626,6 +1752,7 @@ const slider = document.getElementById('capitalSlider');
 slider.addEventListener('input', (e) => {
   currentCapital = parseFloat(e.target.value);
   recompute();
+  if (typeof window.mmRenderHook === 'function') window.mmRenderHook(); // Section 10 reacts to capital
   document.querySelectorAll('.preset-btn').forEach(btn => {
     btn.classList.toggle('active', parseFloat(btn.dataset.val) === currentCapital);
   });
@@ -1636,6 +1763,7 @@ document.querySelectorAll('.preset-btn').forEach(btn => {
     currentCapital = parseFloat(btn.dataset.val);
     slider.value = currentCapital;
     recompute();
+    if (typeof window.mmRenderHook === 'function') window.mmRenderHook(); // Section 10 reacts to capital
     document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   });
@@ -1664,6 +1792,145 @@ refiSlider.addEventListener('input', (e) => {
   currentRefiRate = parseFloat(e.target.value) / 10000;
   recompute();
 });
+
+
+// ============================================================
+// SECTION 10 — Act now vs. wait (money-market timing)
+// Reads from BASE + currentPrice + currentCapital (single source of truth).
+// Adds ZERO new tokens. DUAL-only feature.
+//
+// MODEL (matches the rest of the memo — buy & hold, no income tax on property):
+//   * 10-year horizon, NO sale assumed. Property return = cash flow +
+//     depreciation tax shield each year. No exit proceeds, no recapture,
+//     no capital gains (we do not sell — we buy and hold).
+//   * Money-market path: interest IS taxed at 35% annually (real, unavoidable).
+//   * The only asymmetry is that real tax drag on the cash pile.
+// ============================================================
+(function(){
+  const MM_TAX = 0.35; // annual tax on money-market interest (TAX_BRACKET_PCT)
+  let mmPrice = BASE.basePrice; // WORTH — anchors the wait side + appreciation.
+  let mmBid   = BASE.basePrice; // BID — what you deploy at now (defaults equal to worth).
+
+  function mmLoanBalE(price, years){
+    const loan = price*BASE.loanPct, m = BASE.mortgageRate/12;
+    const ds1 = loan*(m/(1-Math.pow(1+m,-360)));
+    let b = loan; const y5 = Math.min(years,5);
+    for(let i=0;i<y5*12;i++) b -= (ds1 - b*m);
+    if(years>5){ const ds2 = b*(m/(1-Math.pow(1+m,-360))); for(let i=0;i<(years-5)*12;i++) b -= (ds2 - b*m); }
+    return b;
+  }
+  function mmDS(price){
+    const loan = price*BASE.loanPct, d1 = loan*BASE.dsRatioY1Y5, d2 = loan*BASE.dsRatioY6Y10;
+    return [d1,d1,d1,d1,d1,d2,d2,d2,d2,d2];
+  }
+  // Money market grown N years with interest taxed annually at MM_TAX.
+  function mmGrowNet(c, rate, yrs){ return c*Math.pow(1+rate*(1-MM_TAX), yrs); }
+
+  // ACT NOW: deploy `cap` at `price`, hold 10 yrs.
+  // Annual return = (cash flow + depreciation tax shield) on your pro-rata share.
+  // No sale, no exit equity, no exit tax.
+  function mmActNow(cap, price, disc){
+    const share = cap/(price*BASE.cashInPct), ds = mmDS(price);
+    let v=0, cumCash=0;
+    for(let i=0;i<10;i++){
+      const cf = (BASE.noi[i]-ds[i])*share;          // pre-tax operating cash flow
+      const shield = (price*BASE.depShieldPerDollar)*share; // depreciation tax shield (a benefit)
+      cumCash += cf + shield;
+      v += (cf + shield)/Math.pow(1+disc, i+1);
+    }
+    // Accumulated equity at Y10: value grows from the BID you actually paid (not baseline), minus loan, * share.
+    const y10Val = price*Math.pow(1+BASE.marketGrowth,10);  // `price` here is the BID
+    const bal10 = mmLoanBalE(price, 10);
+    const accumEq = (y10Val - bal10)*share;
+    // NO-SALE total-return NPV: add the PRESENT VALUE of your Y10 equity position (paydown + appreciation),
+    // discounted to today. No sale event, no selling costs, no tax — just recognizing the equity you hold.
+    const npvWithEquity = v + accumEq/Math.pow(1+disc, 10);
+    return {npv:npvWithEquity, npvCashOnly:v, cumCash, accumEq};
+  }
+  // WAIT N yrs: cash sits in money market (interest taxed annually), THEN buy and hold to yr 10.
+  // Once bought, same buy-&-hold treatment (cash flow + shield, no sale).
+  function mmWait(cap, N, mm, disc, anchor){
+    const grown = mmGrowNet(cap, mm, N);
+    const mmInterestNet = grown - cap; // money-market interest earned over the wait, net of annual tax (tracked in cash return, NOT added to down payment)
+    const Pf = anchor*Math.pow(1+BASE.marketGrowth, N); // pay the appreciated PREFERRED UNDERWRITING price
+    const share = cap/(Pf*BASE.cashInPct), ds = mmDS(Pf), hold = 10-N; // OPTION A: deploy the same $1M PRINCIPAL later (not the grown cash)
+    let v=0, cumCash=mmInterestNet; // start the 10-yr cash tally WITH the net interest earned while waiting
+    for(let i=0;i<hold;i++){
+      const cf = (BASE.noi[i]-ds[i])*share;
+      const shield = (Pf*BASE.depShieldPerDollar)*share;
+      cumCash += cf + shield;
+      v += (cf + shield)/Math.pow(1+disc, N+i+1);
+    }
+    // Accumulated equity at Y10: like-kind building grown from WORTH to Y10, minus loan bal after `hold` yrs of pay-down, * share
+    const y10Val = anchor*Math.pow(1+BASE.marketGrowth,10);
+    const bal = mmLoanBalE(Pf, hold);
+    const accumEq = (y10Val - bal)*share;
+    // NO-SALE total-return NPV: discounted property income (above) + PV of Y10 equity + the money-market
+    // interest earned while waiting (a real cash benefit of the wait path). Interest is received over yrs 1..N;
+    // discount it at the midpoint of the wait for a fair present value.
+    const mmInterestPV = mmInterestNet/Math.pow(1+disc, N);
+    const npvWithEquity = v + accumEq/Math.pow(1+disc, 10) + mmInterestPV;
+    return {npv:npvWithEquity, npvCashOnly:v, grown, Pf, share, cumCash, accumEq};
+  }
+  function mmBeprice(cap, N, mm, disc, anchor){
+    let lo=anchor*0.40, hi=anchor*2.2, tgt=mmWait(cap,N,mm,disc,anchor).npv;
+    for(let i=0;i<90;i++){ const mid=(lo+hi)/2; (mmActNow(cap,mid,disc).npv>tgt)?lo=mid:hi=mid; }
+    return (lo+hi)/2;
+  }
+
+  const $m = id => document.getElementById(id);
+  const fM = v => '$'+(v/1e6).toFixed(2)+'M';
+  const fK = v => Math.abs(v)>=1e6 ? '$'+(v/1e6).toFixed(2)+'M' : '$'+Math.round(v/1000)+'K';
+  const fD = v => '$'+Math.round(v).toLocaleString('en-US'); // full dollars w/ commas
+
+  function mmRender(){
+    if(!$m('mmCost')) return;
+    mmPrice = +$m('mmPrice').value;            // WORTH — anchors waiting
+    mmBid   = +$m('mmBid').value;              // BID — what you deploy at now
+    const cap = currentCapital, worth = mmPrice, bid = mmBid;
+    const N = +$m('mmYears').value, mm = +$m('mmMM').value/10000, disc = +$m('mmDisc').value/10000;
+    $m('mmvPrice').textContent = fM(worth);
+    $m('mmvBid').textContent = fM(bid);
+    $m('mmvYears').textContent = N+(N===1?' year':' years');
+    $m('mmvMM').textContent = (mm*100).toFixed(2)+'%';
+    $m('mmvDisc').textContent = (disc*100).toFixed(2)+'%';
+
+    const B = mmActNow(cap, bid, disc);          // act now at your BID  -> {npv,cumCash,accumEq}
+    const A = mmWait(cap, N, mm, disc, worth);   // waiter buys the building (grown from WORTH)
+    const cost = B.npv - A.npv;
+
+    $m('mmNpvB').textContent = fD(B.npv);
+    $m('mmNpvA').textContent = fD(A.npv);
+    $m('mmCashB').textContent = fD(B.cumCash);
+    $m('mmEqB').textContent = fD(B.accumEq)+' total \u00b7 +'+fD(B.accumEq-cap)+' gain';
+    $m('mmCashA').textContent = fD(A.cumCash);
+    $m('mmEqA').textContent = fD(A.accumEq)+' total \u00b7 +'+fD(A.accumEq-cap)+' gain';
+    $m('mmCost').textContent = (cost<0?'-':'')+fD(Math.abs(cost));
+    $m('mmDragTitle').textContent = 'Wait '+N+' yr'+(N>1?'s':'')+', then buy';
+
+    const shareB = cap/(bid*BASE.cashInPct);
+    const overUnder = bid>worth ? (' \u00b7 '+fK(bid-worth)+' over your '+fM(worth)+' worth') : (bid<worth ? (' \u00b7 '+fK(worth-bid)+' under your '+fM(worth)+' worth') : ' \u00b7 at your worth');
+    $m('mmDetB').textContent = 'Deploy '+fK(cap)+' at a '+fM(bid)+' bid now \u00b7 '+(shareB*100).toFixed(1)+'% share'+overUnder+' \u00b7 holds 10 yrs. Return = cash flow + depreciation shield + principal paydown + appreciation. No sale.';
+    $m('mmDetA').textContent = 'First '+N+' yr'+(N>1?'s':'')+': park '+fK(cap)+' in a money market at '+(mm*100).toFixed(1)+'% (taxed '+(MM_TAX*100)+'%/yr), earning '+fK(A.grown-cap)+' net. Then deploy the same '+fK(cap)+' into a comparable building (like-kind, priced at your '+fM(worth)+' worth grown to '+fM(A.Pf)+') \u00b7 holds '+(10-N)+' yrs. Return = cash flow + depreciation shield + principal paydown + appreciation + '+fK(A.grown-cap)+' interest earned.';
+
+    const bWins = B.npv >= A.npv;
+    $m('mmCardB').classList.toggle('win', bWins);
+    $m('mmCardA').classList.toggle('win', !bWins);
+
+    $m('mmCostSub').textContent = cost>=0
+      ? 'NPV you forfeit by waiting '+N+' yr'+(N>1?'s':'')+' instead of deploying now at your '+fM(bid)+' bid.'
+      : 'Waiting '+N+' yr'+(N>1?'s':'')+' adds '+fD(Math.abs(cost))+' of NPV at your '+fM(bid)+' bid.';
+    $m('mmVerdict').textContent = 'You value it at '+fM(worth)+' and would bid '+fM(bid)+' to win. Deploying now '+(cost>=0?'beats':'trails')+' waiting '+N+' yr'+(N>1?'s':'')+' by '+fD(Math.abs(cost))+' of NPV. The waiter deploys the same capital later into a comparable like-kind building (priced at your '+fM(worth)+' worth grown at market), so paying more on the bid is what erodes the act-now edge. Both paths are buy & hold (no sale); the money-market path carries real '+(MM_TAX*100)+'% annual tax on interest, which the property does not.';
+
+    $m('mmFoot').textContent = 'Two prices: WORTH ('+fM(worth)+') anchors what waiting buys and how appreciation grows; BID ('+fM(bid)+') is what you deploy at now and sets your share. Buy & hold, 10-yr horizon, NO sale (cash flow + depreciation shield only; no recapture, no capital gains). Money-market interest taxed at '+(MM_TAX*100)+'% annually. Capital ('+fK(cap)+') from the analyzer above; appreciation = '+(BASE.marketGrowth*100).toFixed(1)+'%/yr. Decision-support estimate \u2014 confirm tax treatment with your CPA. Not investment advice.';
+  }
+
+  ['mmPrice','mmBid','mmYears','mmMM','mmDisc'].forEach(function(id){ const el=document.getElementById(id); if(el) el.addEventListener('input', mmRender); });
+
+  // Expose hook so the memo's recompute() pushes price/capital changes into this section.
+  window.mmRenderHook = mmRender;
+  window.addEventListener('load', mmRender);
+})();
 
 // ================================================================
 // INIT
