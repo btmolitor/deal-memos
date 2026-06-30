@@ -1847,7 +1847,10 @@ refiSlider.addEventListener('input', (e) => {
     const y10Val = price*Math.pow(1+BASE.marketGrowth,10);  // `price` here is the BID
     const bal10 = mmLoanBalE(price, 10);
     const accumEq = (y10Val - bal10)*share;
-    return {npv:v, cumCash, accumEq};
+    // NO-SALE total-return NPV: add the PRESENT VALUE of your Y10 equity position (paydown + appreciation),
+    // discounted to today. No sale event, no selling costs, no tax — just recognizing the equity you hold.
+    const npvWithEquity = v + accumEq/Math.pow(1+disc, 10);
+    return {npv:npvWithEquity, npvCashOnly:v, cumCash, accumEq};
   }
   // WAIT N yrs: cash sits in money market (interest taxed annually), THEN buy and hold to yr 10.
   // Once bought, same buy-&-hold treatment (cash flow + shield, no sale).
@@ -1863,11 +1866,16 @@ refiSlider.addEventListener('input', (e) => {
       cumCash += cf + shield;
       v += (cf + shield)/Math.pow(1+disc, N+i+1);
     }
-    // Accumulated equity at Y10: same building grown from WORTH to Y10, minus loan bal after `hold` yrs of pay-down, * share
+    // Accumulated equity at Y10: like-kind building grown from WORTH to Y10, minus loan bal after `hold` yrs of pay-down, * share
     const y10Val = anchor*Math.pow(1+BASE.marketGrowth,10);
     const bal = mmLoanBalE(Pf, hold);
     const accumEq = (y10Val - bal)*share;
-    return {npv:v, grown, Pf, share, cumCash, accumEq};
+    // NO-SALE total-return NPV: discounted property income (above) + PV of Y10 equity + the money-market
+    // interest earned while waiting (a real cash benefit of the wait path). Interest is received over yrs 1..N;
+    // discount it at the midpoint of the wait for a fair present value.
+    const mmInterestPV = mmInterestNet/Math.pow(1+disc, N);
+    const npvWithEquity = v + accumEq/Math.pow(1+disc, 10) + mmInterestPV;
+    return {npv:npvWithEquity, npvCashOnly:v, grown, Pf, share, cumCash, accumEq};
   }
   function mmBeprice(cap, N, mm, disc, anchor){
     let lo=anchor*0.40, hi=anchor*2.2, tgt=mmWait(cap,N,mm,disc,anchor).npv;
@@ -1907,8 +1915,8 @@ refiSlider.addEventListener('input', (e) => {
 
     const shareB = cap/(bid*BASE.cashInPct);
     const overUnder = bid>worth ? (' \u00b7 '+fK(bid-worth)+' over your '+fM(worth)+' worth') : (bid<worth ? (' \u00b7 '+fK(worth-bid)+' under your '+fM(worth)+' worth') : ' \u00b7 at your worth');
-    $m('mmDetB').textContent = 'Deploy '+fK(cap)+' at a '+fM(bid)+' bid now \u00b7 '+(shareB*100).toFixed(1)+'% share'+overUnder+' \u00b7 holds 10 yrs (cash flow + depreciation shield, no sale).';
-    $m('mmDetA').textContent = 'Deploy the same '+fK(cap)+' into the building later (grown from your '+fM(worth)+' worth to '+fM(A.Pf)+') \u00b7 holds '+(10-N)+' yrs. The '+fK(A.grown-cap)+' of money-market interest earned while waiting (at '+(mm*100).toFixed(1)+'%, taxed '+(MM_TAX*100)+'%/yr) is counted in the cash return, not added to the down payment.';
+    $m('mmDetB').textContent = 'Deploy '+fK(cap)+' at a '+fM(bid)+' bid now \u00b7 '+(shareB*100).toFixed(1)+'% share'+overUnder+' \u00b7 holds 10 yrs. Return = cash flow + depreciation shield + principal paydown + appreciation. No sale.';
+    $m('mmDetA').textContent = 'First '+N+' yr'+(N>1?'s':'')+': park '+fK(cap)+' in a money market at '+(mm*100).toFixed(1)+'% (taxed '+(MM_TAX*100)+'%/yr), earning '+fK(A.grown-cap)+' net. Then deploy the same '+fK(cap)+' into a comparable building (like-kind, priced at your '+fM(worth)+' worth grown to '+fM(A.Pf)+') \u00b7 holds '+(10-N)+' yrs. Return = cash flow + depreciation shield + principal paydown + appreciation + '+fK(A.grown-cap)+' interest earned.';
 
     const bWins = B.npv >= A.npv;
     $m('mmCardB').classList.toggle('win', bWins);
@@ -1917,7 +1925,7 @@ refiSlider.addEventListener('input', (e) => {
     $m('mmCostSub').textContent = cost>=0
       ? 'NPV you forfeit by waiting '+N+' yr'+(N>1?'s':'')+' instead of deploying now at your '+fM(bid)+' bid.'
       : 'Waiting '+N+' yr'+(N>1?'s':'')+' adds '+fD(Math.abs(cost))+' of NPV at your '+fM(bid)+' bid.';
-    $m('mmVerdict').textContent = 'You value it at '+fM(worth)+' and would bid '+fM(bid)+' to win. Deploying now '+(cost>=0?'beats':'trails')+' waiting '+N+' yr'+(N>1?'s':'')+' by '+fD(Math.abs(cost))+' of NPV. The waiter deploys the same capital later into the same building (grown from your '+fM(worth)+' worth), so paying more on the bid is what erodes the act-now edge. Both paths are buy & hold (no sale); the money-market path carries real '+(MM_TAX*100)+'% annual tax on interest, which the property does not.';
+    $m('mmVerdict').textContent = 'You value it at '+fM(worth)+' and would bid '+fM(bid)+' to win. Deploying now '+(cost>=0?'beats':'trails')+' waiting '+N+' yr'+(N>1?'s':'')+' by '+fD(Math.abs(cost))+' of NPV. The waiter deploys the same capital later into a comparable like-kind building (priced at your '+fM(worth)+' worth grown at market), so paying more on the bid is what erodes the act-now edge. Both paths are buy & hold (no sale); the money-market path carries real '+(MM_TAX*100)+'% annual tax on interest, which the property does not.';
 
     $m('mmFoot').textContent = 'Two prices: WORTH ('+fM(worth)+') anchors what waiting buys and how appreciation grows; BID ('+fM(bid)+') is what you deploy at now and sets your share. Buy & hold, 10-yr horizon, NO sale (cash flow + depreciation shield only; no recapture, no capital gains). Money-market interest taxed at '+(MM_TAX*100)+'% annually. Capital ('+fK(cap)+') from the analyzer above; appreciation = '+(BASE.marketGrowth*100).toFixed(1)+'%/yr. Decision-support estimate \u2014 confirm tax treatment with your CPA. Not investment advice.';
   }
