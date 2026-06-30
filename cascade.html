@@ -585,6 +585,7 @@ body {
 
 .mmkt-card .mmkt-subgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); }
 .mmkt-sub-lab { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); opacity: 0.55; line-height: 1.3; }
+.mmkt-sub-gain { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--green); margin-top: 1px; }
 .mmkt-sub-val { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-size: 17px; font-weight: 700; color: var(--ink); margin-top: 2px; }
 
 /* ============ SECTION 10 — Act now vs. wait (money-market timing) ============ */
@@ -720,7 +721,7 @@ body {
         <div class="partner-cell"><div class="partner-label">10-yr Cash Return + Dep Shield <span class="partner-note">35% tax bracket</span></div><div class="partner-value" id="outBenefits">—</div></div>
         <div class="partner-cell"><div class="partner-label">Cash + Dep Shield (10-yr avg) <span class="partner-note">35% tax bracket</span></div><div class="partner-value featured" id="outSimpleYield">—</div></div>
         <div class="partner-cell"><div class="partner-label">Principal Paydown (Y10)</div><div class="partner-value" id="outPrincPaydown">—</div></div>
-        <div class="partner-cell"><div class="partner-label">Accumulated Equity (Y10)</div><div class="partner-value" id="outAccumEquity">—</div></div>
+        <div class="partner-cell"><div class="partner-label">Accumulated Equity (Y10) <span style="opacity:0.6">total</span></div><div class="partner-value" id="outAccumEquity">—</div><div class="mmkt-sub-gain" id="outAccumEquityGain">—</div></div>
         <div class="partner-cell"><div class="partner-label">Simple Sale Return (10-yr avg) <span class="partner-note">net of 2% sale fees</span></div><div class="partner-value" id="outIRR">—</div></div>
       </div>
     </div>
@@ -941,7 +942,7 @@ body {
           <div class="mmkt-detail" id="mmDetB"></div>
           <div class="mmkt-subgrid">
             <div><div class="mmkt-sub-lab">10-yr Cash Return + Dep Shield</div><div class="mmkt-sub-val" id="mmCashB">&mdash;</div></div>
-            <div><div class="mmkt-sub-lab">Accumulated Equity (Y10)</div><div class="mmkt-sub-val" id="mmEqB">&mdash;</div></div>
+            <div><div class="mmkt-sub-lab">Accumulated Equity (Y10) <span style="opacity:0.6">total</span></div><div class="mmkt-sub-val" id="mmEqB">&mdash;</div><div class="mmkt-sub-gain" id="mmEqGainB">&mdash;</div></div>
           </div>
         </div>
         <div class="mmkt-card" id="mmCardA">
@@ -952,7 +953,7 @@ body {
           <div class="mmkt-detail" id="mmDetA"></div>
           <div class="mmkt-subgrid">
             <div><div class="mmkt-sub-lab">10-yr Cash Return + Dep Shield</div><div class="mmkt-sub-val" id="mmCashA">&mdash;</div></div>
-            <div><div class="mmkt-sub-lab">Accumulated Equity (Y10)</div><div class="mmkt-sub-val" id="mmEqA">&mdash;</div></div>
+            <div><div class="mmkt-sub-lab">Accumulated Equity (Y10) <span style="opacity:0.6">total</span></div><div class="mmkt-sub-val" id="mmEqA">&mdash;</div><div class="mmkt-sub-gain" id="mmEqGainA">&mdash;</div></div>
           </div>
         </div>
       </div>
@@ -1269,6 +1270,7 @@ function renderPartner(D, capital, scenario) {
   document.getElementById('outY1Monthly').textContent = y1Display;
   document.getElementById('outBenefits').textContent = fmt$(cumulativeBenefits, { compact: true });
   document.getElementById('outAccumEquity').textContent = fmt$(accumulatedEquity, { compact: true });
+  document.getElementById('outAccumEquityGain').textContent = '+' + fmt$(accumulatedEquity - capital, { compact: true }) + ' gain';
   document.getElementById('outPrincPaydown').textContent = fmt$(principalPaydown, { compact: true });
   document.getElementById('outIRR').textContent = fmtPct(simpleReturn, 2);
   document.getElementById('outSimpleYield').textContent = fmtPct(D.cashPlusTaxShield, 2);
@@ -1899,15 +1901,17 @@ refiSlider.addEventListener('input', (e) => {
     $m('mmNpvA').textContent = fD(A.npv);
     $m('mmCashB').textContent = fD(B.cumCash);
     $m('mmEqB').textContent = fD(B.accumEq);
+    $m('mmEqGainB').textContent = '+'+fD(B.accumEq-cap)+' gain';
     $m('mmCashA').textContent = fD(A.cumCash);
     $m('mmEqA').textContent = fD(A.accumEq);
+    $m('mmEqGainA').textContent = '+'+fD(A.accumEq-cap)+' gain';
     $m('mmCost').textContent = (cost<0?'-':'')+fD(Math.abs(cost));
     $m('mmDragTitle').textContent = 'Wait '+N+' yr'+(N>1?'s':'')+', then buy';
 
     const shareB = cap/(bid*BASE.cashInPct);
     const overUnder = bid>worth ? (' \u00b7 '+fK(bid-worth)+' over your '+fM(worth)+' worth') : (bid<worth ? (' \u00b7 '+fK(worth-bid)+' under your '+fM(worth)+' worth') : ' \u00b7 at your worth');
     $m('mmDetB').textContent = 'Deploy '+fK(cap)+' at a '+fM(bid)+' bid now \u00b7 '+(shareB*100).toFixed(1)+'% share'+overUnder+' \u00b7 holds 10 yrs (cash flow + depreciation shield, no sale).';
-    $m('mmDetA').textContent = fK(cap)+' earns '+(mm*100).toFixed(1)+'% (taxed '+(MM_TAX*100)+'%/yr) for '+N+' yr'+(N>1?'s':'')+' \u2192 '+fK(A.grown)+', then buys the building (grown from your '+fM(worth)+' worth to '+fM(A.Pf)+') \u00b7 holds '+(10-N)+' yrs.';
+    $m('mmDetA').textContent = 'Deploy the same '+fK(cap)+' into the building later (grown from your '+fM(worth)+' worth to '+fM(A.Pf)+') \u00b7 holds '+(10-N)+' yrs. The '+fK(A.grown-cap)+' of money-market interest earned while waiting (at '+(mm*100).toFixed(1)+'%, taxed '+(MM_TAX*100)+'%/yr) is counted in the cash return, not added to the down payment.';
 
     const bWins = B.npv >= A.npv;
     $m('mmCardB').classList.toggle('win', bWins);
