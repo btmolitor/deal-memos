@@ -588,7 +588,7 @@ body {
 .mmkt-sub-val-eq { font-size: 14px !important; }
 .mmkt-sub-val { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-size: 17px; font-weight: 700; color: var(--ink); margin-top: 2px; }
 
-/* ============ SECTION 10 — Act now vs. wait (money-market timing) ============ */
+/* ============ SECTION 11 — Act now vs. wait (money-market timing) ============ */
 .mmkt-details { margin-bottom: 56px; border: 1px solid var(--rule-strong); background: var(--paper); }
 .mmkt-summary { padding: 18px 24px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; }
 .mmkt-summary::-webkit-details-marker { display: none; }
@@ -668,12 +668,12 @@ body {
     <div class="snapshot">
       <div class="snap-cell"><span class="snap-label">Purchase Price</span><span class="snap-value" id="sPrice">—</span></div>
       <div class="snap-cell"><span class="snap-label">Units / Price per Unit</span><span class="snap-value" id="sUnitsPPU">—</span></div>
-      <div class="snap-cell"><span class="snap-label">Going-In Cap Rate</span><span class="snap-value" id="sCap">—</span></div>
-      <div class="snap-cell"><span class="snap-label">Year 1 Cash-on-Cash</span><span class="snap-value" id="sCoC">—</span></div>
-      <div class="snap-cell"><span class="snap-label">Cash + Dep Shield (10-yr avg)</span><span class="snap-value" id="sCashTaxShield">—</span><span class="snap-note">35% tax bracket</span></div>
       <div class="snap-cell"><span class="snap-label">Loan / Rate / Amort</span><span class="snap-value" id="sLoan">—</span></div>
-      <div class="snap-cell"><span class="snap-label">Year 1 NOI / Expense Ratio</span><span class="snap-value" id="sNOI">—</span></div>
+      <div class="snap-cell"><span class="snap-label">Year 1 Cash-on-Cash</span><span class="snap-value" id="sCoC">—</span></div>
       <div class="snap-cell"><span class="snap-label">Year 1 DSCR</span><span class="snap-value" id="sDSCR">—</span></div>
+      <div class="snap-cell"><span class="snap-label">Cash + Dep Shield (10-yr avg)</span><span class="snap-value" id="sCashTaxShield">—</span><span class="snap-note">35% tax bracket</span></div>
+      <div class="snap-cell"><span class="snap-label">Year 1 NOI / Expense Ratio</span><span class="snap-value" id="sNOI">—</span></div>
+      <div class="snap-cell"><span class="snap-label">Going-In Cap Rate</span><span class="snap-value" id="sCap">—</span></div>
       <div class="snap-cell"><span class="snap-label">Year 10 Property Value (1.5% growth)</span><span class="snap-value" id="sY10PV">—</span></div>
       <div class="snap-cell"><span class="snap-label">Down Payment</span><span class="snap-value" id="sDown">—</span></div>
       <div class="snap-cell"><span class="snap-label">Total Cash In</span><span class="snap-value" id="sCashIn">—</span><span class="snap-note">includes closing fees</span></div>
@@ -902,9 +902,35 @@ body {
     </div>
   </section>
 
-  <!-- 09 RISKS & CAUTION -->
+  <!-- 09 VACANCY SENSITIVITY -->
   <section class="section">
-    <div class="section-label">09 — What could go wrong</div>
+    <div class="section-label">09 — Vacancy sensitivity</div>
+    <h2 class="section-title">Vacancy stress test</h2>
+    <p style="margin-bottom: 16px; font-size: 12px; color: var(--ink); opacity: 0.55; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase;">Self-contained &middot; does not change the main model</p>
+    <div class="tbl-scroll">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Vacancy</th>
+            <th>Units vacant</th>
+            <th>Vacancy loss</th>
+            <th>Y1 NOI</th>
+            <th>Y1 Cash Flow</th>
+            <th>Y1 DSCR</th>
+            <th>Y1 CoC</th>
+          </tr>
+        </thead>
+        <tbody id="vacSensBody">
+          <tr><td colspan="7" style="text-align: center; opacity: 0.5;">&mdash;</td></tr>
+        </tbody>
+      </table>
+      <p style="font-style: italic; font-size: 12px; color: var(--ink); opacity: 0.65; margin-top: 12px;">This table answers: "If our 5% vacancy assumption is wrong, how much headroom does the deal have?" Range runs 3% to 7% in 0.25% steps. "Units vacant" expresses each rate as an average number of units empty across the year. Each row recomputes when the price slider moves.</p>
+    </div>
+  </section>
+
+  <!-- 10 RISKS & CAUTION -->
+  <section class="section">
+    <div class="section-label">10 — What could go wrong</div>
     <h2 class="section-title">Risks &amp; constraints</h2>
     <div class="story" style="border-left-color: var(--gold); background: rgba(198,146,20,0.08);">
       <p class="story-headline" style="color: var(--gold);">A constraint to note.</p><div class="story-body"><p>At a $7.0M purchase with 40% down, this deal clears the structure-independent test — a 5.46% going-in cap beats our 5.0% floor — and finances at a 1.26 DSCR. Where it falls short is current cash yield: Year-1 cash-on-cash is 2.7% against our 3% target, and DSCR sits effectively at the 1.25 minimum with little cushion.</p><p>The building itself is sound — newer construction, fully occupied, a lean expense ratio. The tension is between the entry price and the Year-1 cash return: at this basis the deal leans on rent growth and the eventual exit rather than on day-one cash flow. That is a reasonable profile for a patient, stabilized hold, but partners should be comfortable with a thin early cash yield going in. If that profile does not fit, this is a reasonable deal to pass on without regret.</p></div>
@@ -919,9 +945,9 @@ body {
   </section>
 
 
-  <!-- 10 TIMING — ACT NOW VS WAIT (money-market) -->
+  <!-- 11 TIMING — ACT NOW VS WAIT (money-market) -->
   <details class="mmkt-details">
-    <summary class="mmkt-summary"><span>10 &mdash; Timing &middot; Act now vs. wait</span></summary>
+    <summary class="mmkt-summary"><span>11 &mdash; Timing &middot; Act now vs. wait</span></summary>
     <div class="mmkt-body">
       <h2 class="mmkt-title">Act now, or wait for the next deal?</h2>
       <p class="mmkt-lede">Deploying capital into this property now captures ten years of ownership. Waiting parks the cash at a money-market rate and buys a comparable building later &mdash; after it has appreciated. This compares the two on net present value, using the price and capital set in the analyzer above. Appreciation grows from the underwritten baseline, so overpaying is penalized.</p>
@@ -1731,13 +1757,55 @@ function renderExpenseSensitivity(D) {
   tbody.innerHTML = html;
 }
 
+function renderVacancySensitivity(D) {
+  const tbody = document.getElementById('vacSensBody');
+  if (!tbody) return;
+  const gprY1 = BASE.gpr[0];
+  const opexY1 = Math.abs(BASE.opex[0]);
+  const baseDS = (function(){
+    const r = BASE.mortgageRate/12, n = BASE.amortYears*12, P = D.loan;
+    if (r === 0) return (P/BASE.amortYears);
+    return (P * r * Math.pow(1+r, n) / (Math.pow(1+r, n) - 1)) * 12;
+  })();
+  const baseCashIn = D.cashIn;
+  const units = BASE.units;
+  // 3% to 7% in 0.25% steps; base assumption = 5%
+  const rates = [];
+  for (let v = 0.03; v <= 0.0701; v += 0.0025) rates.push(Math.round(v*10000)/10000);
+  let html = '';
+  for (const v of rates) {
+    const vacLoss = gprY1 * v;
+    const egi = gprY1 - vacLoss;
+    const noi = egi - opexY1;
+    const cf = noi - baseDS;
+    const dscr = noi / baseDS;
+    const coc = cf / baseCashIn;
+    const unitsVacant = v * units;
+    const isBase = Math.abs(v - 0.05) < 1e-9;
+    const dscrClass = dscr >= 1.25 ? 'pos' : (dscr < 1.20 ? 'neg' : '');
+    const cocClass = (coc >= 0.03 && coc <= 0.06) ? 'pos' : 'neg';
+    const baseStyle = isBase ? ' style="font-weight: 600;"' : '';
+    const vacLabel = (v*100).toFixed(2) + '%' + (isBase ? ' (base)' : '');
+    html += '<tr' + baseStyle + '>';
+    html += '<td>' + vacLabel + '</td>';
+    html += '<td>' + unitsVacant.toFixed(1) + ' of ' + units + '</td>';
+    html += '<td>' + fmt$(vacLoss, { compact: false }) + '</td>';
+    html += '<td>' + fmt$(noi, { compact: false }) + '</td>';
+    html += '<td>' + fmt$(cf, { compact: false }) + '</td>';
+    html += '<td class="' + dscrClass + '">' + dscr.toFixed(2) + '</td>';
+    html += '<td class="' + cocClass + '">' + fmtPct(coc, 2) + '</td>';
+    html += '</tr>';
+  }
+  tbody.innerHTML = html;
+}
+
 function recompute() {
   const D = derive(currentPrice);
   renderSnapshot(D);
   renderPartner(D, currentCapital, currentScenario);
   renderWaterfall(D, currentYearIdx);
   renderProjection(D);
-  renderRefi(D, currentRefiRate); renderRateSensitivity(D); renderExpenseSensitivity(D); }
+  renderRefi(D, currentRefiRate); renderRateSensitivity(D); renderExpenseSensitivity(D); renderVacancySensitivity(D); }
 
 // ================================================================
 // EVENT HANDLERS
@@ -1757,7 +1825,7 @@ const slider = document.getElementById('capitalSlider');
 slider.addEventListener('input', (e) => {
   currentCapital = parseFloat(e.target.value);
   recompute();
-  if (typeof window.mmRenderHook === 'function') window.mmRenderHook(); // Section 10 reacts to capital
+  if (typeof window.mmRenderHook === 'function') window.mmRenderHook(); // Section 11 reacts to capital
   document.querySelectorAll('.preset-btn').forEach(btn => {
     btn.classList.toggle('active', parseFloat(btn.dataset.val) === currentCapital);
   });
@@ -1768,7 +1836,7 @@ document.querySelectorAll('.preset-btn').forEach(btn => {
     currentCapital = parseFloat(btn.dataset.val);
     slider.value = currentCapital;
     recompute();
-    if (typeof window.mmRenderHook === 'function') window.mmRenderHook(); // Section 10 reacts to capital
+    if (typeof window.mmRenderHook === 'function') window.mmRenderHook(); // Section 11 reacts to capital
     document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   });
@@ -1800,7 +1868,7 @@ refiSlider.addEventListener('input', (e) => {
 
 
 // ============================================================
-// SECTION 10 — Act now vs. wait (money-market timing)
+// SECTION 11 — Act now vs. wait (money-market timing)
 // Reads from BASE + currentPrice + currentCapital (single source of truth).
 // Adds ZERO new tokens. DUAL-only feature.
 //
