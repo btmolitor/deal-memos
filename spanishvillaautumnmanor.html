@@ -708,10 +708,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$1,000,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">38.87%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">46.75%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="2573000" step="10000" value="1000000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="2139000" step="10000" value="1000000" class="slider" id="capitalSlider">
           <div class="slider-ticks"><span>$100K</span><span>$622K</span><span>$1.1M</span><span>$1.7M</span><span>$2.2M</span></div>
         </div>
         <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn active" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn" data-val="1000000">$1.00M</button><button class="preset-btn" data-val="1500000">$1.50M</button><button class="preset-btn" data-val="2190000">$2.19M</button></div>
@@ -1029,10 +1029,10 @@ const BASE = {
   units: 64,
 
   // Ratios applied to purchase price
-  downPct: 0.4,
+  downPct: 0.33,
   closingReservesPct: 0.015,  // combined closing + reserves = 1.5% of price
-  loanPct: 0.6,              // = 1 - downPct
-  cashInPct: 0.415,           // = down + closing/reserves
+  loanPct: 0.67,              // = 1 - downPct
+  cashInPct: 0.345,           // = down + closing/reserves
   depShieldPerDollar: 0.01145455,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
@@ -1044,11 +1044,11 @@ const BASE = {
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.01726297, 0.01835508, 0.01951628, 0.02075095, 0.02206373, 0.01609343, 0.01711156, 0.0181941, 0.01934512, 0.02056895],
+  wfPrincRatios: [0.02318825, 0.02465522, 0.02621499, 0.02787344, 0.02963682, 0.02161729, 0.02298487, 0.02443898, 0.02598507, 0.02762898],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1, 1, 0.98616028, 0.97144502, 0.95579881, 0.94438637, 0.93225193, 0.91934983, 0.9056315, 0.89104529],
-  ioWfPrincRatios: [0, 0, 0.00830383, 0.00882916, 0.00938772, 0.00684747, 0.00728066, 0.00774126, 0.008231, 0.00875172],
+  ioWfPrincRatios: [0, 0, 0.00927261, 0.00985923, 0.01048296, 0.00764634, 0.00813007, 0.00864441, 0.00919128, 0.00977276],
   ioDsByYearRatios: [0.0615, 0.0615, 0.07495393, 0.07495393, 0.07495393, 0.06987595, 0.06987595, 0.06987595, 0.06987595, 0.06987595],
 
   // FIXED operating data — does NOT scale with price (same building)
@@ -1206,7 +1206,7 @@ function renderSnapshot(D) {
   capCell.classList.toggle('pos', D.goingInCap >= 0.05);
   capCell.classList.toggle('neg', D.goingInCap < 0.05);
   document.getElementById('sCashIn').textContent = fmt$(D.cashIn, { compact: true });
-  document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (40%)';
+  document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (33%)';
   document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 6.15% · 30yr';
   // Expense ratio = OpEx / EGI where EGI = NOI + OpEx (OpEx stored as positive in this BASE)
   const y1NOI = BASE.noi[0];
