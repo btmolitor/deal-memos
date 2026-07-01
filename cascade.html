@@ -657,11 +657,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $7.00M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$7.00M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.75M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$6.75M</div>
       </div>
-      <input type="range" id="priceSlider" min="6112699.2" max="8140000" step="10000" value="7000000" class="price-slider" />
-      <div class="price-control-ticks"><span>$6.11M</span><span>baseline $7.00M</span><span>$8.14M</span></div>
+      <input type="range" id="priceSlider" min="6112699.2" max="8140000" step="10000" value="6750000" class="price-slider" />
+      <div class="price-control-ticks"><span>$6.11M</span><span>baseline $6.75M</span><span>$8.14M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -708,10 +708,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$1,000,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">34.42%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">35.70%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="2905000" step="10000" value="1000000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="2801250" step="10000" value="1000000" class="slider" id="capitalSlider">
           <div class="slider-ticks"><span>$100K</span><span>$801K</span><span>$1.5M</span><span>$2.2M</span><span>$2.9M</span></div>
         </div>
         <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn active" data-val="1000000">$1.00M</button><button class="preset-btn" data-val="1500000">$1.50M</button><button class="preset-btn" data-val="2905000">$2.90M</button></div>
@@ -950,7 +950,7 @@ body {
     <summary class="mmkt-summary"><span>11 &mdash; Timing &middot; Act now vs. wait</span></summary>
     <div class="mmkt-body">
       <h2 class="mmkt-title">Act now, or wait for the next deal?</h2>
-      <p class="mmkt-lede">Deploying capital into this property now captures ten years of ownership. Waiting parks the cash at a money-market rate and buys a comparable building later &mdash; after it has appreciated. This compares the two on net present value, using the price and capital set in the analyzer above. Appreciation grows from the underwritten baseline, so overpaying is penalized.</p>
+      <p class="mmkt-lede">Deploying capital into this property now captures ten years of ownership. Waiting parks the cash at a money-market rate and buys a comparable building later &mdash; after it has appreciated. This compares the two on net present value, using the worth, bid, and capital set below. The building grows from the same worth-based number no matter what you pay, so overpaying can't buy more appreciation &mdash; it only shrinks your return.</p>
 
       <div class="mmkt-cost-band">
         <div class="mmkt-cost-lab">Cost of waiting</div>
@@ -987,13 +987,13 @@ body {
       <div class="mmkt-controls">
         <div class="mmkt-ctl star">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Preferred underwriting price <span style="font-weight:400;opacity:0.6">(what it&rsquo;s worth &mdash; anchors waiting)</span></span><span class="mmkt-ctl-val" id="mmvPrice">&mdash;</span></div>
-          <input type="range" id="mmPrice" min="6112699.2" max="8140000" step="10000" value="7000000">
-          <div class="mmkt-ticks"><span>$6.11M</span><span>baseline $7.00M</span><span>$8.14M</span></div>
+          <input type="range" id="mmPrice" min="6112699.2" max="8140000" step="10000" value="6750000">
+          <div class="mmkt-ticks"><span>$6.11M</span><span>baseline $6.75M</span><span>$8.14M</span></div>
         </div>
         <div class="mmkt-ctl star">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Bid price <span style="font-weight:400;opacity:0.6">(what you&rsquo;d pay to win &mdash; what you deploy at)</span></span><span class="mmkt-ctl-val" id="mmvBid">&mdash;</span></div>
-          <input type="range" id="mmBid" min="6112699.2" max="8140000" step="10000" value="7000000">
-          <div class="mmkt-ticks"><span>$6.11M</span><span>worth $7.00M</span><span>$8.14M</span></div>
+          <input type="range" id="mmBid" min="6112699.2" max="8140000" step="10000" value="6750000">
+          <div class="mmkt-ticks"><span>$6.11M</span><span>worth $6.75M</span><span>$8.14M</span></div>
         </div>
         <div class="mmkt-ctl">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Years you wait</span><span class="mmkt-ctl-val" id="mmvYears">2 years</span></div>
@@ -1030,7 +1030,7 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 7000000,
+  basePrice: 6750000,
   units: 44,
 
   // Ratios applied to purchase price
@@ -1049,7 +1049,7 @@ const BASE = {
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.01726296, 0.01835508, 0.01951629, 0.02075095, 0.02206373, 0.01609343, 0.01711156, 0.0181941, 0.01934512, 0.02056896],
+  wfPrincRatios: [0.01726296, 0.01835508, 0.01951628, 0.02075095, 0.02206373, 0.01609343, 0.01711156, 0.0181941, 0.01934512, 0.02056896],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1, 1, 0.98616028, 0.97144502, 0.95579881, 0.94438637, 0.93225193, 0.91934983, 0.9056315, 0.89104529],
@@ -1936,7 +1936,9 @@ refiSlider.addEventListener('input', (e) => {
     const share = cap/(Pf*BASE.cashInPct), ds = mmDS(Pf), hold = 10-N; // OPTION A: deploy the same $1M PRINCIPAL later (not the grown cash)
     let v=0, cumCash=mmInterestNet; // start the 10-yr cash tally WITH the net interest earned while waiting
     for(let i=0;i<hold;i++){
-      const cf = (BASE.noi[i]-ds[i])*share;
+      // OPTION 2: the comparable building's income has appreciated alongside its price during the wait,
+      // so it enters at this deal's grown NOI (noi[N+i]), not today's frozen NOI. Keeps price & income consistent.
+      const cf = (BASE.noi[N+i]-ds[i])*share;
       const shield = (Pf*BASE.depShieldPerDollar)*share;
       cumCash += cf + shield;
       v += (cf + shield)/Math.pow(1+disc, N+i+1);
@@ -2003,7 +2005,7 @@ refiSlider.addEventListener('input', (e) => {
       : 'Waiting '+N+' yr'+(N>1?'s':'')+' adds '+fD(Math.abs(cost))+' of NPV at your '+fM(bid)+' bid.';
     $m('mmVerdict').textContent = 'You value it at '+fM(worth)+' and would bid '+fM(bid)+' to win. Deploying now '+(cost>=0?'beats':'trails')+' waiting '+N+' yr'+(N>1?'s':'')+' by '+fD(Math.abs(cost))+' of NPV. The waiter deploys the same capital later into a comparable like-kind building (priced at your '+fM(worth)+' worth grown at market), so paying more on the bid is what erodes the act-now edge. Both paths are buy & hold (equity valued at a hypothetical Y10 sale net of 2% costs via 1031 — no income tax or recapture — not actually sold); the money-market path carries real '+(MM_TAX*100)+'% annual tax on interest, which the property does not.';
 
-    $m('mmFoot').textContent = 'Two prices: WORTH ('+fM(worth)+') anchors what waiting buys and how appreciation grows; BID ('+fM(bid)+') is what you deploy at now and sets your share. Buy & hold, 10-yr horizon, NO sale (cash flow + depreciation shield only; no recapture, no capital gains). Money-market interest taxed at '+(MM_TAX*100)+'% annually. Capital ('+fK(cap)+') from the analyzer above; appreciation = '+(BASE.marketGrowth*100).toFixed(1)+'%/yr. Decision-support estimate \u2014 confirm tax treatment with your CPA. Not investment advice.';
+    $m('mmFoot').textContent = 'Two prices: WORTH ('+fM(worth)+') anchors what waiting buys and how appreciation grows; BID ('+fM(bid)+') is what you deploy at now and sets your share. Buy & hold, 10-yr horizon, NO sale (cash flow + depreciation shield only; no recapture, no capital gains). Money-market interest taxed at '+(MM_TAX*100)+'% annually. Capital ('+fK(cap)+') from the analyzer above; appreciation = '+(BASE.marketGrowth*100).toFixed(1)+'%/yr. The comparable building bought after waiting enters at appreciated income (its price and rents both grow during the wait), so the wait path gets a fair, fully-consistent yield rather than a handicapped one \u2014 chosen so that an \u201cact now wins\u201d result reflects a level comparison you can trust, not a conservative thumb on the scale. Decision-support estimate \u2014 confirm tax treatment with your CPA. Not investment advice.';
   }
 
   ['mmPrice','mmBid','mmYears','mmMM','mmDisc'].forEach(function(id){ const el=document.getElementById(id); if(el) el.addEventListener('input', mmRender); });
