@@ -629,6 +629,13 @@ body {
 .mmkt-controls input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--paper); border: 2px solid var(--accent); cursor: pointer; }
 .mmkt-ticks { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--ink); opacity: 0.5; margin-top: 4px; }
 .mmkt-foot { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink); opacity: 0.5; line-height: 1.7; padding-top: 16px; border-top: 1px solid var(--rule); }
+.mmkt-bidstats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--rule); }
+.mmkt-bidstat { display: flex; flex-direction: column; }
+.mmkt-bidstat-lab { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); opacity: 0.55; line-height: 1.3; }
+.mmkt-bidstat-val { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-size: 15px; font-weight: 700; color: var(--ink); margin-top: 3px; }
+.mmkt-bidstat-val.pos { color: var(--green); }
+.mmkt-bidstat-val.neg { color: var(--brick); }
+@media (max-width: 620px) { .mmkt-bidstats { grid-template-columns: 1fr; gap: 6px; } }
 .mmkt-cost-band { background: var(--ink); color: var(--paper); padding: 22px 30px; margin-bottom: 8px; }
 .mmkt-cost-lab { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-soft); margin-bottom: 6px; }
 .mmkt-cost-num { font-family: 'Fraunces', serif; font-size: clamp(30px, 6vw, 46px); font-weight: 900; line-height: 1; letter-spacing: -0.02em; }
@@ -984,11 +991,21 @@ body {
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Preferred underwriting price <span style="font-weight:400;opacity:0.6">(what it&rsquo;s worth &mdash; anchors waiting)</span></span><span class="mmkt-ctl-val" id="mmvPrice">&mdash;</span></div>
           <input type="range" id="mmPrice" min="5000000" max="7500000" step="10000" value="6200000">
           <div class="mmkt-ticks"><span>$5.00M</span><span>baseline $6.20M</span><span>$7.50M</span></div>
+          <div class="mmkt-bidstats">
+            <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Units / Price per Unit</span><span class="mmkt-bidstat-val" id="mmWorthPPU">&mdash;</span></div>
+            <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Year 1 Cash-on-Cash</span><span class="mmkt-bidstat-val" id="mmWorthCoC">&mdash;</span></div>
+            <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Year 1 DSCR</span><span class="mmkt-bidstat-val" id="mmWorthDSCR">&mdash;</span></div>
+          </div>
         </div>
         <div class="mmkt-ctl star">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Bid price <span style="font-weight:400;opacity:0.6">(what you&rsquo;d pay to win &mdash; what you deploy at)</span></span><span class="mmkt-ctl-val" id="mmvBid">&mdash;</span></div>
           <input type="range" id="mmBid" min="5000000" max="7500000" step="10000" value="6200000">
           <div class="mmkt-ticks"><span>$5.00M</span><span>worth $6.20M</span><span>$7.50M</span></div>
+          <div class="mmkt-bidstats">
+            <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Units / Price per Unit</span><span class="mmkt-bidstat-val" id="mmBidPPU">&mdash;</span></div>
+            <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Year 1 Cash-on-Cash</span><span class="mmkt-bidstat-val" id="mmBidCoC">&mdash;</span></div>
+            <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Year 1 DSCR</span><span class="mmkt-bidstat-val" id="mmBidDSCR">&mdash;</span></div>
+          </div>
         </div>
         <div class="mmkt-ctl">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Years you wait</span><span class="mmkt-ctl-val" id="mmvYears">2 years</span></div>
@@ -1968,7 +1985,33 @@ refiSlider.addEventListener('input', (e) => {
     const cap = currentCapital, worth = mmPrice, bid = mmBid;
     const N = +$m('mmYears').value, mm = +$m('mmMM').value/10000, disc = +$m('mmDisc').value/10000;
     $m('mmvPrice').textContent = fM(worth);
+    // Live deal metrics at the WORTH price (mirror the main model: PPU, Y1 CoC, Y1 DSCR)
+    (function(){
+      const wLoan = worth * BASE.loanPct;
+      const wCashIn = worth * BASE.cashInPct;
+      const m = BASE.mortgageRate/12, n = BASE.amortYears*12;
+      const wDS = (m===0) ? wLoan/BASE.amortYears : wLoan * m * Math.pow(1+m,n)/(Math.pow(1+m,n)-1) * 12;
+      const ppu = worth / BASE.units;
+      const dscr = BASE.noi[0] / wDS;
+      const coc = (BASE.noi[0] - wDS) / wCashIn;
+      if ($m('mmWorthPPU')) $m('mmWorthPPU').textContent = BASE.units + ' \\u00b7 ' + fD(ppu);
+      if ($m('mmWorthCoC')) { const el=$m('mmWorthCoC'); el.textContent = (coc*100).toFixed(2)+'%'; el.className='mmkt-bidstat-val '+((coc>=0.03&&coc<=0.06)?'pos':'neg'); }
+      if ($m('mmWorthDSCR')) { const el=$m('mmWorthDSCR'); el.textContent = dscr.toFixed(2); el.className='mmkt-bidstat-val '+(dscr>=1.25?'pos':(dscr<1.20?'neg':'')); }
+    })();
     $m('mmvBid').textContent = fM(bid);
+    // Live deal metrics at the BID (mirror the main model: PPU, Y1 CoC, Y1 DSCR)
+    (function(){
+      const bidLoan = bid * BASE.loanPct;
+      const bidCashIn = bid * BASE.cashInPct;
+      const m = BASE.mortgageRate/12, n = BASE.amortYears*12;
+      const bidDS = (m===0) ? bidLoan/BASE.amortYears : bidLoan * m * Math.pow(1+m,n)/(Math.pow(1+m,n)-1) * 12;
+      const ppu = bid / BASE.units;
+      const dscr = BASE.noi[0] / bidDS;
+      const coc = (BASE.noi[0] - bidDS) / bidCashIn;
+      if ($m('mmBidPPU')) $m('mmBidPPU').textContent = BASE.units + ' \u00b7 ' + fD(ppu);
+      if ($m('mmBidCoC')) { const el=$m('mmBidCoC'); el.textContent = (coc*100).toFixed(2)+'%'; el.className='mmkt-bidstat-val '+((coc>=0.03&&coc<=0.06)?'pos':'neg'); }
+      if ($m('mmBidDSCR')) { const el=$m('mmBidDSCR'); el.textContent = dscr.toFixed(2); el.className='mmkt-bidstat-val '+(dscr>=1.25?'pos':(dscr<1.20?'neg':'')); }
+    })();
     $m('mmvYears').textContent = N+(N===1?' year':' years');
     $m('mmvMM').textContent = (mm*100).toFixed(2)+'%';
     $m('mmvDisc').textContent = (disc*100).toFixed(2)+'%';
