@@ -583,9 +583,12 @@ body {
 .proj-dual-diff td { padding-top: 2px; padding-bottom: 8px; font-size: 12px; opacity: 0.7; border-bottom: 1px solid rgba(0,0,0,0.08); }
 
 
-.mmkt-card .mmkt-subgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.mmkt-card .mmkt-subgrid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); align-items: start; }
 .mmkt-sub-lab { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); opacity: 0.55; line-height: 1.3; }
-.mmkt-sub-val-eq { font-size: 14px !important; }
+.mmkt-sub-val-eq { font-size: 15px !important; white-space: nowrap; }
+.mmkt-eq-gain { font-weight: 600; color: var(--green); }
+@media (max-width: 620px) { .mmkt-card .mmkt-subgrid { grid-template-columns: 1fr; gap: 12px; } .mmkt-sub-val-eq { font-size: 14px !important; } }
+
 .mmkt-sub-val { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-size: 17px; font-weight: 700; color: var(--ink); margin-top: 2px; }
 
 /* ============ SECTION 11 — Act now vs. wait (money-market timing) ============ */
@@ -1217,7 +1220,7 @@ function renderSnapshot(D) {
   else priceDisplay.classList.remove('off-baseline');
 
   document.getElementById('sPrice').textContent = fmt$(D.price, { compact: true });
-  document.getElementById('sUnitsPPU').textContent = D.units + ' · ' + fmt$(D.ppu, { compact: true });
+  document.getElementById('sUnitsPPU').textContent = D.units + ' · ' + fmt$(D.ppu, { compact: false });
   const capCell = document.getElementById('sCap');
   capCell.textContent = fmtPct(D.goingInCap, 2);
   capCell.classList.toggle('pos', D.goingInCap >= 0.05);
@@ -1994,7 +1997,7 @@ refiSlider.addEventListener('input', (e) => {
       const ppu = worth / BASE.units;
       const dscr = BASE.noi[0] / wDS;
       const coc = (BASE.noi[0] - wDS) / wCashIn;
-      if ($m('mmWorthPPU')) $m('mmWorthPPU').textContent = BASE.units + ' \\u00b7 ' + fD(ppu);
+      if ($m('mmWorthPPU')) $m('mmWorthPPU').textContent = BASE.units + ' \u00b7 ' + fD(ppu);
       if ($m('mmWorthCoC')) { const el=$m('mmWorthCoC'); el.textContent = (coc*100).toFixed(2)+'%'; el.className='mmkt-bidstat-val '+((coc>=0.03&&coc<=0.06)?'pos':'neg'); }
       if ($m('mmWorthDSCR')) { const el=$m('mmWorthDSCR'); el.textContent = dscr.toFixed(2); el.className='mmkt-bidstat-val '+(dscr>=1.25?'pos':(dscr<1.20?'neg':'')); }
     })();
@@ -2023,9 +2026,9 @@ refiSlider.addEventListener('input', (e) => {
     $m('mmNpvB').textContent = fD(B.npv);
     $m('mmNpvA').textContent = fD(A.npv);
     $m('mmCashB').textContent = fD(B.cumCash);
-    $m('mmEqB').textContent = fD(B.accumEq)+' total \u00b7 +'+fD(B.accumEq-cap)+' gain';
+    $m('mmEqB').innerHTML = fD(B.accumEq)+' <span style="opacity:0.55;font-weight:400">total</span> \u00b7 <span class="mmkt-eq-gain">+'+fD(B.accumEq-cap)+'</span>';
     $m('mmCashA').textContent = fD(A.cumCash);
-    $m('mmEqA').textContent = fD(A.accumEq)+' total \u00b7 +'+fD(A.accumEq-cap)+' gain';
+    $m('mmEqA').innerHTML = fD(A.accumEq)+' <span style="opacity:0.55;font-weight:400">total</span> \u00b7 <span class="mmkt-eq-gain">+'+fD(A.accumEq-cap)+'</span>';
     $m('mmCost').textContent = (cost<0?'-':'')+fD(Math.abs(cost));
     $m('mmDragTitle').textContent = 'Wait '+N+' yr'+(N>1?'s':'')+', then buy';
 
