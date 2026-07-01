@@ -660,7 +660,7 @@ body {
         <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.40M baseline</span></div>
         <div class="price-control-value" id="priceDisplay">$6.40M</div>
       </div>
-      <input type="range" id="priceSlider" min="5000000" max="7500000" step="25000" value="6400000" class="price-slider" />
+      <input type="range" id="priceSlider" min="5000000" max="7500000" step="10000" value="6400000" class="price-slider" />
       <div class="price-control-ticks"><span>$5.00M</span><span>baseline $6.40M</span><span>$7.50M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
@@ -707,11 +707,11 @@ body {
       </div>
       <div class="lever-control">
         <div class="lever-display">
-          <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">18.83%</strong></div>
+          <div class="lever-amount" id="leverAmount">$1,000,000</div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">37.65%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="2656000" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="2656000" step="10000" value="1000000" class="slider" id="capitalSlider">
           <div class="slider-ticks"><span>$100K</span><span>$622K</span><span>$1.1M</span><span>$1.7M</span><span>$2.2M</span></div>
         </div>
         <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn active" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn" data-val="1000000">$1.00M</button><button class="preset-btn" data-val="1500000">$1.50M</button><button class="preset-btn" data-val="2190000">$2.19M</button></div>
@@ -982,12 +982,12 @@ body {
       <div class="mmkt-controls">
         <div class="mmkt-ctl star">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Preferred underwriting price <span style="font-weight:400;opacity:0.6">(what it&rsquo;s worth &mdash; anchors waiting)</span></span><span class="mmkt-ctl-val" id="mmvPrice">&mdash;</span></div>
-          <input type="range" id="mmPrice" min="5000000" max="7500000" step="25000" value="6400000">
+          <input type="range" id="mmPrice" min="5000000" max="7500000" step="10000" value="6400000">
           <div class="mmkt-ticks"><span>$5.00M</span><span>baseline $6.40M</span><span>$7.50M</span></div>
         </div>
         <div class="mmkt-ctl star">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Bid price <span style="font-weight:400;opacity:0.6">(what you&rsquo;d pay to win &mdash; what you deploy at)</span></span><span class="mmkt-ctl-val" id="mmvBid">&mdash;</span></div>
-          <input type="range" id="mmBid" min="5000000" max="7500000" step="25000" value="6400000">
+          <input type="range" id="mmBid" min="5000000" max="7500000" step="10000" value="6400000">
           <div class="mmkt-ticks"><span>$5.00M</span><span>worth $6.40M</span><span>$7.50M</span></div>
         </div>
         <div class="mmkt-ctl">
@@ -1071,7 +1071,7 @@ const BASE = {
 // ================================================================
 let currentPrice = BASE.basePrice;
 let currentScenario = 'A';
-let currentCapital = 500000;
+let currentCapital = 1000000;
 let currentYearIdx = 0;
 let currentRefiRate = 0.0615;
 
