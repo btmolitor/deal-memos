@@ -583,11 +583,9 @@ body {
 .proj-dual-diff td { padding-top: 2px; padding-bottom: 8px; font-size: 12px; opacity: 0.7; border-bottom: 1px solid rgba(0,0,0,0.08); }
 
 
-.mmkt-card .mmkt-subgrid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); align-items: start; }
+.mmkt-card .mmkt-subgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); }
 .mmkt-sub-lab { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); opacity: 0.55; line-height: 1.3; }
-.mmkt-sub-val-eq { font-size: 15px !important; white-space: nowrap; }
-.mmkt-eq-gain { font-weight: 600; color: var(--green); }
-@media (max-width: 620px) { .mmkt-card .mmkt-subgrid { grid-template-columns: 1fr; gap: 12px; } .mmkt-sub-val-eq { font-size: 14px !important; } }
+.mmkt-sub-val-eq { font-size: 14px !important; }
 
 .mmkt-sub-val { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-size: 17px; font-weight: 700; color: var(--ink); margin-top: 2px; }
 
@@ -2026,9 +2024,9 @@ refiSlider.addEventListener('input', (e) => {
     $m('mmNpvB').textContent = fD(B.npv);
     $m('mmNpvA').textContent = fD(A.npv);
     $m('mmCashB').textContent = fD(B.cumCash);
-    $m('mmEqB').innerHTML = fD(B.accumEq)+' <span style="opacity:0.55;font-weight:400">total</span> \u00b7 <span class="mmkt-eq-gain">+'+fD(B.accumEq-cap)+'</span>';
+    $m('mmEqB').textContent = fD(B.accumEq)+' total \u00b7 +'+fD(B.accumEq-cap)+' gain';
     $m('mmCashA').textContent = fD(A.cumCash);
-    $m('mmEqA').innerHTML = fD(A.accumEq)+' <span style="opacity:0.55;font-weight:400">total</span> \u00b7 <span class="mmkt-eq-gain">+'+fD(A.accumEq-cap)+'</span>';
+    $m('mmEqA').textContent = fD(A.accumEq)+' total \u00b7 +'+fD(A.accumEq-cap)+' gain';
     $m('mmCost').textContent = (cost<0?'-':'')+fD(Math.abs(cost));
     $m('mmDragTitle').textContent = 'Wait '+N+' yr'+(N>1?'s':'')+', then buy';
 
