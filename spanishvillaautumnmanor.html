@@ -665,11 +665,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.40M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$6.40M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.20M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$6.20M</div>
       </div>
-      <input type="range" id="priceSlider" min="5000000" max="7500000" step="10000" value="6400000" class="price-slider" />
-      <div class="price-control-ticks"><span>$5.00M</span><span>baseline $6.40M</span><span>$7.50M</span></div>
+      <input type="range" id="priceSlider" min="5000000" max="7500000" step="10000" value="6200000" class="price-slider" />
+      <div class="price-control-ticks"><span>$5.00M</span><span>baseline $6.20M</span><span>$7.50M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -716,10 +716,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$1,000,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">39.56%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">40.83%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="2528000" step="10000" value="1000000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="2449000" step="10000" value="1000000" class="slider" id="capitalSlider">
           <div class="slider-ticks"><span>$100K</span><span>$622K</span><span>$1.1M</span><span>$1.7M</span><span>$2.2M</span></div>
         </div>
         <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn active" data-val="1000000">$1.00M</button><button class="preset-btn" data-val="1500000">$1.50M</button><button class="preset-btn" data-val="2905000">$2.90M</button></div>
@@ -990,8 +990,8 @@ body {
       <div class="mmkt-controls">
         <div class="mmkt-ctl star">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Preferred underwriting price <span style="font-weight:400;opacity:0.6">(what it&rsquo;s worth &mdash; anchors waiting)</span></span><span class="mmkt-ctl-val" id="mmvPrice">&mdash;</span></div>
-          <input type="range" id="mmPrice" min="5000000" max="7500000" step="10000" value="6400000">
-          <div class="mmkt-ticks"><span>$5.00M</span><span>baseline $6.40M</span><span>$7.50M</span></div>
+          <input type="range" id="mmPrice" min="5000000" max="7500000" step="10000" value="6200000">
+          <div class="mmkt-ticks"><span>$5.00M</span><span>baseline $6.20M</span><span>$7.50M</span></div>
           <div class="mmkt-bidstats">
             <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Units / Price per Unit</span><span class="mmkt-bidstat-val" id="mmWorthPPU">&mdash;</span></div>
             <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Year 1 Cash-on-Cash</span><span class="mmkt-bidstat-val" id="mmWorthCoC">&mdash;</span></div>
@@ -1000,8 +1000,8 @@ body {
         </div>
         <div class="mmkt-ctl star">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Bid price <span style="font-weight:400;opacity:0.6">(what you&rsquo;d pay to win &mdash; what you deploy at)</span></span><span class="mmkt-ctl-val" id="mmvBid">&mdash;</span></div>
-          <input type="range" id="mmBid" min="5000000" max="7500000" step="10000" value="6400000">
-          <div class="mmkt-ticks"><span>$5.00M</span><span>worth $6.40M</span><span>$7.50M</span></div>
+          <input type="range" id="mmBid" min="5000000" max="7500000" step="10000" value="6200000">
+          <div class="mmkt-ticks"><span>$5.00M</span><span>worth $6.20M</span><span>$7.50M</span></div>
           <div class="mmkt-bidstats">
             <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Units / Price per Unit</span><span class="mmkt-bidstat-val" id="mmBidPPU">&mdash;</span></div>
             <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Year 1 Cash-on-Cash</span><span class="mmkt-bidstat-val" id="mmBidCoC">&mdash;</span></div>
@@ -1043,7 +1043,7 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 6400000,
+  basePrice: 6200000,
   units: 64,
 
   // Ratios applied to purchase price
@@ -1062,7 +1062,7 @@ const BASE = {
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.01874161, 0.01992727, 0.02118794, 0.02252835, 0.02395358, 0.0174719, 0.01857723, 0.01975249, 0.0210021, 0.02233077],
+  wfPrincRatios: [0.0187416, 0.01992726, 0.02118793, 0.02252835, 0.02395358, 0.0174719, 0.01857723, 0.01975249, 0.0210021, 0.02233077],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1, 1, 0.98616028, 0.97144502, 0.95579881, 0.94438637, 0.93225193, 0.91934983, 0.9056315, 0.89104529],
@@ -1308,7 +1308,7 @@ function renderPartner(D, capital, scenario) {
   document.getElementById('leverShare').textContent = fmtPct(share);
   document.getElementById('outY1Monthly').textContent = y1Display;
   document.getElementById('outBenefits').textContent = fmt$(cumulativeBenefits, { compact: true });
-  document.getElementById('outAccumEquity').textContent = fmt$(accumulatedEquity, { compact: true }) + ' total · +' + fmt$(accumulatedEquity - capital, { compact: true }) + ' gain';
+  document.getElementById('outAccumEquity').textContent = fmt$(accumulatedEquity, { compact: true }) + ' total · ' + fmt$(Math.abs(accumulatedEquity - capital), { compact: true }) + ((accumulatedEquity - capital) >= 0 ? ' gain' : ' loss');
   document.getElementById('outPrincPaydown').textContent = fmt$(principalPaydown, { compact: true });
   document.getElementById('outIRR').textContent = fmtPct(simpleReturn, 2);
   document.getElementById('outSimpleYield').textContent = fmtPct(D.cashPlusTaxShield, 2);
@@ -2024,9 +2024,9 @@ refiSlider.addEventListener('input', (e) => {
     $m('mmNpvB').textContent = fD(B.npv);
     $m('mmNpvA').textContent = fD(A.npv);
     $m('mmCashB').textContent = fD(B.cumCash);
-    $m('mmEqB').textContent = fD(B.accumEq)+' total \u00b7 +'+fD(B.accumEq-cap)+' gain';
+    $m('mmEqB').textContent = fD(B.accumEq)+' total \u00b7 '+fD(Math.abs(B.accumEq-cap))+((B.accumEq-cap)>=0?' gain':' loss');
     $m('mmCashA').textContent = fD(A.cumCash);
-    $m('mmEqA').textContent = fD(A.accumEq)+' total \u00b7 +'+fD(A.accumEq-cap)+' gain';
+    $m('mmEqA').textContent = fD(A.accumEq)+' total \u00b7 '+fD(Math.abs(A.accumEq-cap))+((A.accumEq-cap)>=0?' gain':' loss');
     $m('mmCost').textContent = (cost<0?'-':'')+fD(Math.abs(cost));
     $m('mmDragTitle').textContent = 'Wait '+N+' yr'+(N>1?'s':'')+', then buy';
 
