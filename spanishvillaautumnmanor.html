@@ -665,11 +665,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.20M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$6.20M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $6.30M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$6.30M</div>
       </div>
-      <input type="range" id="priceSlider" min="5000000" max="7500000" step="10000" value="6200000" class="price-slider" />
-      <div class="price-control-ticks"><span>$5.00M</span><span>baseline $6.20M</span><span>$7.50M</span></div>
+      <input type="range" id="priceSlider" min="5000000" max="7500000" step="10000" value="6300000" class="price-slider" />
+      <div class="price-control-ticks"><span>$5.00M</span><span>baseline $6.30M</span><span>$7.50M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -716,10 +716,10 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$1,000,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">40.83%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">40.18%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="2449000" step="10000" value="1000000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="2488500" step="10000" value="1000000" class="slider" id="capitalSlider">
           <div class="slider-ticks"><span>$100K</span><span>$622K</span><span>$1.1M</span><span>$1.7M</span><span>$2.2M</span></div>
         </div>
         <div class="preset-buttons"><button class="preset-btn" data-val="100000">$100K</button><button class="preset-btn" data-val="250000">$250K</button><button class="preset-btn" data-val="500000">$500K</button><button class="preset-btn" data-val="750000">$750K</button><button class="preset-btn active" data-val="1000000">$1.00M</button><button class="preset-btn" data-val="1500000">$1.50M</button><button class="preset-btn" data-val="2905000">$2.90M</button></div>
@@ -990,8 +990,8 @@ body {
       <div class="mmkt-controls">
         <div class="mmkt-ctl star">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Preferred underwriting price <span style="font-weight:400;opacity:0.6">(what it&rsquo;s worth &mdash; anchors waiting)</span></span><span class="mmkt-ctl-val" id="mmvPrice">&mdash;</span></div>
-          <input type="range" id="mmPrice" min="5000000" max="7500000" step="10000" value="6200000">
-          <div class="mmkt-ticks"><span>$5.00M</span><span>baseline $6.20M</span><span>$7.50M</span></div>
+          <input type="range" id="mmPrice" min="5000000" max="7500000" step="10000" value="6300000">
+          <div class="mmkt-ticks"><span>$5.00M</span><span>baseline $6.30M</span><span>$7.50M</span></div>
           <div class="mmkt-bidstats">
             <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Units / Price per Unit</span><span class="mmkt-bidstat-val" id="mmWorthPPU">&mdash;</span></div>
             <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Year 1 Cash-on-Cash</span><span class="mmkt-bidstat-val" id="mmWorthCoC">&mdash;</span></div>
@@ -1000,8 +1000,8 @@ body {
         </div>
         <div class="mmkt-ctl star">
           <div class="mmkt-ctl-head"><span class="mmkt-ctl-name">Bid price <span style="font-weight:400;opacity:0.6">(what you&rsquo;d pay to win &mdash; what you deploy at)</span></span><span class="mmkt-ctl-val" id="mmvBid">&mdash;</span></div>
-          <input type="range" id="mmBid" min="5000000" max="7500000" step="10000" value="6200000">
-          <div class="mmkt-ticks"><span>$5.00M</span><span>worth $6.20M</span><span>$7.50M</span></div>
+          <input type="range" id="mmBid" min="5000000" max="7500000" step="10000" value="6300000">
+          <div class="mmkt-ticks"><span>$5.00M</span><span>worth $6.30M</span><span>$7.50M</span></div>
           <div class="mmkt-bidstats">
             <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Units / Price per Unit</span><span class="mmkt-bidstat-val" id="mmBidPPU">&mdash;</span></div>
             <div class="mmkt-bidstat"><span class="mmkt-bidstat-lab">Year 1 Cash-on-Cash</span><span class="mmkt-bidstat-val" id="mmBidCoC">&mdash;</span></div>
@@ -1043,7 +1043,7 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 6200000,
+  basePrice: 6300000,
   units: 64,
 
   // Ratios applied to purchase price
@@ -1062,7 +1062,7 @@ const BASE = {
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.0187416, 0.01992726, 0.02118793, 0.02252835, 0.02395358, 0.0174719, 0.01857723, 0.01975249, 0.0210021, 0.02233077],
+  wfPrincRatios: [0.01874161, 0.01992727, 0.02118793, 0.02252835, 0.02395358, 0.0174719, 0.01857723, 0.01975249, 0.0210021, 0.02233077],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1, 1, 0.98616028, 0.97144502, 0.95579881, 0.94438637, 0.93225193, 0.91934983, 0.9056315, 0.89104529],
@@ -1070,11 +1070,11 @@ const BASE = {
   ioDsByYearRatios: [0.0615, 0.0615, 0.07495393, 0.07495393, 0.07495393, 0.06987595, 0.06987595, 0.06987595, 0.06987595, 0.06987595],
 
   // FIXED operating data — does NOT scale with price (same building)
-  gpr:     [903984, 931103.52, 959036.63, 987807.72, 1017441.96, 1047965.21, 1079404.17, 1111786.3, 1145139.89, 1179494.08],
-  vacancy: [-45199.2, -46555.18, -47951.83, -49390.39, -50872.1, -52398.26, -53970.21, -55589.31, -57256.99, -58974.7],
-  egi:     [858784.8, 884548.34, 911084.79, 938417.34, 966569.86, 995566.95, 1025433.96, 1056196.98, 1087882.89, 1120519.38],
-  opex:    [-507394.24, -523715.95, -540582.3, -558012.39, -576026.01, -594643.7, -613886.77, -633777.31, -654338.27, -675593.45],
-  noi:     [351390.56, 360832.4, 370502.49, 380404.95, 390543.85, 400923.26, 411547.2, 422419.67, 433544.62, 444925.93],
+  gpr:     [913481, 940614.92, 968562.86, 997349.23, 1026999.2, 1057538.67, 1088994.32, 1121393.64, 1154764.93, 1189137.37],
+  vacancy: [-45223.2, -46579.9, -47977.29, -49416.61, -50899.11, -52426.08, -53998.87, -55618.83, -57287.4, -59006.02],
+  egi:     [868257.8, 894035.02, 920585.56, 947932.62, 976100.09, 1005112.58, 1034995.45, 1065774.8, 1097477.54, 1130131.35],
+  opex:    [-507867.89, -524190.28, -541057.34, -558488.15, -576502.52, -595120.98, -614364.84, -634256.2, -654818.01, -676074.04],
+  noi:     [360389.91, 369844.74, 379528.23, 389444.47, 399597.57, 409991.6, 420630.61, 431518.6, 442659.53, 454057.31],
 
   // Market & exit assumptions
   marketGrowth: 0.015,
