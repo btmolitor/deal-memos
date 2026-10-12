@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.1  (2026-10-12)
+ * DEAL MEMO PUBLISHER  v2.2  (2026-10-12)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -94,11 +94,12 @@ function showLiveLink() {
   var ui = SpreadsheetApp.getUi();
   try {
     var cfg = parseShell_(fetchShell_(SpreadsheetApp.getActiveSpreadsheet().getId(), getGithubKey_())).cfg;
-    linkDialog_('Live memo: ' + cfg.name, [], PUB.SITE_BASE + cfg.slug + '.html', 'Open the live memo', true);
+    linkDialog_('Opening memo: ' + cfg.name, [], PUB.SITE_BASE + cfg.slug + '.html', 'Open the live memo', true);
   } catch (e) { ui.alert('Live memo', String(e.message || e), ui.ButtonSet.OK); }
 }
 
-/** Pop-up with a clickable link that opens in a new browser tab. autoOpen tries to open it straight away. */
+/** Pop-up with a clickable link that opens in a new browser tab. autoOpen opens it straight away and closes the pop-up;
+ *  the pop-up only stays on screen if the browser blocked the new tab. */
 function linkDialog_(title, lines, url, label, autoOpen) {
   var esc = function (t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
   var body = [];
@@ -107,7 +108,7 @@ function linkDialog_(title, lines, url, label, autoOpen) {
     '<p style="margin:14px 0 6px"><a href="' + esc(url) + '" target="_blank" rel="noopener" ' +
     'style="display:inline-block;background:#1a73e8;color:#fff;text-decoration:none;padding:8px 16px;border-radius:4px;font-weight:bold">' + esc(label) + '</a></p>' +
     '<div style="color:#5f6368;font-size:11px;word-break:break-all">' + esc(url) + '</div></div>' +
-    (autoOpen ? '<script>try{window.open(' + JSON.stringify(url) + ',"_blank");}catch(e){}</script>' : '');
+    (autoOpen ? '<script>try{var w=window.open(' + JSON.stringify(url) + ',"_blank");if(w){google.script.host.close();}}catch(e){}</script>' : '');
   var h = Math.min(420, 150 + 22 * lines.length);
   SpreadsheetApp.getUi().showModalDialog(HtmlService.createHtmlOutput(html).setWidth(520).setHeight(h), title);
 }
