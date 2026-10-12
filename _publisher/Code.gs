@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.0  (2026-10-12)
+ * DEAL MEMO PUBLISHER  v2.1  (2026-10-12)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -35,7 +35,7 @@ function onOpen() {
     .addItem('Refresh numbers & publish', 'refreshAndPublish')
     .addItem('Preview only (save to Drive, do not publish)', 'previewOnly')
     .addSeparator()
-    .addItem('Show live memo link', 'showLiveLink')
+    .addItem('Open live memo', 'showLiveLink')
     .addItem('Check setup', 'checkSetup')
     .addItem('Set GitHub key (one time)', 'setGithubKey')
     .addToUi();
@@ -83,7 +83,8 @@ function run_(publish) {
       for (var i = 0; i < drift.length; i++) lines.push('   - ' + drift[i]);
       lines.push('The tables, charts and sliders are current. Ask Claude to "render this deal" to rewrite the text.');
     }
-    ui.alert(publish ? 'Deal memo published' : 'Deal memo preview saved', lines.join('\n'), ui.ButtonSet.OK);
+    if (publish) linkDialog_('Deal memo published', lines, PUB.SITE_BASE + cfg.slug + '.html', 'Open the live memo', false);
+    else linkDialog_('Deal memo preview saved', lines, outFile.getUrl(), 'Open the preview file in Drive', false);
   } catch (e) {
     ui.alert('Deal memo NOT ' + (publish ? 'published' : 'saved'), String(e && e.message ? e.message : e), ui.ButtonSet.OK);
   }
@@ -93,8 +94,22 @@ function showLiveLink() {
   var ui = SpreadsheetApp.getUi();
   try {
     var cfg = parseShell_(fetchShell_(SpreadsheetApp.getActiveSpreadsheet().getId(), getGithubKey_())).cfg;
-    ui.alert('Live memo', PUB.SITE_BASE + cfg.slug + '.html', ui.ButtonSet.OK);
+    linkDialog_('Live memo: ' + cfg.name, [], PUB.SITE_BASE + cfg.slug + '.html', 'Open the live memo', true);
   } catch (e) { ui.alert('Live memo', String(e.message || e), ui.ButtonSet.OK); }
+}
+
+/** Pop-up with a clickable link that opens in a new browser tab. autoOpen tries to open it straight away. */
+function linkDialog_(title, lines, url, label, autoOpen) {
+  var esc = function (t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+  var body = [];
+  for (var i = 0; i < lines.length; i++) body.push(lines[i] === '' ? '<div style="height:8px"></div>' : '<div>' + esc(lines[i]) + '</div>');
+  var html = '<div style="font:13px/1.5 Arial,sans-serif;color:#202124">' + body.join('') +
+    '<p style="margin:14px 0 6px"><a href="' + esc(url) + '" target="_blank" rel="noopener" ' +
+    'style="display:inline-block;background:#1a73e8;color:#fff;text-decoration:none;padding:8px 16px;border-radius:4px;font-weight:bold">' + esc(label) + '</a></p>' +
+    '<div style="color:#5f6368;font-size:11px;word-break:break-all">' + esc(url) + '</div></div>' +
+    (autoOpen ? '<script>try{window.open(' + JSON.stringify(url) + ',"_blank");}catch(e){}</script>' : '');
+  var h = Math.min(420, 150 + 22 * lines.length);
+  SpreadsheetApp.getUi().showModalDialog(HtmlService.createHtmlOutput(html).setWidth(520).setHeight(h), title);
 }
 
 function checkSetup() {
