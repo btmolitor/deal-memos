@@ -10,12 +10,12 @@
  "capital_step": 10000,
  "capital_default": 500000,
  "narrative_basis": {
-  "price": 11000000,
-  "rate": 0.0634,
+  "price": 11500000,
+  "rate": 0.067,
   "down_pct": 0.3,
-  "noi_y1": 805351
+  "noi_y1": 784412
  },
- "rendered": "2026-10-12",
+ "rendered": "2026-10-14",
  "spec": "v1.7"
 }
 -->
@@ -649,7 +649,7 @@ body {
       <div class="scenario-toggle">
         <span class="scenario-toggle-label">Exit scenario</span>
         <button class="scen-btn active" data-scen="A">A &middot; 1.5% growth</button>
-        <button class="scen-btn" data-scen="B">B &middot; 5% cap</button>
+        <button class="scen-btn" data-scen="B">B &middot; {{DUAL_EXIT_CAP_LABEL}} cap</button>
       </div>
       <div class="lever-control">
         <div class="lever-display">
@@ -668,7 +668,7 @@ body {
         <div class="partner-cell"><div class="partner-label">Cash + Dep Shield (10-yr avg) <span class="partner-note">{{DUAL_TAX_BRACKET_PCT}} tax bracket</span></div><div class="partner-value featured" id="outSimpleYield">—</div></div>
         <div class="partner-cell"><div class="partner-label">Principal Paydown (Y10)</div><div class="partner-value" id="outPrincPaydown">—</div></div>
         <div class="partner-cell"><div class="partner-label">Accumulated Equity (Y10)</div><div class="partner-value" id="outAccumEquity">—</div></div>
-        <div class="partner-cell"><div class="partner-label">Simple Sale Return (10-yr avg) <span class="partner-note">net of 2% sale fees</span></div><div class="partner-value" id="outIRR">—</div></div>
+        <div class="partner-cell"><div class="partner-label">Simple Sale Return (10-yr avg) <span class="partner-note">net of {{DUAL_SELL_PCT_LABEL}} sale fees</span></div><div class="partner-value" id="outIRR">—</div></div>
       </div>
     </div>
   </section>
@@ -855,18 +855,18 @@ body {
     <div class="story" style="border-left-color: var(--gold); background: rgba(198,146,20,0.08);">
       <p class="story-headline" style="color: var(--gold);">A note on the structure.</p>
       <div class="story-body">
-        <p>At the analyzer's starting price and on the numbers as reported, this deal clears our hurdles: <strong>Year 1 DSCR of 1.40</strong> against our 1.25 target, and a going-in cap rate of 7.32% against our 5.0% floor. Year 1 cash-on-cash of 6.67% sits above our 3&ndash;6% band, which usually means either that price is fair or the income is flattering. Move the price slider and all three move with it.</p>
-        <p>The cushion is thinner than it looks. If utility bill-back income settles at its recent run-rate, the maintenance credits in the seller's books turn out to be real repairs, and we fund a $300-per-unit reserve, Year 1 income after reserves falls to about $720K. At the starting price that is a 6.5% yield and <strong>a DSCR of 1.25, right at our target with no room left</strong>.</p>
+        <p>At the analyzer's starting price and on our underwriting, Year 1 clears our hurdles, but only just: <strong>Year 1 DSCR of 1.26</strong> against our 1.25 target, a going-in cap rate of 6.82% against our 5.0% floor, and Year 1 cash-on-cash of 4.45% inside our 3&ndash;6% band. Move the price slider and all three move with it.</p>
+        <p>Our numbers already lean conservative. Management is at 5%, insurance at $115,000 against the seller's $95,000, real estate tax at the county's 2027 value, and one-time fees are left out of income. Two things are not yet in the model: a replacement reserve and the electrical panels. A $300-per-unit reserve takes $32,400 a year from cash flow; at the starting price that brings Year 1 cash-on-cash to about 3.6% and <strong>DSCR after reserves to about 1.21, below our target</strong>. The lender's own underwriting carries more income than ours, so loan size is not the constraint. Our cushion is.</p>
         <p><em>Read this carefully. We have not yet seen the full easement agreement with the commercial neighbor or a bid for the electrical panels. If moving ahead before those are answered isn't for you, that's a reasonable read. Let us know.</em></p>
       </div>
     </div>
     <div class="risk-grid">
       <div class="risk-card"><div class="risk-title">Shared-building agreement with the commercial neighbor</div><div class="risk-body">The apartments are tied to the adjoining Cedarvale Business Center by a recorded easement agreement that the offering memo never mentions. We hold only a 2019 amendment; the original 1995 agreement isn't in our file. From what we can see, we pay 40% of repairs to the shared concourse roofs, the neighbor can lien us for unpaid shares, and rebuilding after a fire has to be coordinated with them. That is an open-ended cost share we can't size yet. We get the full agreement, a current estoppel from the neighbor, title and survey, and counsel reads all of it before our money goes hard.</div></div>
       <div class="risk-card"><div class="risk-title">Electrical panels and old plumbing</div><div class="risk-body">Ninety of the 108 units still have Federal Pacific Stab-Lok panels, and the supply lines are partly galvanized steel. Insurers and agency lenders often require those panels replaced. Nothing is in the model for it, and no replacement reserve is modeled either. If replacement runs $2,000 a panel (we don't have a bid yet), that is $180,000 of extra cash at closing, and a lender reserve of $300 a unit takes another $32,400 a year. We get an electrician's bid and the insurer's and lender's positions during diligence, then put the cost into the budget or the price.</div></div>
-      <div class="risk-card"><div class="risk-title">The trailing expenses look light</div><div class="risk-body">The seller's books carry about $31,500 of maintenance credits in two months that look like repairs moved to capital, and utility bill-back income fell from $6,752 a month to $2,680 over the year. If both hold, NOI is $53,000 to $66,000 lower than modeled and, at the analyzer's starting price, Year 1 DSCR drops from 1.40 to about 1.30. We ask for the journal entries and the billing ledger in diligence and re-run the numbers before we commit.</div></div>
-      <div class="risk-card"><div class="risk-title">One-bedroom rents sit above the neighborhood</div><div class="risk-body">Our one-bedrooms rent for a median $1,401; seven nearby properties ask a median $1,199 for smaller units. Thirteen units are on notice, and the six already re-leased went for $1,109 a month less in total than the rents they replaced. If every one-bedroom reset to the $1,275 that September's new leases signed at, we lose about $50,000 a year. We underwrite 5% vacancy and 3% growth, not the broker's renovation premiums, and we price renewals unit by unit.</div></div>
-      <div class="risk-card"><div class="risk-title">Rate lock and refinance</div><div class="risk-body">The 6.34% quote is a month old and not locked. At the analyzer's starting price, every half point higher before we lock takes Year 1 DSCR from 1.40 to 1.33; a full point takes it to 1.27. The quote is a 10-year fixed, so nothing forces a refinance at Year 5. If we choose to refinance then, the break-even rate is 7.00%, which is 66 bps above today's rate; above that our payment rises. We lock as soon as we are under contract and keep the 10-year term.</div></div>
-      <div class="risk-card"><div class="risk-title">Exit value depends on the cap rate</div><div class="risk-body">Scenario B values the building at a 5% cap on Year 10 income: $19.5M. The analyzer's starting price works out to a 7.32% going-in cap. At that same cap in Year 10 the building is worth $13.3M, close to what Scenario A shows from that starting price. Treat Scenario A as the planning case and Scenario B as a ceiling we are not counting on. In Scenario A at the starting price, 62% of the return arrives during the hold as cash flow and tax shield, so we don't need a strong sale to be paid.</div></div>
+      <div class="risk-card"><div class="risk-title">The seller's expense history has gaps</div><div class="risk-body">The seller's books carry about $31,500 of maintenance credits in two months that look like repairs moved to capital, so their net repair cost is too low to rely on. We budget $65,000 for repairs plus separate lines for appliances, flooring and painting. Utility bill-back income also dipped, from $6,752 in August 2025 to $4,274 in July 2026 (utility and trash combined). Residents are billed about two months after we pay the bills, so spring's low heating bills show up as a summer dip; across the full year the property recovered about 75% of its utility and trash cost, and we model 70%. We confirm with the seller's journal entries, the billing ledger and August&ndash;September actuals before we commit.</div></div>
+      <div class="risk-card"><div class="risk-title">One-bedroom rents sit above the neighborhood</div><div class="risk-body">Our one-bedrooms rent for a median $1,401; nearby comparable properties ask a median $1,274. Theirs are mostly smaller (660&ndash;771 square feet against our 835), and per square foot we are slightly below them, but renters compare the monthly number. Thirteen units are on notice, and the six already re-leased went for $1,109 a month less in total than the rents they replaced. If every one-bedroom reset to the $1,275 that September's new leases signed at, we would lose about $54,000 a year. We underwrite 5% vacancy and 3% growth, not the broker's renovation premiums, and we price renewals unit by unit.</div></div>
+      <div class="risk-card"><div class="risk-title">Rate lock and refinance</div><div class="risk-body">We model a 6.70% rate, 41 bps above the lender's 5-year fixed quote of 6.29%, which is a month old and not locked. At the analyzer's starting price, every half point higher takes Year 1 DSCR from 1.26 to 1.20; a full point takes it to 1.14. We plan a 5-year fixed loan and a refinance at Year 5. Nobody can call 2031 rates, so the projections assume the same rate on a fresh 30-year schedule; section 06 lets you test higher and lower. Refinance costs, roughly 1&ndash;2% of the loan, are not in the projections. We lock as soon as we are under contract.</div></div>
+      <div class="risk-card"><div class="risk-title">Exit value depends on the cap rate</div><div class="risk-body">Scenario B values the building at a 7% cap on Year 10 income: about $14.0M. That is slightly above the 6.82% going-in cap at the analyzer's starting price, so we assume no cap-rate improvement for a building that will be ten years older. Scenario A, 1.5% annual growth, lands at about $13.3M. The two methods land within $1M of each other, so neither depends on a strong market. In Scenario A at the starting price, about 63% of the profit arrives during the hold as cash flow and tax shield, so we don't need a strong sale to be paid.</div></div>
     </div>
   </section>
 

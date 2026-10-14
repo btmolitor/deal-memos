@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.2  (2026-10-12)
+ * DEAL MEMO PUBLISHER  v2.3  (2026-10-14)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -13,6 +13,10 @@
  *
  * Nothing in this file is deal-specific. Deal settings travel inside the shell file.
  * Token math mirrors render spec v1.7 (dual lane, template 10c). Do not edit one without the other.
+ *
+ * v2.3: exit cap (Summary!D45), selling costs (Summary!F46), closing % (Financials!C18 / C4) and tax bracket
+ * (Financials!C31) are read from the Sheet instead of fixed in this file. New tokens DUAL_EXIT_CAP_LABEL and
+ * DUAL_SELL_PCT_LABEL let the memo show the exit cap and sale fee the Sheet uses.
  */
 
 var PUB = {
@@ -25,7 +29,8 @@ var PUB = {
   SHELL_DIR: '_shells',
   FIN: 'Financials',
   SUM: 'Summary',
-  CLOSING: 0.015, EXIT_CAP: 0.05, SELL: 0.02, TAX: 0.35
+  // Defaults only, used when a shell predates v2.3 labels. Live values come from the Sheet (see readModel_).
+  CLOSING: 0.015, EXIT_CAP: 0.07, SELL: 0.02, TAX: 0.35
 };
 
 /* ───────────────────────── menu ───────────────────────── */
@@ -227,13 +232,19 @@ function readModel_(ss) {
   label_(S, 'H15', 'Annual Depreciation');
   label_(S, 'B20', 'Gross Potential');
   label_(S, 'B24', 'Net Operating Income');
+  label_(S, 'B45', 'Exit Assumption');
+  label_(S, 'B46', 'Selling Costs');
+  label_(F, 'B18', 'Closing Costs');
+  label_(F, 'B31', 'Tax Bracket');
   var row = function (sh, r) { return sh.getRange(r, 3, 1, 10).getValues()[0]; };
   var m = {
     price: F.getRange('C1').getValue(), down_pct: F.getRange('C7').getValue(), rate: F.getRange('C10').getValue(),
     amort: F.getRange('C11').getValue(), growth: F.getRange('C32').getValue(),
     boy_balances: row(F, 9), ds_y1: F.getRange('C143').getValue(), ds_y6: F.getRange('H143').getValue(),
     units: S.getRange('I5').getValue(), annual_dep: S.getRange('I15').getValue(),
-    gpr: row(S, 20), vacancy: row(S, 21), egi: row(S, 22), opex: row(S, 23), noi: row(S, 24)
+    gpr: row(S, 20), vacancy: row(S, 21), egi: row(S, 22), opex: row(S, 23), noi: row(S, 24),
+    exit_cap: S.getRange('D45').getValue(), sell: S.getRange('F46').getValue(),
+    closing: F.getRange('C18').getValue() / F.getRange('C4').getValue(), tax: F.getRange('C31').getValue()
   };
   return checkModel_(m);
 }
@@ -247,7 +258,7 @@ function label_(sh, a1, expect) {
 
 function checkModel_(m) {
   var isNum = function (x) { return typeof x === 'number' && isFinite(x); };
-  var scalars = ['price', 'down_pct', 'rate', 'amort', 'growth', 'ds_y1', 'ds_y6', 'units', 'annual_dep'];
+  var scalars = ['price', 'down_pct', 'rate', 'amort', 'growth', 'ds_y1', 'ds_y6', 'units', 'annual_dep', 'exit_cap', 'sell', 'closing', 'tax'];
   for (var i = 0; i < scalars.length; i++) if (!isNum(m[scalars[i]])) throw new Error('Model value "' + scalars[i] + '" is not a number (error or blank cell in the Sheet).');
   var arrs = ['boy_balances', 'gpr', 'vacancy', 'egi', 'opex', 'noi'];
   for (var j = 0; j < arrs.length; j++) {
@@ -259,6 +270,10 @@ function checkModel_(m) {
   if (m.down_pct <= 0 || m.down_pct >= 1) throw new Error('Down payment % must be between 0 and 100%.');
   if (m.rate <= 0 || m.rate > 0.25) throw new Error('Mortgage rate looks wrong: ' + m.rate);
   if (m.amort < 5 || m.amort > 40) throw new Error('Amortization years looks wrong: ' + m.amort);
+  if (m.exit_cap < 0.02 || m.exit_cap > 0.15) throw new Error('Exit cap (Summary!D45) looks wrong: ' + m.exit_cap);
+  if (m.sell < 0 || m.sell > 0.1) throw new Error('Selling costs (Summary!F46) look wrong: ' + m.sell);
+  if (m.closing < 0 || m.closing > 0.1) throw new Error('Closing costs % (Financials!C18 / C4) look wrong: ' + m.closing);
+  if (m.tax < 0 || m.tax > 0.6) throw new Error('Tax bracket (Financials!C31) looks wrong: ' + m.tax);
   var loan = m.price * (1 - m.down_pct);
   if (Math.abs(m.boy_balances[0] - loan) > 1) throw new Error('Loan does not tie: price x (1 - down) = ' + money_(loan) + ' but Financials!C9 = ' + money_(m.boy_balances[0]) + '. (Improvements or a note in the model? Ask Claude to re-render.)');
   if (m.noi[0] <= 0) throw new Error('Year 1 NOI is zero or negative.');
@@ -286,7 +301,7 @@ function sliderSettings_(m, cfg) {
     pmax = Math.round((price + 1500000) / 250000) * 250000;
   }
   var bp = Math.round(m.rate * 10000);
-  var tcl = Math.round(price * (round_(m.down_pct + PUB.CLOSING, 6)));
+  var tcl = Math.round(price * (round_(m.down_pct + m.closing, 6)));
   var capDefault = Math.min(cfg.capital_default, tcl);
   return { price_min: pmin, price_max: pmax, price_step: cfg.price_step,
            capital: { min: Math.min(cfg.capital_min, capDefault), step: cfg.capital_step, 'default': capDefault },
@@ -341,7 +356,7 @@ function pct_(x, d) { return d === undefined ? pctTrim_(x) : (x * 100).toFixed(d
 
 function buildTokens_(m, ui) {
   var price = Math.round(m.price), down = m.down_pct, rate = m.rate, amort = Math.round(m.amort);
-  var loan = round_(price * (1 - down), 2), cashPct = round_(down + PUB.CLOSING, 6), cashIn = price * cashPct;
+  var loan = round_(price * (1 - down), 2), cashPct = round_(down + m.closing, 6), cashIn = price * cashPct;
   var i, k;
   // STD lane: Financials row 9 (BOY1..BOY10) -> EOY1..EOY9; EOY10 computed on the post-refi schedule
   var eoy = m.boy_balances.slice(1, 10), eoy5 = eoy[4];
@@ -358,7 +373,7 @@ function buildTokens_(m, ui) {
   for (i = 0; i < 10; i++) { ioBal.push(io[i] / loan); ioWf.push(((i === 0 ? loan : io[i - 1]) - io[i]) / price); }
   var ioPost = io5 * pmtConst_(rate, amort) / loan;
   var ioDs = [rate, rate, c28, c28, c28, ioPost, ioPost, ioPost, ioPost, ioPost];
-  var depShield = round_(m.annual_dep * PUB.TAX, 2);
+  var depShield = round_(m.annual_dep * m.tax, 2);
   var cap = ui.capital, presets = [100000, 250000, 500000, 750000, 1000000];
   var tcl = Math.round(cashIn), half = tcl / 2, btns = [];
   for (i = 0; i < presets.length; i++) {
@@ -374,7 +389,7 @@ function buildTokens_(m, ui) {
     DUAL_BASE_PRICE: String(price), DUAL_BASE_PRICE_COMPACT: compact_(price),
     DUAL_PRICE_MIN: String(ui.price_min), DUAL_PRICE_MAX: String(ui.price_max), DUAL_PRICE_STEP: String(ui.price_step),
     DUAL_PRICE_MIN_COMPACT: compact_(ui.price_min), DUAL_PRICE_MAX_COMPACT: compact_(ui.price_max),
-    DUAL_DOWN_PCT: num_(down), DUAL_CLOSING_RESERVES_PCT: num_(PUB.CLOSING), DUAL_LOAN_PCT: num_(round_(1 - down, 10)),
+    DUAL_DOWN_PCT: num_(down), DUAL_CLOSING_RESERVES_PCT: num_(round_(m.closing, 6)), DUAL_LOAN_PCT: num_(round_(1 - down, 10)),
     DUAL_CASH_IN_PCT: num_(cashPct), DUAL_DEP_SHIELD_PER_DOLLAR: num_(depShield) + ' / ' + price,
     DUAL_DS_RATIO_Y1_Y5: Math.round(Math.abs(m.ds_y1)) + ' / ' + num_(loan),
     DUAL_DS_RATIO_Y6_Y10: Math.round(Math.abs(m.ds_y6)) + ' / ' + num_(loan),
@@ -382,9 +397,10 @@ function buildTokens_(m, ui) {
     DUAL_IO_BAL_RATIOS_Y1_Y10: arr_(ioBal, 6), DUAL_IO_WF_PRINC_RATIOS_Y1_Y10: arr_(ioWf, 6), DUAL_IO_DS_BY_YEAR_RATIOS: arr_(ioDs, 6),
     DUAL_GPR_Y1_Y10: iarr_(m.gpr), DUAL_VACANCY_Y1_Y10: iarr_(m.vacancy), DUAL_EGI_Y1_Y10: iarr_(m.egi),
     DUAL_OPEX_Y1_Y10: iarr_(m.opex), DUAL_NOI_Y1_Y10: iarr_(m.noi),
-    DUAL_MARKET_GROWTH: num_(m.growth), DUAL_EXIT_CAP: num_(PUB.EXIT_CAP), DUAL_EXIT_SELLING_COST_PCT: num_(PUB.SELL),
+    DUAL_MARKET_GROWTH: num_(m.growth), DUAL_EXIT_CAP: num_(m.exit_cap), DUAL_EXIT_SELLING_COST_PCT: num_(m.sell),
+    DUAL_EXIT_CAP_LABEL: pctTrim_(m.exit_cap), DUAL_SELL_PCT_LABEL: pctTrim_(m.sell),
     DUAL_MORTGAGE_RATE: num_(rate), DUAL_AMORT_YEARS: String(amort),
-    DUAL_DOWN_PCT_FORMATTED: pctTrim_(down), DUAL_MORTGAGE_RATE_PCT: (rate * 100).toFixed(2) + '%', DUAL_TAX_BRACKET_PCT: pctTrim_(PUB.TAX),
+    DUAL_DOWN_PCT_FORMATTED: pctTrim_(down), DUAL_MORTGAGE_RATE_PCT: (rate * 100).toFixed(2) + '%', DUAL_TAX_BRACKET_PCT: pctTrim_(m.tax),
     DUAL_CAPITAL_MIN: String(cap.min), DUAL_CAPITAL_MAX: String(tcl), DUAL_CAPITAL_STEP: String(cap.step), DUAL_CAPITAL_DEFAULT: String(cap['default']),
     DUAL_CAPITAL_DEFAULT_FORMATTED: '$' + commas_(cap['default']), DUAL_INITIAL_SHARE_PCT: (cap['default'] / cashIn * 100).toFixed(2) + '%',
     DUAL_CAPITAL_TICKS_HTML: ticksHtml, DUAL_CAPITAL_PRESETS_HTML: presetsHtml,
