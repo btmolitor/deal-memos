@@ -578,11 +578,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $11.00M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$11.00M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $11.50M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$11.50M</div>
       </div>
-      <input type="range" id="priceSlider" min="9500000" max="12500000" step="25000" value="11000000" class="price-slider" />
-      <div class="price-control-ticks"><span>$9.50M</span><span>baseline $11.00M</span><span>$12.50M</span></div>
+      <input type="range" id="priceSlider" min="9500000" max="12500000" step="25000" value="11500000" class="price-slider" />
+      <div class="price-control-ticks"><span>$9.50M</span><span>baseline $11.50M</span><span>$12.50M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -628,17 +628,17 @@ body {
       <div class="scenario-toggle">
         <span class="scenario-toggle-label">Exit scenario</span>
         <button class="scen-btn active" data-scen="A">A &middot; 1.5% growth</button>
-        <button class="scen-btn" data-scen="B">B &middot; 5% cap</button>
+        <button class="scen-btn" data-scen="B">B &middot; 7% cap</button>
       </div>
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">14.43%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">13.80%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="3465000" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="3622500" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks">
-            <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.73M</span><span>$3.46M (full)</span>
+            <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.81M</span><span>$3.62M (full)</span>
           </div>
         </div>
         <div class="preset-buttons">
@@ -647,8 +647,8 @@ body {
           <button class="preset-btn active" data-val="500000">$500K</button>
           <button class="preset-btn" data-val="750000">$750K</button>
           <button class="preset-btn" data-val="1000000">$1M</button>
-          <button class="preset-btn" data-val="1732500">$1.73M (half)</button>
-          <button class="preset-btn" data-val="3465000">$3.46M (100%)</button>
+          <button class="preset-btn" data-val="1811250">$1.81M (half)</button>
+          <button class="preset-btn" data-val="3622500">$3.62M (100%)</button>
         </div>
       </div>
       <div class="partner-outputs">
@@ -733,8 +733,8 @@ body {
 
     <div class="refi-rate-control">
       <div class="refi-rate-label">PROJECTED<br/>MARKET RATE<br/>AT REFI</div>
-      <input type="range" min="509" max="809" step="5" value="634" class="slider refi-slider" id="refiRateSlider">
-      <div class="refi-rate-value" id="refiRateDisplay">6.34%</div>
+      <input type="range" min="545" max="845" step="5" value="670" class="slider refi-slider" id="refiRateSlider">
+      <div class="refi-rate-value" id="refiRateDisplay">6.70%</div>
     </div>
 
     <div class="refi-fixed">
@@ -844,18 +844,18 @@ body {
     <div class="story" style="border-left-color: var(--gold); background: rgba(198,146,20,0.08);">
       <p class="story-headline" style="color: var(--gold);">A note on the structure.</p>
       <div class="story-body">
-        <p>At the analyzer's starting price and on the numbers as reported, this deal clears our hurdles: <strong>Year 1 DSCR of 1.40</strong> against our 1.25 target, and a going-in cap rate of 7.32% against our 5.0% floor. Year 1 cash-on-cash of 6.67% sits above our 3&ndash;6% band, which usually means either that price is fair or the income is flattering. Move the price slider and all three move with it.</p>
-        <p>The cushion is thinner than it looks. If utility bill-back income settles at its recent run-rate, the maintenance credits in the seller's books turn out to be real repairs, and we fund a $300-per-unit reserve, Year 1 income after reserves falls to about $720K. At the starting price that is a 6.5% yield and <strong>a DSCR of 1.25, right at our target with no room left</strong>.</p>
+        <p>At the analyzer's starting price and on our underwriting, Year 1 clears our hurdles, but only just: <strong>Year 1 DSCR of 1.26</strong> against our 1.25 target, a going-in cap rate of 6.81% against our 5.0% floor, and Year 1 cash-on-cash of 4.42% inside our 3&ndash;6% band. Move the price slider and all three move with it.</p>
+        <p>Our numbers already lean conservative. Management is at 5%, insurance at $115,000 against the seller's $95,000, real estate tax at the county's 2027 value, and one-time fees are left out of income. Two things are not yet in the model: a replacement reserve and the electrical panels. A $300-per-unit reserve takes $32,400 a year from cash flow; at the starting price that brings Year 1 cash-on-cash to about 3.5% and <strong>DSCR after reserves to about 1.21, below our target</strong>. The lender's own underwriting carries more income than ours, so loan size is not the constraint. Our cushion is.</p>
         <p><em>Read this carefully. We have not yet seen the full easement agreement with the commercial neighbor or a bid for the electrical panels. If moving ahead before those are answered isn't for you, that's a reasonable read. Let us know.</em></p>
       </div>
     </div>
     <div class="risk-grid">
       <div class="risk-card"><div class="risk-title">Shared-building agreement with the commercial neighbor</div><div class="risk-body">The apartments are tied to the adjoining Cedarvale Business Center by a recorded easement agreement that the offering memo never mentions. We hold only a 2019 amendment; the original 1995 agreement isn't in our file. From what we can see, we pay 40% of repairs to the shared concourse roofs, the neighbor can lien us for unpaid shares, and rebuilding after a fire has to be coordinated with them. That is an open-ended cost share we can't size yet. We get the full agreement, a current estoppel from the neighbor, title and survey, and counsel reads all of it before our money goes hard.</div></div>
       <div class="risk-card"><div class="risk-title">Electrical panels and old plumbing</div><div class="risk-body">Ninety of the 108 units still have Federal Pacific Stab-Lok panels, and the supply lines are partly galvanized steel. Insurers and agency lenders often require those panels replaced. Nothing is in the model for it, and no replacement reserve is modeled either. If replacement runs $2,000 a panel (we don't have a bid yet), that is $180,000 of extra cash at closing, and a lender reserve of $300 a unit takes another $32,400 a year. We get an electrician's bid and the insurer's and lender's positions during diligence, then put the cost into the budget or the price.</div></div>
-      <div class="risk-card"><div class="risk-title">The trailing expenses look light</div><div class="risk-body">The seller's books carry about $31,500 of maintenance credits in two months that look like repairs moved to capital, and utility bill-back income fell from $6,752 a month to $2,680 over the year. If both hold, NOI is $53,000 to $66,000 lower than modeled and, at the analyzer's starting price, Year 1 DSCR drops from 1.40 to about 1.30. We ask for the journal entries and the billing ledger in diligence and re-run the numbers before we commit.</div></div>
-      <div class="risk-card"><div class="risk-title">One-bedroom rents sit above the neighborhood</div><div class="risk-body">Our one-bedrooms rent for a median $1,401; seven nearby properties ask a median $1,199 for smaller units. Thirteen units are on notice, and the six already re-leased went for $1,109 a month less in total than the rents they replaced. If every one-bedroom reset to the $1,275 that September's new leases signed at, we lose about $50,000 a year. We underwrite 5% vacancy and 3% growth, not the broker's renovation premiums, and we price renewals unit by unit.</div></div>
-      <div class="risk-card"><div class="risk-title">Rate lock and refinance</div><div class="risk-body">The 6.34% quote is a month old and not locked. At the analyzer's starting price, every half point higher before we lock takes Year 1 DSCR from 1.40 to 1.33; a full point takes it to 1.27. The quote is a 10-year fixed, so nothing forces a refinance at Year 5. If we choose to refinance then, the break-even rate is 7.00%, which is 66 bps above today's rate; above that our payment rises. We lock as soon as we are under contract and keep the 10-year term.</div></div>
-      <div class="risk-card"><div class="risk-title">Exit value depends on the cap rate</div><div class="risk-body">Scenario B values the building at a 5% cap on Year 10 income: $19.5M. The analyzer's starting price works out to a 7.32% going-in cap. At that same cap in Year 10 the building is worth $13.3M, close to what Scenario A shows from that starting price. Treat Scenario A as the planning case and Scenario B as a ceiling we are not counting on. In Scenario A at the starting price, 62% of the return arrives during the hold as cash flow and tax shield, so we don't need a strong sale to be paid.</div></div>
+      <div class="risk-card"><div class="risk-title">The seller's expense history has gaps</div><div class="risk-body">The seller's books carry about $31,500 of maintenance credits in two months that look like repairs moved to capital, so their net repair cost is too low to rely on. We budget $65,000 for repairs plus separate lines for appliances, flooring and painting. Utility bill-back income also dipped, from $6,752 in August 2025 to $4,274 in July 2026 (utility and trash combined). Residents are billed about two months after we pay the bills, so spring's low heating bills show up as a summer dip; across the full year the property recovered about 75% of its utility and trash cost, and we model 70%. We confirm with the seller's journal entries, the billing ledger and August&ndash;September actuals before we commit.</div></div>
+      <div class="risk-card"><div class="risk-title">One-bedroom rents sit above the neighborhood</div><div class="risk-body">Our one-bedrooms rent for a median $1,401; nearby comparable properties ask a median $1,274. Theirs are mostly smaller (660&ndash;771 square feet against our 835), and per square foot we are slightly below them, but renters compare the monthly number. Thirteen units are on notice, and the six already re-leased went for $1,109 a month less in total than the rents they replaced. If every one-bedroom reset to the $1,275 that September's new leases signed at, we would lose about $54,000 a year. We underwrite 5% vacancy and 3% growth, not the broker's renovation premiums, and we price renewals unit by unit.</div></div>
+      <div class="risk-card"><div class="risk-title">Rate lock and refinance</div><div class="risk-body">We model a 6.70% rate, 41 bps above the lender's 5-year fixed quote of 6.29%, which is a month old and not locked. At the analyzer's starting price, every half point higher takes Year 1 DSCR from 1.26 to 1.20; a full point takes it to 1.14. We plan a 5-year fixed loan and a refinance at Year 5. Nobody can call 2031 rates, so the projections assume the same rate on a fresh 30-year schedule; section 06 lets you test higher and lower. Refinance costs, roughly 1&ndash;2% of the loan, are not in the projections. We lock as soon as we are under contract.</div></div>
+      <div class="risk-card"><div class="risk-title">Exit value depends on the cap rate</div><div class="risk-body">Scenario B values the building at a 7% cap on Year 10 income: about $14.0M. That is slightly above the 6.81% going-in cap at the analyzer's starting price, so we assume no cap-rate improvement for a building that will be ten years older. Scenario A, 1.5% annual growth, lands at about $13.3M. The two methods land within $1M of each other, so neither depends on a strong market. In Scenario A at the starting price, about 63% of the profit arrives during the hold as cash flow and tax shield, so we don't need a strong sale to be paid.</div></div>
     </div>
   </section>
 
@@ -873,7 +873,7 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 11000000,
+  basePrice: 11500000,
   units: 108,
 
   // Ratios applied to purchase price
@@ -881,36 +881,36 @@ const BASE = {
   closingReservesPct: 0.015,  // combined closing + reserves = 1.5% of price
   loanPct: 0.7,              // = 1 - downPct
   cashInPct: 0.315,           // = down + closing/reserves
-  depShieldPerDollar: 126000 / 11000000,  // annual dep tax shield per $ of price
+  depShieldPerDollar: 131727.27 / 11500000,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
-  dsRatioY1Y5: 574342 / 7700000,   // 0.07002877828
-  dsRatioY6Y10: 536647 / 7700000,  // 0.06495109502
+  dsRatioY1Y5: 623339 / 8050000,   // 0.07002877828
+  dsRatioY6Y10: 584838 / 8050000,  // 0.06495109502
 
   // Mortgage balance decay — Y1-Y10 balance ÷ initial loan
-  balRatios: [0.988479, 0.976206, 0.963132, 0.949205, 0.934368, 0.923604, 0.912136, 0.899920, 0.886907, 0.873044],
+  balRatios: [0.989240, 0.977737, 0.965439, 0.952291, 0.938235, 0.928140, 0.917347, 0.905808, 0.893473, 0.880284],
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.0256, 0.0273, 0.0291, 0.0309, 0.0330, 0.0239, 0.0255, 0.0271, 0.0289, 0.0308],
+  wfPrincRatios: [0.0239, 0.0256, 0.0273, 0.0292, 0.0312, 0.0224, 0.0240, 0.0256, 0.0274, 0.0293],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
-  ioBalRatios: [1.000000, 1.000000, 0.986607, 0.972340, 0.957142, 0.946115, 0.934368, 0.921855, 0.908524, 0.894323],
-  ioWfPrincRatios: [0.000000, 0.000000, 0.009375, 0.009987, 0.010639, 0.007719, 0.008223, 0.008760, 0.009331, 0.009940],
-  ioDsByYearRatios: [0.063400, 0.063400, 0.076408, 0.076408, 0.076408, 0.071393, 0.071393, 0.071393, 0.071393, 0.071393],
+  ioBalRatios: [1.000000, 1.000000, 0.987422, 0.973975, 0.959598, 0.949273, 0.938235, 0.926434, 0.913817, 0.900329],
+  ioWfPrincRatios: [0.000000, 0.000000, 0.008805, 0.009413, 0.010063, 0.007228, 0.007727, 0.008261, 0.008832, 0.009442],
+  ioDsByYearRatios: [0.067000, 0.067000, 0.079197, 0.079197, 0.079197, 0.074305, 0.074305, 0.074305, 0.074305, 0.074305],
 
   // FIXED operating data — does NOT scale with price (same building)
-  gpr:     [1776970, 1824755, 1873974, 1924669, 1976886, 2030668, 2086065, 2143123, 2201893, 2262426],
+  gpr:     [1727444, 1777497, 1829052, 1882154, 1936848, 1993184, 2051209, 2110976, 2172535, 2235941],
   vacancy: [-79642, -82031, -84492, -87027, -89638, -92327, -95097, -97950, -100888, -103915],
-  egi:     [1697327, 1742723, 1789481, 1837642, 1887248, 1938341, 1990968, 2045173, 2101004, 2158511],
-  opex:    [-891976, -920359, -949688, -979996, -1011319, -1043691, -1077149, -1111733, -1147481, -1184436],
-  noi:     [805351, 822365, 839794, 857646, 875929, 894651, 913818, 933440, 953523, 974075],
+  egi:     [1647802, 1695466, 1744560, 1795127, 1847210, 1900857, 1956112, 2013026, 2071647, 2132026],
+  opex:    [-864390, -892533, -921636, -951732, -982858, -1015051, -1048350, -1082794, -1118425, -1155288],
+  noi:     [783412, 802933, 822924, 843395, 864352, 885806, 907763, 930232, 953221, 976738],
 
   // Market & exit assumptions
   marketGrowth: 0.015,
-  exitCap: 0.05,
+  exitCap: 0.07,
   exitSellingCostPct: 0.02,  // backed out: exit A net / gross → 2% of sale price
-  mortgageRate: 0.0634,
+  mortgageRate: 0.067,
   amortYears: 30
 };
 
@@ -921,7 +921,7 @@ let currentPrice = BASE.basePrice;
 let currentScenario = 'A';
 let currentCapital = 500000;
 let currentYearIdx = 0;
-let currentRefiRate = 0.0634;
+let currentRefiRate = 0.067;
 
 // ================================================================
 // UTILITIES
@@ -1055,7 +1055,7 @@ function renderSnapshot(D) {
   capCell.classList.toggle('neg', D.goingInCap < 0.05);
   document.getElementById('sCashIn').textContent = fmt$(D.cashIn, { compact: true });
   document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (30%)';
-  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 6.34% · 30yr';
+  document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 6.70% · 30yr';
   // Expense ratio = OpEx / EGI where EGI = NOI + OpEx (OpEx stored as positive in this BASE)
   const y1NOI = BASE.noi[0];
   const y1OpEx = Math.abs(BASE.opex[0]);
