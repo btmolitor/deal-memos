@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.3  (2026-10-14)
+ * DEAL MEMO PUBLISHER  v2.4  (2026-10-14)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -14,9 +14,11 @@
  * Nothing in this file is deal-specific. Deal settings travel inside the shell file.
  * Token math mirrors render spec v1.7 (dual lane, template 10c). Do not edit one without the other.
  *
- * v2.3: exit cap (Summary!D45), selling costs (Summary!F46), closing % (Financials!C18 / C4) and tax bracket
+ * v2.3: exit cap (Summary, Exit Assumption row), selling costs (next row), closing % (Financials!C18 / C4) and tax bracket
  * (Financials!C31) are read from the Sheet instead of fixed in this file. New tokens DUAL_EXIT_CAP_LABEL and
  * DUAL_SELL_PCT_LABEL let the memo show the exit cap and sale fee the Sheet uses.
+ * v2.4: the exit block on Summary is found by its label ("Exit Assumption" in column B), so rows can be
+ * added above it without breaking the publisher.
  */
 
 var PUB = {
@@ -232,8 +234,8 @@ function readModel_(ss) {
   label_(S, 'H15', 'Annual Depreciation');
   label_(S, 'B20', 'Gross Potential');
   label_(S, 'B24', 'Net Operating Income');
-  label_(S, 'B45', 'Exit Assumption');
-  label_(S, 'B46', 'Selling Costs');
+  var exitRow = findRow_(S, 'Exit Assumption');
+  label_(S, 'B' + (exitRow + 1), 'Selling Costs');
   label_(F, 'B18', 'Closing Costs');
   label_(F, 'B31', 'Tax Bracket');
   var row = function (sh, r) { return sh.getRange(r, 3, 1, 10).getValues()[0]; };
@@ -243,10 +245,16 @@ function readModel_(ss) {
     boy_balances: row(F, 9), ds_y1: F.getRange('C143').getValue(), ds_y6: F.getRange('H143').getValue(),
     units: S.getRange('I5').getValue(), annual_dep: S.getRange('I15').getValue(),
     gpr: row(S, 20), vacancy: row(S, 21), egi: row(S, 22), opex: row(S, 23), noi: row(S, 24),
-    exit_cap: S.getRange('D45').getValue(), sell: S.getRange('F46').getValue(),
+    exit_cap: S.getRange('D' + exitRow).getValue(), sell: S.getRange('F' + (exitRow + 1)).getValue(),
     closing: F.getRange('C18').getValue() / F.getRange('C4').getValue(), tax: F.getRange('C31').getValue()
   };
   return checkModel_(m);
+}
+
+function findRow_(sh, expect) {
+  var vals = sh.getRange('B1:B300').getValues();
+  for (var i = 0; i < vals.length; i++) if (String(vals[i][0]).toLowerCase().indexOf(expect.toLowerCase()) !== -1) return i + 1;
+  throw new Error('Layout check failed: no "' + expect + '" row found in column B of ' + sh.getName() + '. Ask Claude to update the publisher before publishing.');
 }
 
 function label_(sh, a1, expect) {
@@ -270,8 +278,8 @@ function checkModel_(m) {
   if (m.down_pct <= 0 || m.down_pct >= 1) throw new Error('Down payment % must be between 0 and 100%.');
   if (m.rate <= 0 || m.rate > 0.25) throw new Error('Mortgage rate looks wrong: ' + m.rate);
   if (m.amort < 5 || m.amort > 40) throw new Error('Amortization years looks wrong: ' + m.amort);
-  if (m.exit_cap < 0.02 || m.exit_cap > 0.15) throw new Error('Exit cap (Summary!D45) looks wrong: ' + m.exit_cap);
-  if (m.sell < 0 || m.sell > 0.1) throw new Error('Selling costs (Summary!F46) look wrong: ' + m.sell);
+  if (m.exit_cap < 0.02 || m.exit_cap > 0.15) throw new Error('Exit cap (Summary, Exit Assumption row, column D) looks wrong: ' + m.exit_cap);
+  if (m.sell < 0 || m.sell > 0.1) throw new Error('Selling costs (Summary, Selling Costs row, column F) look wrong: ' + m.sell);
   if (m.closing < 0 || m.closing > 0.1) throw new Error('Closing costs % (Financials!C18 / C4) look wrong: ' + m.closing);
   if (m.tax < 0 || m.tax > 0.6) throw new Error('Tax bracket (Financials!C31) looks wrong: ' + m.tax);
   var loan = m.price * (1 - m.down_pct);
