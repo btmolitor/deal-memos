@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.4  (2026-10-14)
+ * DEAL MEMO PUBLISHER  v2.5  (2026-10-15)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -19,6 +19,7 @@
  * DUAL_SELL_PCT_LABEL let the memo show the exit cap and sale fee the Sheet uses.
  * v2.4: the exit block on Summary is found by its label ("Exit Assumption" in column B), so rows can be
  * added above it without breaking the publisher.
+ * v2.5: "Export Summary PDF to deal folder" saves the Summary tab as a dated landscape PDF in the deal folder.
  */
 
 var PUB = {
@@ -31,6 +32,7 @@ var PUB = {
   SHELL_DIR: '_shells',
   FIN: 'Financials',
   SUM: 'Summary',
+  TZ: 'America/Chicago',
   // Defaults only, used when a shell predates v2.3 labels. Live values come from the Sheet (see readModel_).
   CLOSING: 0.015, EXIT_CAP: 0.07, SELL: 0.02, TAX: 0.35
 };
@@ -41,6 +43,8 @@ function onOpen() {
   SpreadsheetApp.getUi().createMenu('Deal Memo')
     .addItem('Refresh numbers & publish', 'refreshAndPublish')
     .addItem('Preview only (save to Drive, do not publish)', 'previewOnly')
+    .addSeparator()
+    .addItem('Export Summary PDF to deal folder', 'exportSummaryPdf')
     .addSeparator()
     .addItem('Open live memo', 'showLiveLink')
     .addItem('Check setup', 'checkSetup')
@@ -94,6 +98,39 @@ function run_(publish) {
     else linkDialog_('Deal memo preview saved', lines, outFile.getUrl(), 'Open the preview file in Drive', false);
   } catch (e) {
     ui.alert('Deal memo NOT ' + (publish ? 'published' : 'saved'), String(e && e.message ? e.message : e), ui.ButtonSet.OK);
+  }
+}
+
+/** Saves the Summary tab as a landscape letter PDF in the deal folder: <Deal>_Deal_Summary_<yyyy-MM-dd>.pdf.
+ *  Hidden rows stay out, links stay clickable. A second export on the same day gets a time suffix; nothing is overwritten. */
+function exportSummaryPdf() {
+  var ui = SpreadsheetApp.getUi();
+  try {
+    SpreadsheetApp.flush();
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sh = ss.getSheetByName(PUB.SUM);
+    if (!sh) throw new Error('No tab named "' + PUB.SUM + '" in this Sheet.');
+    var folder = dealFolder_(ss);
+    var params = {
+      format: 'pdf', gid: sh.getSheetId(), size: 'letter', portrait: 'false', fitw: 'true', scale: '2',
+      gridlines: 'false', printtitle: 'false', sheetnames: 'false', pagenum: 'UNDEFINED', fzr: 'false',
+      horizontal_alignment: 'LEFT', vertical_alignment: 'TOP',
+      top_margin: '0.3', bottom_margin: '0.3', left_margin: '0.3', right_margin: '0.3'
+    };
+    var q = [];
+    for (var k in params) q.push(k + '=' + encodeURIComponent(params[k]));
+    var url = 'https://docs.google.com/spreadsheets/d/' + ss.getId() + '/export?' + q.join('&');
+    var r = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() }, muteHttpExceptions: true });
+    if (r.getResponseCode() !== 200) throw new Error('Google did not return the PDF (' + r.getResponseCode() + '). Try again in a minute.');
+
+    var deal = ss.getName().replace(/_?Deal_Model.*$/i, '').replace(/\s+/g, '_') || 'Deal';
+    var now = new Date();
+    var name = deal + '_Deal_Summary_' + Utilities.formatDate(now, PUB.TZ, 'yyyy-MM-dd');
+    if (folder.getFilesByName(name + '.pdf').hasNext()) name += '_' + Utilities.formatDate(now, PUB.TZ, 'HHmm');
+    var file = folder.createFile(r.getBlob().setName(name + '.pdf'));
+    linkDialog_('Summary PDF saved', ['Saved to the deal folder (' + folder.getName() + '):', file.getName()], file.getUrl(), 'Open the PDF', false);
+  } catch (e) {
+    ui.alert('Summary PDF NOT saved', String(e && e.message ? e.message : e), ui.ButtonSet.OK);
   }
 }
 
