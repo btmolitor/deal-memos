@@ -19,7 +19,8 @@
  * DUAL_SELL_PCT_LABEL let the memo show the exit cap and sale fee the Sheet uses.
  * v2.4: the exit block on Summary is found by its label ("Exit Assumption" in column B), so rows can be
  * added above it without breaking the publisher.
- * v2.5: "Export Summary PDF to deal folder" saves the Summary tab as a dated landscape PDF in the deal folder.
+ * v2.5: "Export Summary PDF to deal folder" saves the Summary tab as a dated landscape PDF in the deal folder,
+ * with page 2 starting at RATE SENSITIVITY (pages are joined with pdf-lib 1.17.1).
  */
 
 var PUB = {
@@ -102,8 +103,9 @@ function run_(publish) {
 }
 
 /** Saves the Summary tab as a landscape letter PDF in the deal folder: <Deal>_Deal_Summary_<yyyy-MM-dd>.pdf.
+ *  Page 1 runs through the waterfalls; page 2 starts at the "RATE SENSITIVITY" title, so no section is split.
  *  Hidden rows stay out, links stay clickable. A second export on the same day gets a time suffix; nothing is overwritten. */
-function exportSummaryPdf() {
+async function exportSummaryPdf() {
   var ui = SpreadsheetApp.getUi();
   try {
     SpreadsheetApp.flush();
@@ -111,27 +113,65 @@ function exportSummaryPdf() {
     var sh = ss.getSheetByName(PUB.SUM);
     if (!sh) throw new Error('No tab named "' + PUB.SUM + '" in this Sheet.');
     var folder = dealFolder_(ss);
-    var params = {
-      format: 'pdf', gid: sh.getSheetId(), size: 'letter', portrait: 'false', fitw: 'true', scale: '2',
-      gridlines: 'false', printtitle: 'false', sheetnames: 'false', pagenum: 'UNDEFINED', fzr: 'false',
-      horizontal_alignment: 'LEFT', vertical_alignment: 'TOP',
-      top_margin: '0.3', bottom_margin: '0.3', left_margin: '0.3', right_margin: '0.3'
-    };
-    var q = [];
-    for (var k in params) q.push(k + '=' + encodeURIComponent(params[k]));
-    var url = 'https://docs.google.com/spreadsheets/d/' + ss.getId() + '/export?' + q.join('&');
-    var r = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() }, muteHttpExceptions: true });
-    if (r.getResponseCode() !== 200) throw new Error('Google did not return the PDF (' + r.getResponseCode() + '). Try again in a minute.');
+    var lastRow = sh.getLastRow(), lastCol = sh.getLastColumn();
+    var brk = 0, colB = sh.getRange(1, 2, lastRow, 1).getValues();
+    for (var i = 0; i < colB.length; i++) if (/^\s*RATE SENSITIVITY/i.test(String(colB[i][0]))) { brk = i + 1; break; }
+
+    var blob, note = [];
+    if (brk > 1) {
+      try {
+        var p1 = summaryPdfPart_(ss, sh, 1, brk - 1, lastCol), p2 = summaryPdfPart_(ss, sh, brk, lastRow, lastCol);
+        blob = await mergePdfs_([p1, p2]);
+      } catch (mergeErr) {
+        blob = null;
+        note.push('Note: could not set the page break (' + (mergeErr.message || mergeErr) + '). Google placed the break itself.');
+      }
+    }
+    if (!blob) blob = summaryPdfPart_(ss, sh, 1, lastRow, lastCol);
 
     var deal = ss.getName().replace(/_?Deal_Model.*$/i, '').replace(/\s+/g, '_') || 'Deal';
     var now = new Date();
     var name = deal + '_Deal_Summary_' + Utilities.formatDate(now, PUB.TZ, 'yyyy-MM-dd');
     if (folder.getFilesByName(name + '.pdf').hasNext()) name += '_' + Utilities.formatDate(now, PUB.TZ, 'HHmm');
-    var file = folder.createFile(r.getBlob().setName(name + '.pdf'));
-    linkDialog_('Summary PDF saved', ['Saved to the deal folder (' + folder.getName() + '):', file.getName()], file.getUrl(), 'Open the PDF', false);
+    var file = folder.createFile(blob.setName(name + '.pdf'));
+    linkDialog_('Summary PDF saved', ['Saved to the deal folder (' + folder.getName() + '):', file.getName()].concat(note), file.getUrl(), 'Open the PDF', false);
   } catch (e) {
     ui.alert('Summary PDF NOT saved', String(e && e.message ? e.message : e), ui.ButtonSet.OK);
   }
+}
+
+/** One PDF of rows r1..r2 (1-based, inclusive), columns A..lastCol, scaled to the page width. */
+function summaryPdfPart_(ss, sh, r1, r2, lastCol) {
+  var params = {
+    format: 'pdf', gid: sh.getSheetId(), r1: r1 - 1, r2: r2, c1: 0, c2: lastCol,
+    size: 'letter', portrait: 'false', fitw: 'true', scale: '2',
+    gridlines: 'false', printtitle: 'false', sheetnames: 'false', pagenum: 'UNDEFINED', fzr: 'false',
+    horizontal_alignment: 'LEFT', vertical_alignment: 'TOP',
+    top_margin: '0.3', bottom_margin: '0.3', left_margin: '0.3', right_margin: '0.3'
+  };
+  var q = [];
+  for (var k in params) q.push(k + '=' + encodeURIComponent(params[k]));
+  var url = 'https://docs.google.com/spreadsheets/d/' + ss.getId() + '/export?' + q.join('&');
+  var r = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() }, muteHttpExceptions: true });
+  if (r.getResponseCode() !== 200) throw new Error('Google did not return the PDF (' + r.getResponseCode() + '). Try again in a minute.');
+  return r.getBlob();
+}
+
+/** Joins PDFs into one, using the pdf-lib library (pinned version, loaded on demand). */
+async function mergePdfs_(blobs) {
+  if (typeof PDFLib === 'undefined') {
+    if (typeof globalThis.setTimeout === 'undefined') globalThis.setTimeout = function (f, t) { Utilities.sleep(t || 0); return f(); };
+    var src = UrlFetchApp.fetch('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js').getContentText();
+    (0, eval)(src);
+  }
+  var out = await PDFLib.PDFDocument.create();
+  for (var i = 0; i < blobs.length; i++) {
+    var doc = await PDFLib.PDFDocument.load(new Uint8Array(blobs[i].getBytes()));
+    var pages = await out.copyPages(doc, doc.getPageIndices());
+    for (var j = 0; j < pages.length; j++) out.addPage(pages[j]);
+  }
+  var bytes = await out.save();
+  return Utilities.newBlob(Array.from(bytes, function (b) { return b > 127 ? b - 256 : b; }), 'application/pdf');
 }
 
 function showLiveLink() {
