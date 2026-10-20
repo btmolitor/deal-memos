@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.7  (2026-10-20)
+ * DEAL MEMO PUBLISHER  v2.8  (2026-10-20)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -27,6 +27,9 @@
  * COMP_MAP_LINK_HTML (empty when the deal has no mappable comps, so the memo shows no dead link).
  * v2.7: the comp-map link is also written into the Rent Comps tab, column A of the caption row directly above
  * the "Property" header (found by text, so it works for any deal). Note rows with no bedroom count are skipped.
+ * v2.8: subject rows are identified by "Subject" in the In comp median? column (U), so they can sit anywhere in the
+ * list (e.g. sorted by bed among the comps). The older layout, where every row below a "SUBJECT PROPERTY CHECK"
+ * marker row is a subject row, is still read the same way.
  */
 
 var PUB = {
@@ -447,7 +450,7 @@ function buildCompMap_(ss, cfg, token) {
     out.geocoded = geocodeBlanks_(sh, comps);
     var mappable = comps.props.filter(function (p) { return isFinite(p.lat) && isFinite(p.lng); });
     comps.props.forEach(function (p) { if (!(isFinite(p.lat) && isFinite(p.lng))) out.warnings.push(p.name + ' has no coordinates (add a street address in parentheses in column A, or fill Lat/Lng), so it is not pinned.'); });
-    if (!mappable.some(function (p) { return p.role === 'sub'; })) { out.warnings.push('the subject rows (below "SUBJECT PROPERTY CHECK") have no coordinates, so no map.'); return out; }
+    if (!mappable.some(function (p) { return p.role === 'sub'; })) { out.warnings.push('the subject rows (In comp median? = Subject) have no coordinates, so no map.'); return out; }
     if (mappable.length < 2) { out.warnings.push('fewer than two mappable properties, so no map.'); return out; }
     var shell = fetchRepoFile_(PUB.SHELL_DIR + '/' + PUB.MAP_SHELL, token);
     var data = { deal: cfg.name, city: comps.city, median_1br: comps.median_1br, median_studio: comps.median_studio, pulled: comps.pulled,
@@ -506,6 +509,8 @@ function readComps_(sh) {
     if (!a) continue;
     if (/^SUBJECT PROPERTY CHECK/i.test(a)) { subjectZone = true; continue; }
     if (vals[r][C.bed] === '' || vals[r][C.bed] == null) continue;   // note rows (e.g. "Found but not used…") have no bedroom count
+    var flag = String(vals[r][C.flag]).trim().toUpperCase();
+    var isSub = subjectZone || flag === 'SUBJECT';   // v2.8: U = "Subject"; legacy: below the SUBJECT PROPERTY CHECK row
     // "Name (street address) - Plan": the parentheses hold the street address, " - Plan" names a floor plan and is dropped
     // so a property's unit types fold into one pin. A parenthetical that is not an address (e.g. "(subject)") is ignored.
     var mm = /^(.*?)\s*\(([^)]*)\)\s*(.*)$/.exec(a);
@@ -515,14 +520,14 @@ function readComps_(sh) {
     var key = name.toLowerCase();
     var p = res.byName[key];
     if (!p) {
-      p = { id: key.replace(/[^a-z0-9]+/g, '').slice(0, 24) || ('p' + r), name: name, role: subjectZone ? 'sub' : (String(vals[r][C.flag]).trim().toUpperCase() === 'Y' ? 'comp' : 'excl'),
+      p = { id: key.replace(/[^a-z0-9]+/g, '').slice(0, 24) || ('p' + r), name: name, role: isSub ? 'sub' : (flag === 'Y' ? 'comp' : 'excl'),
             addr: street ? street + (city ? ', ' + city : '') : city, street: street, city: city, units: [], note: '',
             listing: link(vals[r][C.url]), site: C.site >= 0 ? link(vals[r][C.site]) : '',
             lat: Number(vals[r][C.lat]), lng: Number(vals[r][C.lng]), rows: [] };
       if (!p.lat) p.lat = NaN; if (!p.lng) p.lng = NaN;
       if (C.notes >= 0) { var n = String(vals[r][C.notes] || '').trim(); if (n.length > 230) n = n.slice(0, 230).replace(/\s+\S*$/, '') + '…'; p.note = n; }
       res.props.push(p); res.byName[key] = p;
-      if (subjectZone && !res.city) res.city = city;
+      if (isSub && !res.city) res.city = city;
     }
     p.rows.push(r + 1);
     var bed = Number(vals[r][C.bed]), type = bed === 0 ? 'Studio' : bed >= 1 ? Math.round(bed) + 'BR' : String(vals[r][C.bed]);
