@@ -752,6 +752,8 @@ ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction
 .pop table { border-collapse: collapse; margin: 4px 0 6px; font-variant-numeric: tabular-nums; }
 .pop td { padding: 1px 10px 1px 0; }
 .pop td:nth-child(n+2) { text-align: right; }
+.pop tr.subj td { color: var(--subject); font-size: 12px; padding-bottom: 4px; }
+.pop tr.subj td:first-child { padding-left: 10px; }
 .pop .flag { display: inline-block; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; margin-bottom: 6px; }
 .pop .flag.comp { background: var(--accent-soft); color: var(--comp); }
 .pop .flag.excl { border: 1px solid var(--excl); color: var(--muted); }
@@ -856,10 +858,13 @@ var DATA = {{COMP_DATA}};
       ? { radius: 7, color: c, weight: 2, fillColor: cssVar("--panel"), fillOpacity: 0.9 }
       : { radius: p.role === "sub" ? 10 : 8, color: cssVar("--panel"), weight: 2, fillColor: c, fillOpacity: 1 };
   }
+  var SUBJ = P.filter(function (q) { return q.role === "sub"; })[0];
   function popup(p) {
+    var cells = function (sf, rent, bold) { return "<td>" + (sf ? sf + " SF" : "") + "</td><td>" + (rent ? (bold ? "<b>" + money(rent) + "</b>" : money(rent)) : "—") + "</td><td>" + (sf && rent ? "$" + (rent / sf).toFixed(2) + "/SF" : "") + "</td>"; };
     var rows = p.units.map(function (u) {
-      var sf = Number(u[1]), rent = Number(u[2]);
-      return "<tr><td>" + esc(u[0]) + "</td><td>" + (sf ? sf + " SF" : "") + "</td><td><b>" + (rent ? money(rent) : "—") + "</b></td><td>" + (sf && rent ? "$" + (rent / sf).toFixed(2) + "/SF" : "") + "</td></tr>";
+      var row = "<tr><td>" + esc(u[0]) + "</td>" + cells(Number(u[1]), Number(u[2]), true) + "</tr>";
+      var s = SUBJ && SUBJ !== p ? SUBJ.units.filter(function (x) { return x[0] === u[0]; })[0] : null;
+      return row + (s ? '<tr class="subj"><td>Subject</td>' + cells(Number(s[1]), Number(s[2]), false) + "</tr>" : "");
     }).join("");
     var flag = p.role === "sub" ? '<span class="flag sub">Subject</span>' : p.role === "comp" ? '<span class="flag comp">In comp median</span>' : '<span class="flag excl">Excluded from median</span>';
     var dist = p.role === "sub" ? "" : " · " + p.dist.toFixed(1) + " mi";
