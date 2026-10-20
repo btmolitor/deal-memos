@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.6  (2026-10-20)
+ * DEAL MEMO PUBLISHER  v2.7  (2026-10-20)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -25,6 +25,8 @@
  * asks, notes, listing and property-site links) using the shell _shells/comp_map_template.html, geocodes blank
  * Lat/Lng cells (columns X:Y) with the Census Bureau geocoder and writes them back, and fills the memo token
  * COMP_MAP_LINK_HTML (empty when the deal has no mappable comps, so the memo shows no dead link).
+ * v2.7: the comp-map link is also written into the Rent Comps tab, column A of the caption row directly above
+ * the "Property" header (found by text, so it works for any deal). Note rows with no bedroom count are skipped.
  */
 
 var PUB = {
@@ -454,10 +456,23 @@ function buildCompMap_(ss, cfg, token) {
     var html = shell.split('{{COMP_DATA}}').join(json);
     if (/\{\{[A-Z0-9_]+\}\}/.test(html)) throw new Error('map shell still has unfilled placeholders');
     out.html = html; out.pins = mappable.length;
+    writeCompMapCell_(sh, comps.hdrRow, '=HYPERLINK("' + PUB.SITE_BASE + cfg.slug + '_comps.html","Comp map: ' + out.pins + ' properties pinned; each pin links to its listing and its own website →")');
   } catch (e) {
     out.html = ''; out.warnings.push('not built (' + (e && e.message ? e.message : e) + '). The memo was published without the map link.');
+    try { var sh2 = ss.getSheetByName(PUB.COMPS); if (sh2) writeCompMapCell_(sh2, readComps_(sh2).hdrRow, 'Comp map: not built on the last refresh (see the Deal Memo dialog).'); } catch (e2) {}
   }
   return out;
+}
+
+/** Writes the comp-map link into column A of the row above the "Property" header (the caption row). Only touches a cell that is blank or already holds the comp-map caption. */
+function writeCompMapCell_(sh, hdrRow, value) {
+  if (!hdrRow || hdrRow < 2) return;
+  var cell = sh.getRange(hdrRow - 1, 1);
+  var cur = String(cell.getValue() || '').trim();
+  if (cur && !/^Comp map/i.test(cur)) return;   // someone put something else there; leave it alone
+  if (value.charAt(0) === '=') cell.setFormula(value); else cell.setValue(value);
+  cell.setFontSize(9).setFontStyle('italic').setHorizontalAlignment('left').setVerticalAlignment('middle').setWrap(false);
+  if (sh.getRowHeight(hdrRow - 1) < 22) sh.setRowHeight(hdrRow - 1, 22);
 }
 
 /** Reads the Rent Comps tab into one record per property. Layout is found by header text, not row numbers. */
@@ -483,7 +498,7 @@ function readComps_(sh) {
     if (!s) return '';
     return /^[a-z]+:\/\//i.test(s) ? s : 'https://' + s;
   };
-  var res = { props: [], byName: {}, city: '', pulled: '', warnings: [],
+  var res = { props: [], byName: {}, city: '', pulled: '', warnings: [], hdrRow: hdr + 1,
               median_1br: summaryOk ? num(vals[1][4]) : null, median_studio: summaryOk ? num(vals[2][4]) : null };
   var subjectZone = false, latest = null;
   for (r = hdr + 1; r < vals.length; r++) {
