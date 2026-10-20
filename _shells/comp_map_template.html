@@ -864,7 +864,7 @@ var DATA = {{COMP_DATA}};
     var rows = p.units.map(function (u) {
       var row = "<tr><td>" + esc(u[0]) + "</td>" + cells(Number(u[1]), Number(u[2]), true) + "</tr>";
       var s = SUBJ && SUBJ !== p ? SUBJ.units.filter(function (x) { return x[0] === u[0]; })[0] : null;
-      return row + (s ? '<tr class="subj"><td>Subject</td>' + cells(Number(s[1]), Number(s[2]), false) + "</tr>" : "");
+      return row + (s ? '<tr class="subj"><td>Subject ask</td>' + cells(Number(s[1]), Number(s[2]), false) + "</tr>" : "");
     }).join("");
     var flag = p.role === "sub" ? '<span class="flag sub">Subject</span>' : p.role === "comp" ? '<span class="flag comp">In comp median</span>' : '<span class="flag excl">Excluded from median</span>';
     var dist = p.role === "sub" ? "" : " · " + p.dist.toFixed(1) + " mi";
