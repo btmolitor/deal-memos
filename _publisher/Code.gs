@@ -81,6 +81,7 @@ function run_(publish) {
     tokens.COMP_MAP_LINK_HTML = cmap.html ? compMapLinkHtml_(cfg, cmap) : '';
 
     var html = fillShell_(parsed.html, tokens);
+    if (tokens.COMP_MAP_LINK_HTML && parsed.html.indexOf('{{COMP_MAP_LINK_HTML}}') === -1) html = injectCompMapLink_(html, tokens.COMP_MAP_LINK_HTML);
     validateOutput_(html);
 
     var outFile = saveToFolder_(folder, cfg.output_name, html);
@@ -555,6 +556,21 @@ function fetchRepoFile_(path, token) {
   var r = UrlFetchApp.fetch(url, { method: 'get', headers: headers, muteHttpExceptions: true });
   if (r.getResponseCode() === 200) return r.getContentText('UTF-8');
   throw new Error('could not read ' + path + ' from GitHub (' + r.getResponseCode() + ')');
+}
+
+/** Shells rendered before spec v1.8 have no COMP_MAP_LINK_HTML token: put the link (and its style) at the end of the
+ *  last section before the footer, which is section 09 in every template. Returns html unchanged if no slot is found. */
+function injectCompMapLink_(html, linkHtml) {
+  var css = '.comp-map-link { margin-top: 18px; font-size: 13px; color: var(--ink); opacity: 0.8; }\n' +
+            '.comp-map-link a { color: var(--accent); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--accent-soft); }\n' +
+            '.comp-map-link a:hover { border-bottom-color: var(--accent); }\n';
+  var foot = html.indexOf('<footer');
+  if (foot < 0) return html;
+  var close = html.lastIndexOf('</section>', foot);
+  if (close < 0) return html;
+  var out = html.slice(0, close) + '  ' + linkHtml + '\n  ' + html.slice(close);
+  if (out.indexOf('.comp-map-link {') === -1) { var st = out.indexOf('</style>'); if (st > 0) out = out.slice(0, st) + css + out.slice(st); }
+  return out;
 }
 
 /** The one-line link the memo shows in section 09 (token COMP_MAP_LINK_HTML). */
