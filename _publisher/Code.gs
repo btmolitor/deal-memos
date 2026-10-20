@@ -81,7 +81,7 @@ function run_(publish) {
     tokens.COMP_MAP_LINK_HTML = cmap.html ? compMapLinkHtml_(cfg, cmap) : '';
 
     var html = fillShell_(parsed.html, tokens);
-    if (tokens.COMP_MAP_LINK_HTML && parsed.html.indexOf('{{COMP_MAP_LINK_HTML}}') === -1) html = injectCompMapLink_(html, tokens.COMP_MAP_LINK_HTML);
+    if (tokens.COMP_MAP_LINK_HTML && parsed.html.indexOf('{{COMP_MAP_LINK_HTML}}') === -1 && parsed.html.indexOf('class="comp-map-link"') === -1) html = injectCompMapLink_(html, tokens.COMP_MAP_LINK_HTML);
     validateOutput_(html);
 
     var outFile = saveToFolder_(folder, cfg.output_name, html);
