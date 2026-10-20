@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO LOADER  v1.0  (2026-10-20)
+ * DEAL MEMO LOADER  v1.1  (2026-10-20)
  *
  * This is the ONLY code that lives inside a deal Sheet (Extensions > Apps Script). It is pasted once into the
  * master template and once into each live deal Sheet, and never again: every click on the Deal Memo menu
@@ -61,6 +61,21 @@ function fetchSource_() {
   var r2 = UrlFetchApp.fetch(LOADER.API_URL, { headers: headers, muteHttpExceptions: true });
   if (r2.getResponseCode() === 200) return r2.getContentText('UTF-8');
   throw new Error('Could not load the Deal Memo Publisher from GitHub (' + r.getResponseCode() + ' / ' + r2.getResponseCode() + '). Check the internet connection and that btmolitor/deal-memos still has _publisher/Code.gs, then try again.');
+}
+
+/**
+ * Never called. Google decides a script's permissions by scanning its code, and the publisher's code arrives at
+ * run time, so every service the publisher uses is named here once. If Code.gs starts using a new Google
+ * service, add it here (and re-paste the loader).
+ */
+function declareScopes_() {
+  SpreadsheetApp.getUi().showModalDialog(HtmlService.createHtmlOutput(''), '');
+  SpreadsheetApp.getActiveSpreadsheet(); SpreadsheetApp.flush();
+  DriveApp.getFileById(''); DriveApp.createFile('', ''); DriveApp.getFilesByName('');
+  DocumentApp.openById('');
+  UrlFetchApp.fetch('');
+  ScriptApp.getOAuthToken();
+  Utilities.formatDate(new Date(), 'UTC', ''); Utilities.newBlob(''); Utilities.base64Encode(''); Utilities.sleep(0);
 }
 
 function storedKey_() {
