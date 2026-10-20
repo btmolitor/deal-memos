@@ -490,6 +490,7 @@ function readComps_(sh) {
     var a = String(vals[r][0] == null ? '' : vals[r][0]).trim();
     if (!a) continue;
     if (/^SUBJECT PROPERTY CHECK/i.test(a)) { subjectZone = true; continue; }
+    if (vals[r][C.bed] === '' || vals[r][C.bed] == null) continue;   // note rows (e.g. "Found but not used…") have no bedroom count
     // "Name (street address) - Plan": the parentheses hold the street address, " - Plan" names a floor plan and is dropped
     // so a property's unit types fold into one pin. A parenthetical that is not an address (e.g. "(subject)") is ignored.
     var mm = /^(.*?)\s*\(([^)]*)\)\s*(.*)$/.exec(a);
