@@ -738,7 +738,9 @@ ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction
 .list .name { min-width: 0; }
 .list .name small { display: block; color: var(--muted); font-size: 12px; }
 .list .rent { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-.list .rent small { display: block; color: var(--muted); font-size: 11px; }
+.list .rent { display: grid; grid-template-columns: auto auto; column-gap: 8px; justify-content: end; align-content: start; }
+.list .rent span { text-align: left; }
+.list .rent .v { text-align: right; }
 .list li.excl .name, .list li.excl .rent { color: var(--muted); }
 #map { min-width: 0; min-height: 0; background: var(--bg); position: relative; }
 .leaflet-tile-pane { filter: var(--tile-filter); }
@@ -884,11 +886,11 @@ var DATA = {"deal":"Cedarvale Highlands","city":"Eagan","median_1br":1197,"media
     visible().sort(function (a, b) { return a.dist - b.dist; }).forEach(function (p) {
       var li = document.createElement("li"); li.dataset.id = p.id; li.tabIndex = 0; li.className = p.role;
       var r1 = unit(p, "1BR"), r0 = unit(p, "Studio"), r2 = unit(p, "2BR");
-      var main = r1 ? money(r1) + " 1BR" : r2 ? money(r2) + " 2BR" : r0 ? money(r0) + " studio" : "—";
-      var sub = r1 ? (r0 ? money(r0) + " studio" : "no studio") : (r2 && r0 ? money(r0) + " studio" : "");
+      var cells = [], add = function (t, v) { cells.push('<span>' + t + '</span><span class="v">' + (v ? money(v) : "—") + '</span>'); };
+      if (r1 || r0) { add("1BR", r1); add("Studio", r0); } else if (r2) { add("2BR", r2); }
       li.innerHTML = '<span class="dot ' + p.role + '"></span>' +
         '<span class="name">' + esc(p.name) + '<small>' + (p.role === "sub" ? "Subject" : p.dist.toFixed(1) + " mi") + (p.addr ? " · " + esc(p.addr.replace(/,\s*[^,]+$/, "")) : "") + '</small></span>' +
-        '<span class="rent">' + main + '<small>' + sub + '</small></span>';
+        '<span class="rent">' + (cells.join("") || '<span class="v">—</span>') + '</span>';
       var go = function () { map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 15), { duration: 0.6 }); markers[p.id].openPopup(); setActive(p.id); };
       li.addEventListener("click", go);
       li.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
