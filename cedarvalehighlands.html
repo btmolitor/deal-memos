@@ -475,6 +475,9 @@ body {
   gap: 16px; margin-top: 16px;
 }
 .risk-card { background: var(--paper); border: 1px solid var(--rule-strong); padding: 20px 22px; }
+.comp-map-link { margin-top: 18px; font-size: 13px; color: var(--ink); opacity: 0.8; }
+.comp-map-link a { color: var(--accent); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+.comp-map-link a:hover { border-bottom-color: var(--accent); }
 .risk-title { font-weight: 600; font-size: 15px; margin-bottom: 8px; color: var(--accent); }
 .risk-body { font-size: 13.5px; line-height: 1.6; color: var(--ink); opacity: 0.85; }
 
@@ -857,6 +860,7 @@ body {
       <div class="risk-card"><div class="risk-title">Rate lock and refinance</div><div class="risk-body">We model a 6.70% rate, 41 bps above the lender's 5-year fixed quote of 6.29%, which is a month old and not locked. At the analyzer's starting price, every half point higher takes Year 1 DSCR from 1.26 to 1.20; a full point takes it to 1.14. We plan a 5-year fixed loan and a refinance at Year 5. Nobody can call 2031 rates, so the projections assume the same rate on a fresh 30-year schedule; section 06 lets you test higher and lower. Refinance costs, roughly 1&ndash;2% of the loan, are not in the projections. We lock as soon as we are under contract.</div></div>
       <div class="risk-card"><div class="risk-title">Exit value depends on the cap rate</div><div class="risk-body">Scenario B values the building at a 7% cap on Year 10 income: about $14.0M. That is slightly above the 6.81% going-in cap at the analyzer's starting price, so we assume no cap-rate improvement for a building that will be ten years older. Scenario A, 1.5% annual growth, lands at about $13.3M. The two methods land within $1M of each other, so neither depends on a strong market. In Scenario A at the starting price, about 63% of the profit arrives during the hold as cash flow and tax shield, so we don't need a strong sale to be paid.</div></div>
     </div>
+    <p class="comp-map-link"><a href="https://btmolitor.github.io/deal-memos/cedarvalehighlands_comps.html" target="_blank" rel="noopener">See the rent comps on a map &rarr;</a> 17 properties; each pin links to its listing and its own website.</p>
   </section>
 
   <footer class="footer">

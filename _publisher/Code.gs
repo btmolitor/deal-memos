@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.5  (2026-10-15)
+ * DEAL MEMO PUBLISHER  v2.6  (2026-10-20)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -21,6 +21,10 @@
  * added above it without breaking the publisher.
  * v2.5: "Export Summary PDF to deal folder" saves the Summary tab as a dated landscape PDF in the deal folder,
  * with page 2 starting at RATE SENSITIVITY (pages are joined with pdf-lib 1.17.1).
+ * v2.6: comp map. Refresh also builds <slug>_comps.html from the Rent Comps tab (one pin per property, flag,
+ * asks, notes, listing and property-site links) using the shell _shells/comp_map_template.html, geocodes blank
+ * Lat/Lng cells (columns X:Y) with the Census Bureau geocoder and writes them back, and fills the memo token
+ * COMP_MAP_LINK_HTML (empty when the deal has no mappable comps, so the memo shows no dead link).
  */
 
 var PUB = {
@@ -31,8 +35,10 @@ var PUB = {
   PORTFOLIO_DOC_ID: '1EUK54eNCNqoCpcdfveIswl92cbxJRimZO1xnK7Vmlk8',
   KEY_FILE_NAME: 'deal-memos-publish-key (private - do not share)',
   SHELL_DIR: '_shells',
+  MAP_SHELL: 'comp_map_template.html',
   FIN: 'Financials',
   SUM: 'Summary',
+  COMPS: 'Rent Comps',
   TZ: 'America/Chicago',
   // Defaults only, used when a shell predates v2.3 labels. Live values come from the Sheet (see readModel_).
   CLOSING: 0.015, EXIT_CAP: 0.07, SELL: 0.02, TAX: 0.35
@@ -69,6 +75,11 @@ function run_(publish) {
     var ui_ = sliderSettings_(m, cfg);
     var tokens = buildTokens_(m, ui_);
     for (var tk in tokens) if (/NaN|undefined|Infinity/.test(tokens[tk])) throw new Error('Computed value ' + tk + ' came out blank or invalid. Nothing was saved or published.');
+
+    // Comp map (v2.6). Never fatal for the memo: a problem here leaves the memo link out and says why.
+    var cmap = buildCompMap_(ss, cfg, token);
+    tokens.COMP_MAP_LINK_HTML = cmap.html ? compMapLinkHtml_(cfg, cmap) : '';
+
     var html = fillShell_(parsed.html, tokens);
     validateOutput_(html);
 
@@ -77,10 +88,13 @@ function run_(publish) {
     lines.push('Numbers read from the Sheet: price ' + money_(m.price) + ', rate ' + pct_(m.rate, 2) +
                ', down ' + pct_(m.down_pct) + ', Year 1 NOI ' + money_(m.noi[0]) + '.');
     lines.push('Saved to the deal folder: ' + outFile.getName());
+    if (cmap.html) { saveToFolder_(folder, cfg.slug + '_comps.html', cmap.html); lines.push('Comp map: ' + cmap.pins + ' properties pinned' + (cmap.geocoded ? ', ' + cmap.geocoded + ' newly geocoded' : '') + '.'); }
+    for (var w = 0; w < cmap.warnings.length; w++) lines.push('Comp map: ' + cmap.warnings[w]);
 
     if (publish) {
       if (!token) throw new Error('No GitHub key is stored yet. Run Deal Memo > Set GitHub key (one time), then try again.');
       pushToGithub_(cfg.slug + '.html', html, token, 'Regenerate ' + cfg.slug + '.html from Sheet');
+      if (cmap.html) pushToGithub_(cfg.slug + '_comps.html', cmap.html, token, 'Regenerate ' + cfg.slug + '_comps.html from Rent Comps');
       lines.push('Published: ' + PUB.SITE_BASE + cfg.slug + '.html  (allow 1-2 minutes for the site to rebuild)');
       var p = updatePortfolioLine_(cfg, m);
       lines.push(p);
@@ -415,6 +429,139 @@ function validateOutput_(html) {
   var need = { 'snap-cell': [/<div class="snap-cell">/g, 12], 'partner-cell': [/<div class="partner-cell">/g, 6], 'risk-card': [/<div class="risk-card">/g, 6] };
   for (var n in need) { var c = (html.match(need[n][0]) || []).length; if (c !== need[n][1]) throw new Error('Structure check failed: ' + n + ' count is ' + c + ', expected ' + need[n][1] + '.'); }
   if (!/const BASE = \{/.test(html)) throw new Error('Structure check failed: data block missing.');
+}
+
+/* ───────────────────────── comp map (v2.6, render spec v1.8 "Comp map") ───────────────────────── */
+
+/** Builds <slug>_comps.html from the Rent Comps tab. Returns { html, pins, geocoded, warnings }; html is '' when there is nothing to map. */
+function buildCompMap_(ss, cfg, token) {
+  var out = { html: '', pins: 0, geocoded: 0, warnings: [] };
+  try {
+    var sh = ss.getSheetByName(PUB.COMPS);
+    if (!sh) { out.warnings.push('no "' + PUB.COMPS + '" tab, so no map.'); return out; }
+    var comps = readComps_(sh);
+    out.warnings = out.warnings.concat(comps.warnings);
+    out.geocoded = geocodeBlanks_(sh, comps);
+    var mappable = comps.props.filter(function (p) { return isFinite(p.lat) && isFinite(p.lng); });
+    comps.props.forEach(function (p) { if (!(isFinite(p.lat) && isFinite(p.lng))) out.warnings.push(p.name + ' has no coordinates (add a street address in parentheses in column A, or fill Lat/Lng), so it is not pinned.'); });
+    if (!mappable.some(function (p) { return p.role === 'sub'; })) { out.warnings.push('the subject rows (below "SUBJECT PROPERTY CHECK") have no coordinates, so no map.'); return out; }
+    if (mappable.length < 2) { out.warnings.push('fewer than two mappable properties, so no map.'); return out; }
+    var shell = fetchRepoFile_(PUB.SHELL_DIR + '/' + PUB.MAP_SHELL, token);
+    var data = { deal: cfg.name, city: comps.city, median_1br: comps.median_1br, median_studio: comps.median_studio, pulled: comps.pulled,
+                 properties: mappable.map(function (p) { return { id: p.id, name: p.name, role: p.role, addr: p.addr, lat: p.lat, lng: p.lng, units: p.units, note: p.note, listing: p.listing, site: p.site }; }) };
+    var json = JSON.stringify(data).replace(/<\//g, '<\\/');
+    var html = shell.split('{{COMP_DATA}}').join(json);
+    if (/\{\{[A-Z0-9_]+\}\}/.test(html)) throw new Error('map shell still has unfilled placeholders');
+    out.html = html; out.pins = mappable.length;
+  } catch (e) {
+    out.html = ''; out.warnings.push('not built (' + (e && e.message ? e.message : e) + '). The memo was published without the map link.');
+  }
+  return out;
+}
+
+/** Reads the Rent Comps tab into one record per property. Layout is found by header text, not row numbers. */
+function readComps_(sh) {
+  var vals = sh.getDataRange().getValues();
+  var hdr = -1;
+  for (var r = 0; r < vals.length; r++) if (String(vals[r][0]).trim() === 'Property') { hdr = r; break; }
+  if (hdr < 0) throw new Error('no header row starting with "Property" in ' + PUB.COMPS);
+  var H = vals[hdr].map(function (h) { return String(h).toLowerCase(); });
+  var col = function (needle, required) {
+    for (var i = 0; i < H.length; i++) if (H[i].indexOf(needle) !== -1) return i;
+    if (required) throw new Error('no "' + needle + '" column in ' + PUB.COMPS);
+    return -1;
+  };
+  var C = { name: col('property', true), city: col('city', true), bed: col('bed', true), sf: col('sq ft', true), rent: col('rent', true),
+            url: col('url', true), pulled: col('date pulled'), flag: col('in comp median', true), notes: col('notes'),
+            site: col('property website'), lat: col('lat'), lng: col('lng') };
+  if (C.lat < 0 || C.lng < 0) throw new Error('Rent Comps needs Lat and Lng columns after Property website (template v3.9).');
+  var summaryOk = /RENT COMP SUMMARY/i.test(String(vals[0][0]));
+  var num = function (x) { var n = typeof x === 'number' ? x : Number(String(x).replace(/[$,\s]/g, '')); return isFinite(n) && n > 0 ? n : null; };
+  var link = function (x) {
+    var s = String(x || '').replace(/\s*\([^)]*\)\s*$/, '').trim();   // drop a trailing "(unverified)"-style tag
+    if (!s) return '';
+    return /^[a-z]+:\/\//i.test(s) ? s : 'https://' + s;
+  };
+  var res = { props: [], byName: {}, city: '', pulled: '', warnings: [],
+              median_1br: summaryOk ? num(vals[1][4]) : null, median_studio: summaryOk ? num(vals[2][4]) : null };
+  var subjectZone = false, latest = null;
+  for (r = hdr + 1; r < vals.length; r++) {
+    var a = String(vals[r][0] == null ? '' : vals[r][0]).trim();
+    if (!a) continue;
+    if (/^SUBJECT PROPERTY CHECK/i.test(a)) { subjectZone = true; continue; }
+    // "Name (street address) - Plan": the parentheses hold the street address, " - Plan" names a floor plan and is dropped
+    // so a property's unit types fold into one pin. A parenthetical that is not an address (e.g. "(subject)") is ignored.
+    var mm = /^(.*?)\s*\(([^)]*)\)\s*(.*)$/.exec(a);
+    var name = (mm ? (mm[1] + (mm[3] ? ' ' + mm[3] : '')).trim() : a).replace(/\s+-\s+[A-Za-z0-9 ]+$/, '').trim();
+    var street = mm && /^\d/.test(mm[2].trim()) ? mm[2].trim() : '';
+    var city = String(vals[r][C.city]).trim();
+    var key = name.toLowerCase();
+    var p = res.byName[key];
+    if (!p) {
+      p = { id: key.replace(/[^a-z0-9]+/g, '').slice(0, 24) || ('p' + r), name: name, role: subjectZone ? 'sub' : (String(vals[r][C.flag]).trim().toUpperCase() === 'Y' ? 'comp' : 'excl'),
+            addr: street ? street + (city ? ', ' + city : '') : city, street: street, city: city, units: [], note: '',
+            listing: link(vals[r][C.url]), site: C.site >= 0 ? link(vals[r][C.site]) : '',
+            lat: Number(vals[r][C.lat]), lng: Number(vals[r][C.lng]), rows: [] };
+      if (!p.lat) p.lat = NaN; if (!p.lng) p.lng = NaN;
+      if (C.notes >= 0) { var n = String(vals[r][C.notes] || '').trim(); if (n.length > 230) n = n.slice(0, 230).replace(/\s+\S*$/, '') + '…'; p.note = n; }
+      res.props.push(p); res.byName[key] = p;
+      if (subjectZone && !res.city) res.city = city;
+    }
+    p.rows.push(r + 1);
+    var bed = Number(vals[r][C.bed]), type = bed === 0 ? 'Studio' : bed >= 1 ? Math.round(bed) + 'BR' : String(vals[r][C.bed]);
+    if (!p.units.some(function (u) { return u[0] === type; })) p.units.push([type, num(vals[r][C.sf]) || 0, num(vals[r][C.rent]) || 0]);
+    if (C.pulled >= 0 && vals[r][C.pulled] instanceof Date && (!latest || vals[r][C.pulled] > latest)) latest = vals[r][C.pulled];
+  }
+  if (latest) res.pulled = Utilities.formatDate(latest, PUB.TZ, 'M/d/yyyy');
+  if (!res.city) res.city = res.props.length ? res.props[0].city : '';
+  if (!summaryOk) res.warnings.push('comp medians not shown (Rent Comps!A1 is not the RENT COMP SUMMARY block).');
+  return res;
+}
+
+/** Fills blank Lat/Lng cells from the Census Bureau geocoder (free, no key). Writes back to every row of the property. Returns the count geocoded. */
+function geocodeBlanks_(sh, comps) {
+  var done = 0, H = sh.getDataRange().getValues();
+  var hdr = -1; for (var r = 0; r < H.length; r++) if (String(H[r][0]).trim() === 'Property') { hdr = r; break; }
+  var latCol = -1, lngCol = -1;
+  for (var i = 0; i < H[hdr].length; i++) { var h = String(H[hdr][i]).toLowerCase(); if (h === 'lat') latCol = i + 1; if (h === 'lng') lngCol = i + 1; }
+  comps.props.forEach(function (p) {
+    if (isFinite(p.lat) && isFinite(p.lng)) return;
+    if (!p.street || !/^\d/.test(p.street)) return;
+    var g = geocode_(p.street + ', ' + (p.city || '') + ', MN');
+    if (!g) { comps.warnings.push('could not geocode "' + p.street + ', ' + p.city + '" for ' + p.name + '.'); return; }
+    p.lat = g.lat; p.lng = g.lng; done++;
+    p.rows.forEach(function (row) { sh.getRange(row, latCol).setValue(g.lat); sh.getRange(row, lngCol).setValue(g.lng); });
+  });
+  return done;
+}
+
+function geocode_(address) {
+  try {
+    var url = 'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=Public_AR_Current&format=json&address=' + encodeURIComponent(address);
+    var r = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+    if (r.getResponseCode() !== 200) return null;
+    var j = JSON.parse(r.getContentText());
+    var m = j && j.result && j.result.addressMatches && j.result.addressMatches[0];
+    if (!m || !m.coordinates) return null;
+    return { lat: round_(Number(m.coordinates.y), 6), lng: round_(Number(m.coordinates.x), 6) };
+  } catch (e) { return null; }
+}
+
+/** Generic read of a file in the deal-memos repo (raw text). */
+function fetchRepoFile_(path, token) {
+  var url = 'https://api.github.com/repos/' + PUB.GITHUB_OWNER + '/' + PUB.GITHUB_REPO + '/contents/' + path + '?ref=' + PUB.GITHUB_BRANCH;
+  var headers = { Accept: 'application/vnd.github.raw', 'X-GitHub-Api-Version': '2022-11-28' };
+  if (token) headers.Authorization = 'Bearer ' + token;
+  var r = UrlFetchApp.fetch(url, { method: 'get', headers: headers, muteHttpExceptions: true });
+  if (r.getResponseCode() === 200) return r.getContentText('UTF-8');
+  throw new Error('could not read ' + path + ' from GitHub (' + r.getResponseCode() + ')');
+}
+
+/** The one-line link the memo shows in section 09 (token COMP_MAP_LINK_HTML). */
+function compMapLinkHtml_(cfg, cmap) {
+  var url = PUB.SITE_BASE + cfg.slug + '_comps.html';
+  return '<p class="comp-map-link"><a href="' + url + '" target="_blank" rel="noopener">See the rent comps on a map &rarr;</a> ' +
+         cmap.pins + ' properties; each pin links to its listing and its own website.</p>';
 }
 
 /* ───────────────────────── token math (render spec v1.7, dual lane) ───────────────────────── */
