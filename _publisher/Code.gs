@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.8  (2026-10-20)
+ * DEAL MEMO PUBLISHER  v2.9  (2026-10-20)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -30,6 +30,11 @@
  * v2.8: subject rows are identified by "Subject" in the In comp median? column (U), so they can sit anywhere in the
  * list (e.g. sorted by bed among the comps). The older layout, where every row below a "SUBJECT PROPERTY CHECK"
  * marker row is a subject row, is still read the same way.
+ * v2.9: rent-comp figures in the written sections. The shell may use {{RC_<UNIT>_<FIELD>}} tokens (UNIT = 1BR, 2BR,
+ * 3BR, STUDIO; FIELD = INPLACE, ASK, ANCHOR, COMP, INPLACE_SF, ASK_SF, COMP_SF, SIZEADJ_GAP), filled on every refresh
+ * from the Rent Comps summary block and the annual-rent block, both found by header text. The settings block may
+ * carry narrative_basis.rc_directions (e.g. "1BR_INPLACE": "above"); the dialog warns when a comparison the text
+ * was written on has flipped, since the words around the numbers do not change.
  */
 
 var PUB = {
@@ -79,6 +84,10 @@ function run_(publish) {
     var m = readModel_(ss);
     var ui_ = sliderSettings_(m, cfg);
     var tokens = buildTokens_(m, ui_);
+    var rc = rentCompFigures_(ss);   // v2.9: rent-comp figures for the written sections
+    var rcUsed = parsed.html.match(/\{\{RC_[A-Z0-9_]+\}\}/g) || [];
+    for (var u = 0; u < rcUsed.length; u++) { var rcName = rcUsed[u].slice(2, -2); if (!(rcName in rc.tokens)) throw new Error('The memo text uses ' + rcUsed[u] + ' but that Rent Comps figure is blank or missing. Fill the Rent Comps summary block, or ask Claude to "render this deal". Nothing was saved or published.'); }
+    for (var rk in rc.tokens) tokens[rk] = rc.tokens[rk];
     for (var tk in tokens) if (/NaN|undefined|Infinity/.test(tokens[tk])) throw new Error('Computed value ' + tk + ' came out blank or invalid. Nothing was saved or published.');
 
     // Comp map (v2.6). Never fatal for the memo: a problem here leaves the memo link out and says why.
@@ -108,7 +117,7 @@ function run_(publish) {
       lines.push('Preview only. Nothing was published.');
     }
 
-    var drift = narrativeDrift_(cfg, m);
+    var drift = narrativeDrift_(cfg, m, rc);
     if (drift.length) {
       lines.push('');
       lines.push('HEADS UP: the written sections (story, risks, caution note) were written by Claude on different numbers:');
@@ -413,13 +422,76 @@ function sliderSettings_(m, cfg) {
            refi_min: bp - 125, refi_max: bp + 175, refi_step: 5 };
 }
 
-function narrativeDrift_(cfg, m) {
+function narrativeDrift_(cfg, m, rc) {
   var b = cfg.narrative_basis, out = [];
   if (!b) return out;
+  if (b.rc_directions && rc) {   // v2.9: the numbers refresh; the words around them ("above", "below") do not
+    var names = { INPLACE: 'in-place rent vs comp median', ASK: 'ask vs comp median', INPLACE_SF: 'in-place $/SF vs comp median $/SF',
+                  ASK_SF: 'ask $/SF vs comp median $/SF', SIZEADJ: 'size-adjusted annual rent vs current' };
+    for (var dk in b.rc_directions) {
+      var now = rc.dir[dk], was = b.rc_directions[dk];
+      if (now === undefined) { out.push(dk.replace(/_/g, ' ') + ': no longer on Rent Comps'); continue; }
+      if (now !== was) { var parts = /^([^_]+)_(.+)$/.exec(dk); out.push((parts ? parts[1].replace('STUDIO', 'Studio') + ' ' + (names[parts[2]] || parts[2]) : dk) + ': written as ' + was + ', now ' + now); }
+    }
+  }
   if (b.price !== undefined && Math.round(b.price) !== Math.round(m.price)) out.push('price was ' + money_(b.price) + ', now ' + money_(m.price));
   if (b.rate !== undefined && Math.abs(b.rate - m.rate) > 0.000001) out.push('rate was ' + pct_(b.rate, 2) + ', now ' + pct_(m.rate, 2));
   if (b.down_pct !== undefined && Math.abs(b.down_pct - m.down_pct) > 0.000001) out.push('down payment was ' + pct_(b.down_pct) + ', now ' + pct_(m.down_pct));
   if (b.noi_y1 !== undefined && Math.abs(b.noi_y1 - m.noi[0]) > 500) out.push('Year 1 NOI was ' + money_(b.noi_y1) + ', now ' + money_(m.noi[0]));
+  return out;
+}
+
+/** v2.9: rent-comp figures for the written sections, read from the Rent Comps tab by header text.
+ *  Summary block: row 1 headers (A1 "RENT COMP SUMMARY…"), one row per unit type below it (column A "1BR", "Studio",
+ *  "2BR", …; rows marked "(n/a)" are skipped). Annual-rent block: the row whose A starts "ANNUAL RENT AT COMP MEDIAN"
+ *  holds its headers. Returns { tokens: { RC_1BR_COMP: '$1,199', … }, dir: { '1BR_INPLACE': 'above', … } }. */
+function rentCompFigures_(ss) {
+  var out = { tokens: {}, dir: {} };
+  var sh = ss.getSheetByName(PUB.COMPS); if (!sh) return out;
+  var v = sh.getDataRange().getValues();
+  if (!v.length || !/RENT COMP SUMMARY/i.test(String(v[0][0]))) return out;
+  var cols = function (hdr) { return hdr.map(function (h) { return String(h).trim().toLowerCase(); }); };
+  var find = function (H, test) { for (var i = 1; i < H.length; i++) if (test(H[i])) return i; return -1; };
+  var H = cols(v[0]);
+  var C = { INPLACE: find(H, function (h) { return h.indexOf('subject in-place median') === 0; }),
+            ASK: find(H, function (h) { return h.indexOf('subject ask') === 0 || h.indexOf('subject advertised ask') === 0; }),
+            ANCHOR: find(H, function (h) { return h.indexOf('inmotion anchor') === 0; }),
+            COMP: find(H, function (h) { return h.indexOf('comp median (') === 0; }),
+            INPLACE_SF: find(H, function (h) { return h === 'in-place $/sf' || h === 'subject in-place $/sf'; }),
+            ASK_SF: find(H, function (h) { return h === 'ask $/sf' || h === 'subject ask $/sf'; }),
+            COMP_SF: find(H, function (h) { return h === 'comp median $/sf'; }) };
+  var unitKey = function (a) { a = String(a == null ? '' : a).trim(); if (/\(n\/a\)/i.test(a)) return ''; var mm = /^(studio|[1-4]\s*br)\b/i.exec(a); return mm ? mm[1].replace(/\s+/g, '').toUpperCase() : ''; };
+  var num = function (x) { if (x === '' || x == null) return null; var n = typeof x === 'number' ? x : Number(String(x).replace(/[$,\s]/g, '')); return isFinite(n) ? n : null; };
+  var sf = function (n) { return '$' + n.toFixed(2); };
+  var side = function (a, b) { return a > b ? 'above' : a < b ? 'below' : 'equal'; };
+  var r, k;
+  for (r = 1; r < v.length; r++) {
+    k = unitKey(v[r][0]);
+    if (!k) { if (String(v[r][0]).length > 40) break; continue; }   // the long note row ends the block
+    var f = {};
+    for (var c in C) if (C[c] >= 0) { var n = num(v[r][C[c]]); if (n !== null) f[c] = n; }
+    if (f.INPLACE !== undefined) out.tokens['RC_' + k + '_INPLACE'] = money_(f.INPLACE);
+    if (f.ASK !== undefined) out.tokens['RC_' + k + '_ASK'] = money_(f.ASK);
+    if (f.ANCHOR !== undefined) out.tokens['RC_' + k + '_ANCHOR'] = money_(f.ANCHOR);
+    if (f.COMP !== undefined) out.tokens['RC_' + k + '_COMP'] = money_(f.COMP);
+    if (f.INPLACE_SF !== undefined) out.tokens['RC_' + k + '_INPLACE_SF'] = sf(f.INPLACE_SF);
+    if (f.ASK_SF !== undefined) out.tokens['RC_' + k + '_ASK_SF'] = sf(f.ASK_SF);
+    if (f.COMP_SF !== undefined) out.tokens['RC_' + k + '_COMP_SF'] = sf(f.COMP_SF);
+    if (f.INPLACE !== undefined && f.COMP !== undefined) out.dir[k + '_INPLACE'] = side(Math.round(f.INPLACE), Math.round(f.COMP));
+    if (f.ASK !== undefined && f.COMP !== undefined) out.dir[k + '_ASK'] = side(Math.round(f.ASK), Math.round(f.COMP));
+    if (f.INPLACE_SF !== undefined && f.COMP_SF !== undefined) out.dir[k + '_INPLACE_SF'] = side(round_(f.INPLACE_SF, 2), round_(f.COMP_SF, 2));
+    if (f.ASK_SF !== undefined && f.COMP_SF !== undefined) out.dir[k + '_ASK_SF'] = side(round_(f.ASK_SF, 2), round_(f.COMP_SF, 2));
+  }
+  for (r = 1; r < v.length; r++) if (/^ANNUAL RENT AT COMP MEDIAN/i.test(String(v[r][0]))) break;
+  if (r < v.length) {
+    var A = cols(v[r]), g = find(A, function (h) { return h.indexOf('difference (size-adjusted)') === 0; });
+    for (var q = r + 1; g >= 0 && q < v.length; q++) {
+      k = unitKey(v[q][0]); if (!k) break;
+      var gap = num(v[q][g]); if (gap === null) continue;
+      out.tokens['RC_' + k + '_SIZEADJ_GAP'] = money_(Math.round(Math.abs(gap) / 100) * 100);   // rounded to $100, no sign: the text says gain or cost
+      out.dir[k + '_SIZEADJ'] = gap > 0 ? 'gain' : gap < 0 ? 'loss' : 'none';
+    }
+  }
   return out;
 }
 
