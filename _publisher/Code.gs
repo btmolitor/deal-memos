@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.9  (2026-10-20)
+ * DEAL MEMO PUBLISHER  v2.10  (2026-10-20)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -12,7 +12,7 @@
  * from the ones the narrative was written on.
  *
  * Nothing in this file is deal-specific. Deal settings travel inside the shell file.
- * Token math mirrors render spec v1.7 (dual lane, template 10c). Do not edit one without the other.
+ * Token math mirrors render spec v1.8 (dual lane, template 10c). Do not edit one without the other.
  *
  * v2.3: exit cap (Summary, Exit Assumption row), selling costs (next row), closing % (Financials!C18 / C4) and tax bracket
  * (Financials!C31) are read from the Sheet instead of fixed in this file. New tokens DUAL_EXIT_CAP_LABEL and
@@ -35,6 +35,10 @@
  * from the Rent Comps summary block and the annual-rent block, both found by header text. The settings block may
  * carry narrative_basis.rc_directions (e.g. "1BR_INPLACE": "above"); the dialog warns when a comparison the text
  * was written on has flipped, since the words around the numbers do not change.
+ * v2.10: the I/O lane's principal-paydown waterfall layer is a share of cash in (it was divided by price, which
+ * understated it from Year 3 on). Balance, waterfall and I/O debt-service ratios carry 9 decimals so the memo ties to
+ * the Sheet to the dollar. The comp map finds the 1BR / Studio comp medians by the unit label in column A and the
+ * "Comp median (" header, not by row and column position.
  */
 
 var PUB = {
@@ -550,6 +554,21 @@ function writeCompMapCell_(sh, hdrRow, value) {
   if (sh.getRowHeight(hdrRow - 1) < 22) sh.setRowHeight(hdrRow - 1, 22);
 }
 
+/** Comp median for one unit type from the Rent Comps summary block: row found by the unit label in column A,
+ *  column by the "Comp median (" header (the $/SF median header reads "Comp median $/SF" and is skipped). */
+function summaryMedian_(vals, unit, num) {
+  var H = vals[0].map(function (h) { return String(h).toLowerCase(); });
+  var c = -1;
+  for (var i = 0; i < H.length; i++) if (H[i].indexOf('comp median (') === 0) { c = i; break; }
+  if (c < 0) return null;
+  for (var r = 1; r < Math.min(vals.length, 12); r++) {
+    var a = String(vals[r][0]).trim().toUpperCase().replace(/\s+/g, '');
+    if (!a) break;
+    if (a.indexOf(unit) === 0 && a.indexOf('(N/A)') === -1) return num(vals[r][c]);
+  }
+  return null;
+}
+
 /** Reads the Rent Comps tab into one record per property. Layout is found by header text, not row numbers. */
 function readComps_(sh) {
   var vals = sh.getDataRange().getValues();
@@ -574,7 +593,7 @@ function readComps_(sh) {
     return /^[a-z]+:\/\//i.test(s) ? s : 'https://' + s;
   };
   var res = { props: [], byName: {}, city: '', pulled: '', warnings: [], hdrRow: hdr + 1,
-              median_1br: summaryOk ? num(vals[1][4]) : null, median_studio: summaryOk ? num(vals[2][4]) : null };
+              median_1br: summaryOk ? summaryMedian_(vals, '1BR', num) : null, median_studio: summaryOk ? summaryMedian_(vals, 'STUDIO', num) : null };
   var subjectZone = false, latest = null;
   for (r = hdr + 1; r < vals.length; r++) {
     var a = String(vals[r][0] == null ? '' : vals[r][0]).trim();
@@ -673,7 +692,7 @@ function compMapLinkHtml_(cfg, cmap) {
          cmap.pins + ' properties; each pin links to its listing and its own website.</p>';
 }
 
-/* ───────────────────────── token math (render spec v1.7, dual lane) ───────────────────────── */
+/* ───────────────────────── token math (render spec v1.8, dual lane) ───────────────────────── */
 
 function pmtConst_(rate, years) { var r = rate / 12, n = years * 12; return r / (1 - Math.pow(1 + r, -n)) * 12; }
 function balAfter_(loan, rate, years, months) {
@@ -711,7 +730,7 @@ function buildTokens_(m, ui) {
   var io5 = io[4];
   for (k = 1; k <= 5; k++) io.push(balAfter_(io5, rate, amort, 12 * k));
   var ioBal = [], ioWf = [];
-  for (i = 0; i < 10; i++) { ioBal.push(io[i] / loan); ioWf.push(((i === 0 ? loan : io[i - 1]) - io[i]) / price); }
+  for (i = 0; i < 10; i++) { ioBal.push(io[i] / loan); ioWf.push(((i === 0 ? loan : io[i - 1]) - io[i]) / cashIn); }   // v2.10: share of cash in, same as the standard lane
   var ioPost = io5 * pmtConst_(rate, amort) / loan;
   var ioDs = [rate, rate, c28, c28, c28, ioPost, ioPost, ioPost, ioPost, ioPost];
   var depShield = round_(m.annual_dep * m.tax, 2);
@@ -734,8 +753,8 @@ function buildTokens_(m, ui) {
     DUAL_CASH_IN_PCT: num_(cashPct), DUAL_DEP_SHIELD_PER_DOLLAR: num_(depShield) + ' / ' + price,
     DUAL_DS_RATIO_Y1_Y5: Math.round(Math.abs(m.ds_y1)) + ' / ' + num_(loan),
     DUAL_DS_RATIO_Y6_Y10: Math.round(Math.abs(m.ds_y6)) + ' / ' + num_(loan),
-    DUAL_STD_BAL_RATIOS_Y1_Y10: arr_(stdBal, 6), DUAL_STD_WF_PRINC_RATIOS_Y1_Y10: arr_(stdWf, 4),
-    DUAL_IO_BAL_RATIOS_Y1_Y10: arr_(ioBal, 6), DUAL_IO_WF_PRINC_RATIOS_Y1_Y10: arr_(ioWf, 6), DUAL_IO_DS_BY_YEAR_RATIOS: arr_(ioDs, 6),
+    DUAL_STD_BAL_RATIOS_Y1_Y10: arr_(stdBal, 9), DUAL_STD_WF_PRINC_RATIOS_Y1_Y10: arr_(stdWf, 9),
+    DUAL_IO_BAL_RATIOS_Y1_Y10: arr_(ioBal, 9), DUAL_IO_WF_PRINC_RATIOS_Y1_Y10: arr_(ioWf, 9), DUAL_IO_DS_BY_YEAR_RATIOS: arr_(ioDs, 9),
     DUAL_GPR_Y1_Y10: iarr_(m.gpr), DUAL_VACANCY_Y1_Y10: iarr_(m.vacancy), DUAL_EGI_Y1_Y10: iarr_(m.egi),
     DUAL_OPEX_Y1_Y10: iarr_(m.opex), DUAL_NOI_Y1_Y10: iarr_(m.noi),
     DUAL_MARKET_GROWTH: num_(m.growth), DUAL_EXIT_CAP: num_(m.exit_cap), DUAL_EXIT_SELLING_COST_PCT: num_(m.sell),
