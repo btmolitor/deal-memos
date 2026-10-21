@@ -636,12 +636,12 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">13.80%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">14.03%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="3622500" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="3565000" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks">
-            <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.81M</span><span>$3.62M (full)</span>
+            <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.78M</span><span>$3.56M (full)</span>
           </div>
         </div>
         <div class="preset-buttons">
@@ -650,8 +650,8 @@ body {
           <button class="preset-btn active" data-val="500000">$500K</button>
           <button class="preset-btn" data-val="750000">$750K</button>
           <button class="preset-btn" data-val="1000000">$1M</button>
-          <button class="preset-btn" data-val="1811250">$1.81M (half)</button>
-          <button class="preset-btn" data-val="3622500">$3.62M (100%)</button>
+          <button class="preset-btn" data-val="1782500">$1.78M (half)</button>
+          <button class="preset-btn" data-val="3565000">$3.56M (100%)</button>
         </div>
       </div>
       <div class="partner-outputs">
@@ -882,9 +882,9 @@ const BASE = {
 
   // Ratios applied to purchase price
   downPct: 0.3,
-  closingReservesPct: 0.015,  // combined closing + reserves = 1.5% of price
+  closingReservesPct: 0.01,  // combined closing + reserves = 1.5% of price
   loanPct: 0.7,              // = 1 - downPct
-  cashInPct: 0.315,           // = down + closing/reserves
+  cashInPct: 0.31,           // = down + closing/reserves
   depShieldPerDollar: 131727.27 / 11500000,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
@@ -896,11 +896,11 @@ const BASE = {
 
   // Waterfall principal paydown ratios (% of cash in per year)
   // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.023910637, 0.025562772, 0.027329064, 0.029217399, 0.031236211, 0.022433791, 0.023983882, 0.025641078, 0.027412779, 0.029306899],
+  wfPrincRatios: [0.024296293, 0.025975075, 0.027769855, 0.029688647, 0.031740021, 0.022795626, 0.024370718, 0.026054643, 0.027854921, 0.029779591],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1.000000000, 1.000000000, 0.987421895, 0.973974689, 0.959598333, 0.949273259, 0.938234762, 0.926433547, 0.913816911, 0.900328514],
-  ioWfPrincRatios: [0.000000000, 0.000000000, 0.027951345, 0.029882678, 0.031947459, 0.022944608, 0.024529994, 0.026224924, 0.028036967, 0.029974216],
+  ioWfPrincRatios: [0.000000000, 0.000000000, 0.028402174, 0.030364657, 0.032462740, 0.023314682, 0.024925639, 0.026647907, 0.028489177, 0.030457671],
   ioDsByYearRatios: [0.067000000, 0.067000000, 0.079196512, 0.079196512, 0.079196512, 0.074304921, 0.074304921, 0.074304921, 0.074304921, 0.074304921],
 
   // FIXED operating data — does NOT scale with price (same building)
