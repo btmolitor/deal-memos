@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.10  (2026-10-20)
+ * DEAL MEMO PUBLISHER  v2.11  (2026-10-21)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -12,7 +12,7 @@
  * from the ones the narrative was written on.
  *
  * Nothing in this file is deal-specific. Deal settings travel inside the shell file.
- * Token math mirrors render spec v1.9 (v1.7 + v1.8 + v1.9 addenda; dual lane, template 10c). Do not edit one without the other.
+ * Token math mirrors render spec v1.10 (v1.7 + v1.8 + v1.9 + v1.10 addenda; dual lane, template 10c). Do not edit one without the other.
  *
  * v2.3: exit cap (Summary, Exit Assumption row), selling costs (next row), closing % (Financials!C18 / C4) and tax bracket
  * (Financials!C31) are read from the Sheet instead of fixed in this file. New tokens DUAL_EXIT_CAP_LABEL and
@@ -39,6 +39,10 @@
  * understated it from Year 3 on). Balance, waterfall and I/O debt-service ratios carry 9 decimals so the memo ties to
  * the Sheet to the dollar. The comp map finds the 1BR / Studio comp medians by the unit label in column A and the
  * "Comp median (" header, not by row and column position.
+ * v2.11: owner cash outside the loan (Financials!C19, "Additional Down Payment") is part of the memo's cash in, as fixed
+ * dollars that do not scale with the price slider. New token DUAL_ADDITIONAL_CASH. Every return, share and waterfall
+ * layer divides by cash in = price x (down + closing %) + C19, the same as Financials!C20. A shell without the token
+ * is refused when C19 is not zero, so an older memo can't silently leave it out.
  */
 
 var PUB = {
@@ -92,6 +96,7 @@ function run_(publish) {
     var rcUsed = parsed.html.match(/\{\{RC_[A-Z0-9_]+\}\}/g) || [];
     for (var u = 0; u < rcUsed.length; u++) { var rcName = rcUsed[u].slice(2, -2); if (!(rcName in rc.tokens)) throw new Error('The memo text uses ' + rcUsed[u] + ' but that Rent Comps figure is blank or missing. Fill the Rent Comps summary block, or ask Claude to "render this deal". Nothing was saved or published.'); }
     for (var rk in rc.tokens) tokens[rk] = rc.tokens[rk];
+    if (m.additional && parsed.html.indexOf('{{DUAL_ADDITIONAL_CASH}}') === -1) throw new Error('Financials!C19 (Additional Down Payment) is ' + money_(m.additional) + ' but this memo shell predates publisher v2.11 and would leave it out of cash in. Ask Claude to update the shell (render spec v1.10). Nothing was saved or published.');
     for (var tk in tokens) if (/NaN|undefined|Infinity/.test(tokens[tk])) throw new Error('Computed value ' + tk + ' came out blank or invalid. Nothing was saved or published.');
 
     // Comp map (v2.6). Never fatal for the memo: a problem here leaves the memo link out and says why.
@@ -105,7 +110,7 @@ function run_(publish) {
     var outFile = saveToFolder_(folder, cfg.output_name, html);
     var lines = [];
     lines.push('Numbers read from the Sheet: price ' + money_(m.price) + ', rate ' + pct_(m.rate, 2) +
-               ', down ' + pct_(m.down_pct) + ', Year 1 NOI ' + money_(m.noi[0]) + '.');
+               ', down ' + pct_(m.down_pct) + (m.additional ? ', additional owner cash ' + money_(m.additional) : '') + ', Year 1 NOI ' + money_(m.noi[0]) + '.');
     lines.push('Saved to the deal folder: ' + outFile.getName());
     if (cmap.html) { saveToFolder_(folder, cfg.slug + '_comps.html', cmap.html); lines.push('Comp map: ' + cmap.pins + ' properties pinned' + (cmap.geocoded ? ', ' + cmap.geocoded + ' newly geocoded' : '') + '.'); }
     for (var w = 0; w < cmap.warnings.length; w++) lines.push('Comp map: ' + cmap.warnings[w]);
@@ -356,9 +361,17 @@ function readModel_(ss) {
     units: S.getRange('I5').getValue(), annual_dep: S.getRange('I15').getValue(),
     gpr: row(S, 20), vacancy: row(S, 21), egi: row(S, 22), opex: row(S, 23), noi: row(S, 24),
     exit_cap: S.getRange('D' + exitRow).getValue(), sell: S.getRange('F' + (exitRow + 1)).getValue(),
-    closing: F.getRange('C18').getValue() / F.getRange('C4').getValue(), tax: F.getRange('C31').getValue()
+    closing: F.getRange('C18').getValue() / F.getRange('C4').getValue(), tax: F.getRange('C31').getValue(),
+    additional: readAdditional_(F)
   };
   return checkModel_(m);
+}
+
+/** v2.11: owner cash outside the loan. Read only when B19 is the "Additional Down Payment" row (older Sheets: 0). */
+function readAdditional_(F) {
+  if (!/additional/i.test(String(F.getRange('B19').getValue()))) return 0;
+  var v = F.getRange('C19').getValue();
+  return v === '' || v === null ? 0 : v;
 }
 
 function findRow_(sh, expect) {
@@ -376,7 +389,7 @@ function label_(sh, a1, expect) {
 
 function checkModel_(m) {
   var isNum = function (x) { return typeof x === 'number' && isFinite(x); };
-  var scalars = ['price', 'down_pct', 'rate', 'amort', 'growth', 'ds_y1', 'ds_y6', 'units', 'annual_dep', 'exit_cap', 'sell', 'closing', 'tax'];
+  var scalars = ['price', 'down_pct', 'rate', 'amort', 'growth', 'ds_y1', 'ds_y6', 'units', 'annual_dep', 'exit_cap', 'sell', 'closing', 'tax', 'additional'];
   for (var i = 0; i < scalars.length; i++) if (!isNum(m[scalars[i]])) throw new Error('Model value "' + scalars[i] + '" is not a number (error or blank cell in the Sheet).');
   var arrs = ['boy_balances', 'gpr', 'vacancy', 'egi', 'opex', 'noi'];
   for (var j = 0; j < arrs.length; j++) {
@@ -392,6 +405,7 @@ function checkModel_(m) {
   if (m.sell < 0 || m.sell > 0.1) throw new Error('Selling costs (Summary, Selling Costs row, column F) look wrong: ' + m.sell);
   if (m.closing < 0 || m.closing > 0.1) throw new Error('Closing costs % (Financials!C18 / C4) look wrong: ' + m.closing);
   if (m.tax < 0 || m.tax > 0.6) throw new Error('Tax bracket (Financials!C31) looks wrong: ' + m.tax);
+  if (m.additional < 0 || m.additional > m.price) throw new Error('Additional Down Payment (Financials!C19) looks wrong: ' + m.additional);
   var loan = m.price * (1 - m.down_pct);
   if (Math.abs(m.boy_balances[0] - loan) > 1) throw new Error('Loan does not tie: price x (1 - down) = ' + money_(loan) + ' but Financials!C9 = ' + money_(m.boy_balances[0]) + '. (Improvements or a note in the model? Ask Claude to re-render.)');
   if (m.noi[0] <= 0) throw new Error('Year 1 NOI is zero or negative.');
@@ -716,7 +730,8 @@ function pct_(x, d) { return d === undefined ? pctTrim_(x) : (x * 100).toFixed(d
 
 function buildTokens_(m, ui) {
   var price = Math.round(m.price), down = m.down_pct, rate = m.rate, amort = Math.round(m.amort);
-  var loan = round_(price * (1 - down), 2), cashPct = round_(down + m.closing, 6), cashIn = price * cashPct;
+  var addl = Math.round(m.additional || 0);   // v2.11: Financials!C19, fixed dollars
+  var loan = round_(price * (1 - down), 2), cashPct = round_(down + m.closing, 6), cashIn = price * cashPct + addl;
   var i, k;
   // STD lane: Financials row 9 (BOY1..BOY10) -> EOY1..EOY9; EOY10 computed on the post-refi schedule
   var eoy = m.boy_balances.slice(1, 10), eoy5 = eoy[4];
@@ -750,7 +765,7 @@ function buildTokens_(m, ui) {
     DUAL_PRICE_MIN: String(ui.price_min), DUAL_PRICE_MAX: String(ui.price_max), DUAL_PRICE_STEP: String(ui.price_step),
     DUAL_PRICE_MIN_COMPACT: compact_(ui.price_min), DUAL_PRICE_MAX_COMPACT: compact_(ui.price_max),
     DUAL_DOWN_PCT: num_(down), DUAL_CLOSING_RESERVES_PCT: num_(round_(m.closing, 6)), DUAL_LOAN_PCT: num_(round_(1 - down, 10)),
-    DUAL_CASH_IN_PCT: num_(cashPct), DUAL_DEP_SHIELD_PER_DOLLAR: num_(depShield) + ' / ' + price,
+    DUAL_CASH_IN_PCT: num_(cashPct), DUAL_ADDITIONAL_CASH: String(addl), DUAL_DEP_SHIELD_PER_DOLLAR: num_(depShield) + ' / ' + price,
     DUAL_DS_RATIO_Y1_Y5: Math.round(Math.abs(m.ds_y1)) + ' / ' + num_(loan),
     DUAL_DS_RATIO_Y6_Y10: Math.round(Math.abs(m.ds_y6)) + ' / ' + num_(loan),
     DUAL_STD_BAL_RATIOS_Y1_Y10: arr_(stdBal, 9), DUAL_STD_WF_PRINC_RATIOS_Y1_Y10: arr_(stdWf, 9),
