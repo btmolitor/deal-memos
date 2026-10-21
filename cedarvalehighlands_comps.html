@@ -804,7 +804,7 @@ ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction
       <label><input type="checkbox" id="showExcl" checked> Show excluded rows</label>
       <label id="anchorWrap" hidden><input type="checkbox" id="showAnchor"> Show out-of-market anchor</label>
     </div>
-    <div class="legend"><span class="l-sub">Subject</span><span class="l-below">We're below</span><span class="l-mixed">Mixed</span><span class="l-above">We're above</span><span class="l-excl">Excluded from median</span><span class="l-note">Comp colors compare our advertised ask per square foot with each comp's, unit type by unit type.</span></div>
+    <div class="legend"><span class="l-sub">Subject</span><span class="l-below">We're below</span><span class="l-mixed">Mixed</span><span class="l-above">We're above</span><span class="l-excl">Excluded from median</span><span class="l-note">Comp colors compare our advertised ask with each comp's on monthly rent and on $/SF: green = we're below on both, red = above on both, amber = the two disagree.</span></div>
     <ul class="list" id="list"></ul>
   </aside>
   <div id="map"></div>
@@ -866,19 +866,26 @@ var DATA = {"deal":"Cedarvale Highlands","city":"Eagan","median_1br":1199,"media
   tiles.addTo(map);
   L.control.scale({ imperial: true, metric: false }).addTo(map);
 
-  // Subject ask $/SF vs each counted comp's $/SF, on the unit types both have: all below = green, all above = red, both = amber.
+  // Subject ask vs each counted comp, on the unit types both have, two ways: monthly ask and ask per SF.
+  // Green = we are below on both for every shared type; red = above on both; amber = the two disagree somewhere.
   var SUBJ0 = P.filter(function (q) { return q.role === "sub"; })[0];
+  var dir = function (a, b) { return a < b ? "below" : a > b ? "above" : "even"; };
   P.forEach(function (p) {
     if (p.role !== "comp" || !SUBJ0) return;
-    var lo = 0, hi = 0;
+    var seen = {}, lines = [];
     SUBJ0.units.forEach(function (s) {
       var c = p.units.filter(function (x) { return x[0] === s[0]; })[0];
-      var sr = Number(s[1]) > 0 ? Number(s[2]) / Number(s[1]) : 0, cr = c && Number(c[1]) > 0 ? Number(c[2]) / Number(c[1]) : 0;
-      if (sr > 0 && cr > 0) { sr = Math.round(sr * 100); cr = Math.round(cr * 100); if (sr < cr) lo++; else if (sr > cr) hi++; }   // compared at the cents shown
+      var ss = Number(s[1]), sr = Number(s[2]), cs = c ? Number(c[1]) : 0, cr = c ? Number(c[2]) : 0;
+      if (!(sr > 0 && cr > 0 && ss > 0 && cs > 0)) return;
+      var r = dir(sr, cr), f = dir(Math.round(sr / ss * 100), Math.round(cr / cs * 100));
+      seen[r] = 1; seen[f] = 1;
+      lines.push(s[0] + ": " + (r === f ? r + " on rent and $/SF" : r + " on rent, " + f + " on $/SF"));
     });
-    p.vs = lo && hi ? "mixed" : lo ? "below" : hi ? "above" : "";
+    if (!lines.length) return;
+    p.vs = seen.below && !seen.above && !seen.even ? "below" : seen.above && !seen.below && !seen.even ? "above" : "mixed";
+    p.vsLines = lines;
   });
-  var VS_TEXT = { below: "Our ask per SF is below this comp", above: "Our ask per SF is above this comp", mixed: "Mixed: our ask per SF is below on one unit type, above on another" };
+  var VS_TEXT = { below: "Our ask is below this comp on rent and $/SF", above: "Our ask is above this comp on rent and $/SF", mixed: "Mixed: rent and $/SF point different ways" };
 
   var markers = {};
   function style(p) {
@@ -901,7 +908,7 @@ var DATA = {"deal":"Cedarvale Highlands","city":"Eagan","median_1br":1199,"media
     if (p.listing) links.push('<a href="' + esc(p.listing) + '" target="_blank" rel="noopener">Listing</a>');
     if (p.site) links.push('<a href="' + esc(p.site) + '" target="_blank" rel="noopener">Property site</a>');
     return '<div class="pop"><h3>' + esc(p.name) + '</h3><div class="addr">' + esc(p.addr) + dist + (p.nudged ? " · pin offset so both show" : "") + '</div>' + flag +
-      (p.vs ? '<div class="vs ' + p.vs + '">' + VS_TEXT[p.vs] + '</div>' : "") + '<table>' + rows + '</table>' + (p.note ? '<div class="note">' + esc(p.note) + '</div>' : "") +
+      (p.vs ? '<div class="vs ' + p.vs + '">' + VS_TEXT[p.vs] + '<br><span style="font-weight:400">' + p.vsLines.map(esc).join("<br>") + '</span></div>' : "") + '<table>' + rows + '</table>' + (p.note ? '<div class="note">' + esc(p.note) + '</div>' : "") +
       '<div class="links">' + links.join("") + '</div></div>';
   }
   P.forEach(function (p) {
