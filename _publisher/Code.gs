@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.11  (2026-10-21)
+ * DEAL MEMO PUBLISHER  v2.12  (2026-10-21)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -43,6 +43,9 @@
  * dollars that do not scale with the price slider. New token DUAL_ADDITIONAL_CASH. Every return, share and waterfall
  * layer divides by cash in = price x (down + closing %) + C19, the same as Financials!C20. A shell without the token
  * is refused when C19 is not zero, so an older memo can't silently leave it out.
+ * v2.12: the Summary PDF gets a second fixed page break, at the "10-YEAR IRR" title (page 2 = rate sensitivity and the
+ * interest-only lane with its waterfall; page 3 = IRR, exit, scorecard, flags). Each break is found by its title; a
+ * missing title is skipped.
  */
 
 var PUB = {
@@ -141,7 +144,7 @@ function run_(publish) {
 }
 
 /** Saves the Summary tab as a landscape letter PDF in the deal folder: <Deal>_Deal_Summary_<yyyy-MM-dd>.pdf.
- *  Page 1 runs through the waterfalls; page 2 starts at the "RATE SENSITIVITY" title, so no section is split.
+ *  Page 1 runs through the waterfalls; page 2 starts at the "RATE SENSITIVITY" title and page 3 at "10-YEAR IRR", so no section is split.
  *  Hidden rows stay out, links stay clickable. A second export on the same day gets a time suffix; nothing is overwritten. */
 async function exportSummaryPdf() {
   var ui = SpreadsheetApp.getUi();
@@ -152,14 +155,16 @@ async function exportSummaryPdf() {
     if (!sh) throw new Error('No tab named "' + PUB.SUM + '" in this Sheet.');
     var folder = dealFolder_(ss);
     var lastRow = sh.getLastRow(), lastCol = sh.getLastColumn();
-    var brk = 0, colB = sh.getRange(1, 2, lastRow, 1).getValues();
-    for (var i = 0; i < colB.length; i++) if (/^\s*RATE SENSITIVITY/i.test(String(colB[i][0]))) { brk = i + 1; break; }
+    var colB = sh.getRange(1, 2, lastRow, 1).getValues(), titles = [/^\s*RATE SENSITIVITY/i, /^\s*10-YEAR IRR/i], brks = [];
+    for (var t = 0; t < titles.length; t++)
+      for (var i = 0; i < colB.length; i++) if (titles[t].test(String(colB[i][0]))) { if (i + 1 > 1 && (!brks.length || i + 1 > brks[brks.length - 1])) brks.push(i + 1); break; }
 
     var blob, note = [];
-    if (brk > 1) {
+    if (brks.length) {
       try {
-        var p1 = summaryPdfPart_(ss, sh, 1, brk - 1, lastCol), p2 = summaryPdfPart_(ss, sh, brk, lastRow, lastCol);
-        blob = await mergePdfs_([p1, p2]);
+        var starts = [1].concat(brks), parts = [];
+        for (var k = 0; k < starts.length; k++) parts.push(summaryPdfPart_(ss, sh, starts[k], k + 1 < starts.length ? starts[k + 1] - 1 : lastRow, lastCol));
+        blob = await mergePdfs_(parts);
       } catch (mergeErr) {
         blob = null;
         note.push('Note: could not set the page break (' + (mergeErr.message || mergeErr) + '). Google placed the break itself.');
