@@ -12,7 +12,7 @@
  * from the ones the narrative was written on.
  *
  * Nothing in this file is deal-specific. Deal settings travel inside the shell file.
- * Token math mirrors render spec v1.8 (dual lane, template 10c). Do not edit one without the other.
+ * Token math mirrors render spec v1.9 (v1.7 + v1.8 + v1.9 addenda; dual lane, template 10c). Do not edit one without the other.
  *
  * v2.3: exit cap (Summary, Exit Assumption row), selling costs (next row), closing % (Financials!C18 / C4) and tax bracket
  * (Financials!C31) are read from the Sheet instead of fixed in this file. New tokens DUAL_EXIT_CAP_LABEL and
@@ -692,7 +692,7 @@ function compMapLinkHtml_(cfg, cmap) {
          cmap.pins + ' properties; each pin links to its listing and its own website.</p>';
 }
 
-/* ───────────────────────── token math (render spec v1.8, dual lane) ───────────────────────── */
+/* ───────────────────────── token math (render spec v1.9, dual lane) ───────────────────────── */
 
 function pmtConst_(rate, years) { var r = rate / 12, n = years * 12; return r / (1 - Math.pow(1 + r, -n)) * 12; }
 function balAfter_(loan, rate, years, months) {
