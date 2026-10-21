@@ -683,8 +683,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
   --fg: #1d1f1a;
   --muted: #6b6e63;
   --line: #d9d8d0;
-  --subject: #b4461f;     /* brick: the subject */
-  --comp: #2c5f4a;        /* pine: counted comps */
+  --subject: #1a4d8f;     /* blue: the subject */
+  --comp: #2c5f4a;        /* pine: links and counted comps with no shared unit type */
+  --below: #2e7d32;       /* green: subject ask below this comp */
+  --mixed: #c99700;       /* amber: below on one unit type, above on another */
+  --above: #c0392b;       /* red: subject ask above this comp */
   --excl: #9a9c93;        /* ash: excluded rows */
   --accent-soft: #e7eee9;
   --tile-filter: none;
@@ -694,14 +697,16 @@ svg.leaflet-image-layer.leaflet-interactive path {
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #15171a; --panel: #1d2024; --fg: #e8e6df; --muted: #9a9d94; --line: #33373c;
-    --subject: #e0734a; --comp: #6fb391; --excl: #6c6f68; --accent-soft: #233029;
+    --subject: #7fa8e6; --comp: #6fb391; --excl: #6c6f68; --accent-soft: #233029;
+    --below: #6fbf73; --mixed: #e0b84a; --above: #e57368;
     --tile-filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.6);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #15171a; --panel: #1d2024; --fg: #e8e6df; --muted: #9a9d94; --line: #33373c;
-  --subject: #e0734a; --comp: #6fb391; --excl: #6c6f68; --accent-soft: #233029;
+  --subject: #7fa8e6; --comp: #6fb391; --excl: #6c6f68; --accent-soft: #233029;
+  --below: #6fbf73; --mixed: #e0b84a; --above: #e57368;
   --tile-filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.6);
   color-scheme: dark;
 }
@@ -726,6 +731,11 @@ aside {
 .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
 .legend .l-sub::before { background: var(--subject); }
 .legend .l-comp::before { background: var(--comp); }
+.legend .l-below::before { background: var(--below); }
+.legend .l-mixed::before { background: var(--mixed); }
+.legend .l-above::before { background: var(--above); }
+.legend .l-note { flex-basis: 100%; }
+.legend .l-note::before { display: none; }
 .legend .l-excl::before { background: transparent; border: 2px solid var(--excl); box-sizing: border-box; }
 ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 .list li { display: grid; grid-template-columns: 14px 1fr auto; gap: 8px; align-items: baseline; padding: 6px 6px; border-radius: 4px; cursor: pointer; }
@@ -734,6 +744,9 @@ ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction
 .list .dot { width: 10px; height: 10px; border-radius: 50%; align-self: center; }
 .list .dot.sub { background: var(--subject); }
 .list .dot.comp { background: var(--comp); }
+.list .dot.comp.below { background: var(--below); }
+.list .dot.comp.mixed { background: var(--mixed); }
+.list .dot.comp.above { background: var(--above); }
 .list .dot.excl { background: transparent; border: 2px solid var(--excl); box-sizing: border-box; }
 .list .name { min-width: 0; }
 .list .name small { display: block; color: var(--muted); font-size: 12px; }
@@ -756,6 +769,8 @@ ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction
 .pop tr.subj td:first-child { padding-left: 10px; }
 .pop .flag { display: inline-block; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; margin-bottom: 6px; }
 .pop .flag.comp { background: var(--accent-soft); color: var(--comp); }
+.pop .vs { font-size: 12px; font-weight: 600; margin: 4px 0 2px; }
+.pop .vs.below { color: var(--below); } .pop .vs.mixed { color: var(--mixed); } .pop .vs.above { color: var(--above); }
 .pop .flag.excl { border: 1px solid var(--excl); color: var(--muted); }
 .pop .flag.sub { background: var(--subject); color: #fff; }
 .pop .note { color: var(--muted); font-size: 12px; margin: 4px 0 8px; }
@@ -789,7 +804,7 @@ ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction
       <label><input type="checkbox" id="showExcl" checked> Show excluded rows</label>
       <label id="anchorWrap" hidden><input type="checkbox" id="showAnchor"> Show out-of-market anchor</label>
     </div>
-    <div class="legend"><span class="l-sub">Subject</span><span class="l-comp">In comp median</span><span class="l-excl">Excluded from median</span></div>
+    <div class="legend"><span class="l-sub">Subject</span><span class="l-below">We're below</span><span class="l-mixed">Mixed</span><span class="l-above">We're above</span><span class="l-excl">Excluded from median</span><span class="l-note">Comp colors compare our advertised ask with each comp's ask, unit type by unit type.</span></div>
     <ul class="list" id="list"></ul>
   </aside>
   <div id="map"></div>
@@ -851,9 +866,23 @@ var DATA = {{COMP_DATA}};
   tiles.addTo(map);
   L.control.scale({ imperial: true, metric: false }).addTo(map);
 
+  // Subject ask vs each counted comp, on the unit types both have: all below = green, all above = red, both = amber.
+  var SUBJ0 = P.filter(function (q) { return q.role === "sub"; })[0];
+  P.forEach(function (p) {
+    if (p.role !== "comp" || !SUBJ0) return;
+    var lo = 0, hi = 0;
+    SUBJ0.units.forEach(function (s) {
+      var c = p.units.filter(function (x) { return x[0] === s[0]; })[0];
+      var sr = Number(s[2]), cr = c ? Number(c[2]) : 0;
+      if (sr > 0 && cr > 0) { if (sr < cr) lo++; else if (sr > cr) hi++; }
+    });
+    p.vs = lo && hi ? "mixed" : lo ? "below" : hi ? "above" : "";
+  });
+  var VS_TEXT = { below: "Our ask is below this comp", above: "Our ask is above this comp", mixed: "Mixed: our ask is below on one unit type, above on another" };
+
   var markers = {};
   function style(p) {
-    var c = p.role === "sub" ? cssVar("--subject") : p.role === "comp" ? cssVar("--comp") : cssVar("--excl");
+    var c = p.role === "sub" ? cssVar("--subject") : p.role === "comp" ? cssVar(p.vs ? "--" + p.vs : "--comp") : cssVar("--excl");
     return p.role === "excl"
       ? { radius: 7, color: c, weight: 2, fillColor: cssVar("--panel"), fillOpacity: 0.9 }
       : { radius: p.role === "sub" ? 10 : 8, color: cssVar("--panel"), weight: 2, fillColor: c, fillOpacity: 1 };
@@ -872,7 +901,7 @@ var DATA = {{COMP_DATA}};
     if (p.listing) links.push('<a href="' + esc(p.listing) + '" target="_blank" rel="noopener">Listing</a>');
     if (p.site) links.push('<a href="' + esc(p.site) + '" target="_blank" rel="noopener">Property site</a>');
     return '<div class="pop"><h3>' + esc(p.name) + '</h3><div class="addr">' + esc(p.addr) + dist + (p.nudged ? " · pin offset so both show" : "") + '</div>' + flag +
-      '<table>' + rows + '</table>' + (p.note ? '<div class="note">' + esc(p.note) + '</div>' : "") +
+      (p.vs ? '<div class="vs ' + p.vs + '">' + VS_TEXT[p.vs] + '</div>' : "") + '<table>' + rows + '</table>' + (p.note ? '<div class="note">' + esc(p.note) + '</div>' : "") +
       '<div class="links">' + links.join("") + '</div></div>';
   }
   P.forEach(function (p) {
@@ -893,7 +922,7 @@ var DATA = {{COMP_DATA}};
       var r1 = unit(p, "1BR"), r0 = unit(p, "Studio"), r2 = unit(p, "2BR");
       var cells = [], add = function (t, v) { cells.push('<span>' + t + '</span><span class="v">' + (v ? money(v) : "—") + '</span>'); };
       if (r1 || r0) { add("1BR", r1); add("Studio", r0); } else if (r2) { add("2BR", r2); }
-      li.innerHTML = '<span class="dot ' + p.role + '"></span>' +
+      li.innerHTML = '<span class="dot ' + p.role + (p.vs ? " " + p.vs : "") + '"></span>' +
         '<span class="name">' + esc(p.name) + '<small>' + (p.role === "sub" ? "Subject" : p.dist.toFixed(1) + " mi") + (p.addr ? " · " + esc(p.addr.replace(/,\s*[^,]+$/, "")) : "") + '</small></span>' +
         '<span class="rent">' + (cells.join("") || '<span class="v">—</span>') + '</span>';
       var go = function () { map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 15), { duration: 0.6 }); markers[p.id].openPopup(); setActive(p.id); };
