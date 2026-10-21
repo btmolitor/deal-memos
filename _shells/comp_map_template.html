@@ -804,7 +804,7 @@ ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction
       <label><input type="checkbox" id="showExcl" checked> Show excluded rows</label>
       <label id="anchorWrap" hidden><input type="checkbox" id="showAnchor"> Show out-of-market anchor</label>
     </div>
-    <div class="legend"><span class="l-sub">Subject</span><span class="l-below">We're below</span><span class="l-mixed">Mixed</span><span class="l-above">We're above</span><span class="l-excl">Excluded from median</span><span class="l-note">Comp colors compare our advertised ask with each comp's ask, unit type by unit type.</span></div>
+    <div class="legend"><span class="l-sub">Subject</span><span class="l-below">We're below</span><span class="l-mixed">Mixed</span><span class="l-above">We're above</span><span class="l-excl">Excluded from median</span><span class="l-note">Comp colors compare our advertised ask per square foot with each comp's, unit type by unit type.</span></div>
     <ul class="list" id="list"></ul>
   </aside>
   <div id="map"></div>
@@ -866,19 +866,19 @@ var DATA = {{COMP_DATA}};
   tiles.addTo(map);
   L.control.scale({ imperial: true, metric: false }).addTo(map);
 
-  // Subject ask vs each counted comp, on the unit types both have: all below = green, all above = red, both = amber.
+  // Subject ask $/SF vs each counted comp's $/SF, on the unit types both have: all below = green, all above = red, both = amber.
   var SUBJ0 = P.filter(function (q) { return q.role === "sub"; })[0];
   P.forEach(function (p) {
     if (p.role !== "comp" || !SUBJ0) return;
     var lo = 0, hi = 0;
     SUBJ0.units.forEach(function (s) {
       var c = p.units.filter(function (x) { return x[0] === s[0]; })[0];
-      var sr = Number(s[2]), cr = c ? Number(c[2]) : 0;
-      if (sr > 0 && cr > 0) { if (sr < cr) lo++; else if (sr > cr) hi++; }
+      var sr = Number(s[1]) > 0 ? Number(s[2]) / Number(s[1]) : 0, cr = c && Number(c[1]) > 0 ? Number(c[2]) / Number(c[1]) : 0;
+      if (sr > 0 && cr > 0) { sr = Math.round(sr * 100); cr = Math.round(cr * 100); if (sr < cr) lo++; else if (sr > cr) hi++; }   // compared at the cents shown
     });
     p.vs = lo && hi ? "mixed" : lo ? "below" : hi ? "above" : "";
   });
-  var VS_TEXT = { below: "Our ask is below this comp", above: "Our ask is above this comp", mixed: "Mixed: our ask is below on one unit type, above on another" };
+  var VS_TEXT = { below: "Our ask per SF is below this comp", above: "Our ask per SF is above this comp", mixed: "Mixed: our ask per SF is below on one unit type, above on another" };
 
   var markers = {};
   function style(p) {
