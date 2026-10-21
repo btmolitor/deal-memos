@@ -594,7 +594,7 @@ body {
       <div class="snap-cell"><span class="snap-label">Units / Price per Unit</span><span class="snap-value" id="sUnitsPPU">—</span></div>
       <div class="snap-cell"><span class="snap-label">Loan / Rate / Amort</span><span class="snap-value" id="sLoan">—</span></div>
       <div class="snap-cell"><span class="snap-label">Down Payment</span><span class="snap-value" id="sDown">—</span></div>
-      <div class="snap-cell"><span class="snap-label">Total Cash In</span><span class="snap-value" id="sCashIn">—</span><span class="snap-note">includes closing fees</span></div>
+      <div class="snap-cell"><span class="snap-label">Total Cash In</span><span class="snap-value" id="sCashIn">—</span><span class="snap-note" id="sCashInNote">includes closing fees</span></div>
       <div class="snap-cell"><span class="snap-label">Going-In Cap Rate</span><span class="snap-value" id="sCap">—</span></div>
       <div class="snap-cell"><span class="snap-label">Year 1 NOI / Expense Ratio</span><span class="snap-value" id="sNOI">—</span></div>
       <div class="snap-cell"><span class="snap-label">Year 1 DSCR</span><span class="snap-value" id="sDSCR">—</span></div>
@@ -636,12 +636,12 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">14.03%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">13.64%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="3565000" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="3665000" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks">
-            <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.78M</span><span>$3.56M (full)</span>
+            <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.83M</span><span>$3.67M (full)</span>
           </div>
         </div>
         <div class="preset-buttons">
@@ -650,8 +650,8 @@ body {
           <button class="preset-btn active" data-val="500000">$500K</button>
           <button class="preset-btn" data-val="750000">$750K</button>
           <button class="preset-btn" data-val="1000000">$1M</button>
-          <button class="preset-btn" data-val="1782500">$1.78M (half)</button>
-          <button class="preset-btn" data-val="3565000">$3.56M (100%)</button>
+          <button class="preset-btn" data-val="1832500">$1.83M (half)</button>
+          <button class="preset-btn" data-val="3665000">$3.67M (100%)</button>
         </div>
       </div>
       <div class="partner-outputs">
@@ -848,13 +848,13 @@ body {
       <p class="story-headline" style="color: var(--gold);">A note on the structure.</p>
       <div class="story-body">
         <p>At the analyzer's starting price and on our underwriting, Year 1 clears our hurdles, but only just: <strong>Year 1 DSCR of 1.26</strong> against our 1.25 target, a going-in cap rate of 6.81% against our 5.0% floor, and Year 1 cash-on-cash of 4.42% inside our 3&ndash;6% band. Move the price slider and all three move with it.</p>
-        <p>Our numbers already lean conservative. Management is at 5%, insurance at $115,000 against the seller's $95,000, real estate tax at the county's 2027 value, and one-time fees are left out of income. Two things are not yet in the model: a replacement reserve and the electrical panels. A $300-per-unit reserve takes $32,400 a year from cash flow; at the starting price that brings Year 1 cash-on-cash to about 3.5% and <strong>DSCR after reserves to about 1.20, below our target</strong>. The lender's own underwriting carries more income than ours, so loan size is not the constraint. Our cushion is.</p>
+        <p>Our numbers already lean conservative. Management is at 5%, insurance at $115,000 against the seller's $95,000, real estate tax at the county's 2027 value, and one-time fees are left out of income. The electrical panels are budgeted at $100,000 of added owner cash. One thing is not yet in the model: a replacement reserve. A $300-per-unit reserve takes $32,400 a year from cash flow; at the starting price that brings Year 1 cash-on-cash to about 3.5% and <strong>DSCR after reserves to about 1.20, below our target</strong>. The lender's own underwriting carries more income than ours, so loan size is not the constraint. Our cushion is.</p>
         <p><em>Read this carefully. We have not yet seen the full easement agreement with the commercial neighbor or a bid for the electrical panels. If moving ahead before those are answered isn't for you, that's a reasonable read. Let us know.</em></p>
       </div>
     </div>
     <div class="risk-grid">
       <div class="risk-card"><div class="risk-title">Shared-building agreement with the commercial neighbor</div><div class="risk-body">The apartments are tied to the adjoining Cedarvale Business Center by a recorded easement agreement that the offering memo never mentions. We hold only a 2019 amendment; the original 1995 agreement isn't in our file. From what we can see, we pay 40% of repairs to the shared concourse roofs, the neighbor can lien us for unpaid shares, and rebuilding after a fire has to be coordinated with them. That is an open-ended cost share we can't size yet. We get the full agreement, a current estoppel from the neighbor, title and survey, and counsel reads all of it before our money goes hard.</div></div>
-      <div class="risk-card"><div class="risk-title">Electrical panels and old plumbing</div><div class="risk-body">Ninety of the 108 units still have Federal Pacific Stab-Lok panels, and the supply lines are partly galvanized steel. Insurers and agency lenders often require those panels replaced. Nothing is in the model for it, and no replacement reserve is modeled either. If replacement runs $2,000 a panel (we don't have a bid yet), that is $180,000 of extra cash at closing, and a lender reserve of $300 a unit takes another $32,400 a year. We get an electrician's bid and the insurer's and lender's positions during diligence, then put the cost into the budget or the price.</div></div>
+      <div class="risk-card"><div class="risk-title">Electrical panels and old plumbing</div><div class="risk-body">Ninety of the 108 units still have Federal Pacific Stab-Lok panels, and the supply lines are partly galvanized steel. Insurers and agency lenders often require those panels replaced. The model budgets $100,000 of added owner cash for the work (we don't have a bid yet). It raises cash in but doesn't change the loan. No replacement reserve is modeled; a lender reserve of $300 a unit takes another $32,400 a year. We get an electrician's bid and the insurer's and lender's positions during diligence, then true up the budget or the price.</div></div>
       <div class="risk-card"><div class="risk-title">The seller's expense history has gaps</div><div class="risk-body">The seller's books carry about $31,500 of maintenance credits in two months that look like repairs moved to capital, so their net repair cost is too low to rely on. We budget $65,000 for repairs plus separate lines for appliances, flooring and painting. Utility bill-back income also dipped, from $6,752 in August 2025 to $4,274 in July 2026 (utility and trash combined). Residents are billed about two months after we pay the bills, so spring's low heating bills show up as a summer dip; across the full year the property recovered about 75% of its utility and trash cost, and we model 70%. We confirm with the seller's journal entries, the billing ledger and August&ndash;September actuals before we commit.</div></div>
       <div class="risk-card"><div class="risk-title">Our rents sit above the older neighbors</div><div class="risk-body">Against similar-age buildings nearby, our one-bedrooms (median $1,401) sit above a comparable median of $1,199, and our studios ($1,170) sit above a median of $1,060. The one-bedroom gap is mostly size: comparable units run 650&ndash;824 square feet against our 835, and per square foot we are slightly below them ($1.68 against $1.71). The studios are different. At $2.54 a square foot against the neighbors&rsquo; $2.40, they are priced above the market even after adjusting for size; repricing them to that rate would cost about $50,600 a year. Newer buildings nearby ask $1,492 and up for a one-bedroom and $1,525 and up for a studio, so there is a ceiling above us, but it is newer product. Thirteen units are on notice, and the six already re-leased went for $1,109 a month less in total than the rents they replaced. If every one-bedroom reset to the $1,275 that September&rsquo;s new leases signed at, we would lose about $50,000 a year. We underwrite 5% vacancy and 3% growth, not the broker&rsquo;s renovation premiums, and we price renewals unit by unit.</div></div>
       <div class="risk-card"><div class="risk-title">Rate lock and refinance</div><div class="risk-body">We model a 6.70% rate, 41 bps above the lender's 5-year fixed quote of 6.29%, which is a month old and not locked. At the analyzer's starting price, 50 bps higher takes Year 1 DSCR from 1.26 to 1.19. We plan a 5-year fixed loan and a refinance at Year 5. Nobody can call 2031 rates, so the projections assume the same rate on a fresh 30-year schedule; section 06 lets you test higher and lower. Refinance costs, roughly 1&ndash;2% of the loan, are not in the projections. We lock as soon as we are under contract.</div></div>
@@ -882,9 +882,10 @@ const BASE = {
 
   // Ratios applied to purchase price
   downPct: 0.3,
-  closingReservesPct: 0.01,  // combined closing + reserves = 1.5% of price
+  closingReservesPct: 0.01,  // closing costs as a share of price (Financials!C18 / C4)
   loanPct: 0.7,              // = 1 - downPct
   cashInPct: 0.31,           // = down + closing/reserves
+  additionalCash: 100000,  // owner cash outside the loan (Financials!C19), fixed dollars
   depShieldPerDollar: 131727.27 / 11500000,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
@@ -894,13 +895,13 @@ const BASE = {
   // Mortgage balance decay — Y1-Y10 balance ÷ initial loan
   balRatios: [0.989240213, 0.977736966, 0.965438887, 0.952291057, 0.938234762, 0.928139556, 0.917346810, 0.905808325, 0.893472574, 0.880284469],
 
-  // Waterfall principal paydown ratios (% of cash in per year)
-  // Price-invariant: numerator (paydown $) and denominator (cash in) both scale linearly with price
-  wfPrincRatios: [0.024296293, 0.025975075, 0.027769855, 0.029688647, 0.031740021, 0.022795626, 0.024370718, 0.026054643, 0.027854921, 0.029779591],
+  // Waterfall principal paydown ratios (% of cash in per year) at the base price. Reference only since v1.10:
+  // derive() computes the layer from the balances, because fixed owner cash makes cash in not purely price-scaled
+  wfPrincRatios: [0.023633365, 0.025266342, 0.027012151, 0.028878589, 0.030873991, 0.022173645, 0.023705760, 0.025343739, 0.027094896, 0.028967051],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1.000000000, 1.000000000, 0.987421895, 0.973974689, 0.959598333, 0.949273259, 0.938234762, 0.926433547, 0.913816911, 0.900328514],
-  ioWfPrincRatios: [0.000000000, 0.000000000, 0.028402174, 0.030364657, 0.032462740, 0.023314682, 0.024925639, 0.026647907, 0.028489177, 0.030457671],
+  ioWfPrincRatios: [0.000000000, 0.000000000, 0.027627217, 0.029536153, 0.031576990, 0.022678538, 0.024245540, 0.025920815, 0.027711846, 0.029626630],
   ioDsByYearRatios: [0.067000000, 0.067000000, 0.079196512, 0.079196512, 0.079196512, 0.074304921, 0.074304921, 0.074304921, 0.074304921, 0.074304921],
 
   // FIXED operating data — does NOT scale with price (same building)
@@ -969,7 +970,7 @@ function derive(price) {
   D.loan = price * BASE.loanPct;
   D.downPmt = price * BASE.downPct;
   D.closingReserves = price * BASE.closingReservesPct;
-  D.cashIn = price * BASE.cashInPct;
+  D.cashIn = price * BASE.cashInPct + BASE.additionalCash;
   D.dsY1Y5 = D.loan * BASE.dsRatioY1Y5;
   D.dsY6Y10 = D.loan * BASE.dsRatioY6Y10;
   D.goingInCap = BASE.noi[0] / price;
@@ -999,8 +1000,8 @@ function derive(price) {
   D.wf = {
     coc: D.cashFlow.map(cf => cf / D.cashIn),
     dep: D.depShieldYears.map(d => d / D.cashIn),
-    // Principal paydown: baked ratios (price-invariant — both numerator and denominator scale linearly with price)
-    princ: BASE.wfPrincRatios.slice(),
+    // Principal paydown: this year's principal paid ÷ cash in (equals the baked ratios at the base price)
+    princ: D.balance.map((b, i) => ((i === 0 ? D.loan : D.balance[i - 1]) - b) / D.cashIn),
     growth: D.propertyValue.map((pv, i) => {
       const prevPV = i === 0 ? price : D.propertyValue[i - 1];
       return (pv - prevPV) / D.cashIn;
@@ -1021,7 +1022,7 @@ function derive(price) {
   D.wfIo = {
     coc: D.ioCashFlow.map(cf => cf / D.cashIn),
     dep: D.wf.dep.slice(),
-    princ: BASE.ioWfPrincRatios.slice(),
+    princ: D.ioBalance.map((b, i) => ((i === 0 ? D.loan : D.ioBalance[i - 1]) - b) / D.cashIn),
     growth: D.wf.growth.slice()
   };
   D.wfIo.total = D.wfIo.coc.map((c, i) => c + D.wfIo.dep[i] + D.wfIo.princ[i] + D.wfIo.growth[i]);
@@ -1058,6 +1059,7 @@ function renderSnapshot(D) {
   capCell.classList.toggle('pos', D.goingInCap >= 0.05);
   capCell.classList.toggle('neg', D.goingInCap < 0.05);
   document.getElementById('sCashIn').textContent = fmt$(D.cashIn, { compact: true });
+  document.getElementById('sCashInNote').textContent = BASE.additionalCash > 0 ? 'includes closing fees and ' + fmt$(BASE.additionalCash, { compact: true }) + ' added owner cash' : 'includes closing fees';
   document.getElementById('sDown').textContent = fmt$(D.downPmt, { compact: true }) + ' (30%)';
   document.getElementById('sLoan').textContent = fmt$(D.loan, { compact: true }) + ' · 6.70% · 30yr';
   // Expense ratio = OpEx / EGI where EGI = NOI + OpEx (OpEx stored as positive in this BASE)
