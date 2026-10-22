@@ -804,7 +804,7 @@ ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction
       <label><input type="checkbox" id="showExcl" checked> Show excluded rows</label>
       <label id="anchorWrap" hidden><input type="checkbox" id="showAnchor"> Show out-of-market anchor</label>
     </div>
-    <div class="legend"><span class="l-sub">Subject</span><span class="l-below">We're below</span><span class="l-mixed">Mixed</span><span class="l-above">We're above</span><span class="l-excl">Excluded from median</span><span class="l-note">Comp colors compare our in-place rent (rent roll) with each comp's advertised rent, on monthly rent and on $/SF: green = we're below on both, red = above on both, amber = the two disagree. Our own ask is shown on our pin for reference.</span></div>
+    <div class="legend"><span class="l-sub">Subject</span><span class="l-below">We're below</span><span class="l-mixed">Mixed</span><span class="l-above">We're above</span><span class="l-excl">Excluded from median</span><span class="l-note">Comp colors compare our ask with each comp's ask, what a renter sees when shopping, on monthly rent and on $/SF: green = we're below on both, red = above on both, amber = the two disagree. Our pin also shows in-place rent and the new-lease trend (ask vs what current tenants pay).</span></div>
     <ul class="list" id="list"></ul>
   </aside>
   <div id="map"></div>
@@ -866,12 +866,12 @@ var DATA = {{COMP_DATA}};
   tiles.addTo(map);
   L.control.scale({ imperial: true, metric: false }).addTo(map);
 
-  // Our IN-PLACE rent (rent roll) vs each counted comp's ask, on the unit types both have, two ways: monthly rent and $/SF.
+  // Our ASK vs each counted comp's ask (what a renter sees), on the unit types both have, two ways: monthly rent and $/SF.
   // Green = we are below on both for every shared type; red = above on both; amber = the two disagree somewhere.
-  // Maps built before publisher v2.13 have no in-place figures and fall back to our ask.
+  // In-place rent (subject_inplace, publisher v2.13+) shows only on our own pin, as the new-lease trend.
   var SUBJ0 = P.filter(function (q) { return q.role === "sub"; })[0];
   var INPL = DATA.subject_inplace && DATA.subject_inplace.length ? DATA.subject_inplace : null;
-  var SUBJ_BASE = INPL || (SUBJ0 ? SUBJ0.units : []), SUBJ_LABEL = INPL ? "Our in-place" : "Subject ask";
+  var SUBJ_BASE = SUBJ0 ? SUBJ0.units : [], SUBJ_LABEL = "Our ask";
   var dir = function (a, b) { return a < b ? "below" : a > b ? "above" : "even"; };
   P.forEach(function (p) {
     if (p.role !== "comp" || !SUBJ0) return;
@@ -888,7 +888,7 @@ var DATA = {{COMP_DATA}};
     p.vs = seen.below && !seen.above && !seen.even ? "below" : seen.above && !seen.below && !seen.even ? "above" : "mixed";
     p.vsLines = lines;
   });
-  var VS_TEXT = { below: "We're below this comp on rent and $/SF", above: "We're above this comp on rent and $/SF", mixed: "Mixed: rent and $/SF point different ways" };
+  var VS_TEXT = { below: "Our ask is below this comp on rent and $/SF: a renter sees us as the better price", above: "Our ask is above this comp on rent and $/SF: a renter sees us as the pricier option", mixed: "Mixed: our ask is not above or below this comp on both rent and $/SF" };
 
   var markers = {};
   function style(p) {
@@ -906,7 +906,13 @@ var DATA = {{COMP_DATA}};
       var s = SUBJ_BASE.filter(function (x) { return x[0] === u[0]; })[0];
       if (isSub) {
         var conf = p.ask_confirmed && p.ask_confirmed[u[0]];
-        return row + (INPL && s ? '<tr class="subj"><td>In-place</td>' + cells(Number(s[1]), Number(s[2]), false) + "</tr>" : "") +
+        var ip = INPL ? INPL.filter(function (x) { return x[0] === u[0]; })[0] : null, trend = "";
+        if (ip) {
+          var d = Number(u[2]) - Number(ip[2]);
+          trend = d > 0 ? "Rising: new leases " + money(d) + " above what current tenants pay" : d < 0 ? "Falling: new leases " + money(-d) + " below what current tenants pay" : "Flat: new leases match what current tenants pay";
+        }
+        return row + (ip ? '<tr class="subj"><td>In-place</td>' + cells(Number(ip[1]), Number(ip[2]), false) + "</tr>" : "") +
+          (trend ? '<tr class="subj"><td colspan="4">' + trend + "</td></tr>" : "") +
           '<tr class="subj"><td colspan="4">' + (conf ? "Ask confirmed: " + esc(conf) : "Ask not confirmed yet") + "</td></tr>";
       }
       return row + (s ? '<tr class="subj"><td>' + SUBJ_LABEL + '</td>' + cells(Number(s[1]), Number(s[2]), false) + "</tr>" : "");
@@ -935,12 +941,11 @@ var DATA = {{COMP_DATA}};
     listEl.innerHTML = "";
     visible().sort(function (a, b) { return a.dist - b.dist; }).forEach(function (p) {
       var li = document.createElement("li"); li.dataset.id = p.id; li.tabIndex = 0; li.className = p.role;
-      var src = p.role === "sub" && INPL ? { units: INPL } : p;   // the subject's line shows in-place, the basis for the colors
-      var r1 = unit(src, "1BR"), r0 = unit(src, "Studio"), r2 = unit(src, "2BR");
+      var r1 = unit(p, "1BR"), r0 = unit(p, "Studio"), r2 = unit(p, "2BR");
       var cells = [], add = function (t, v) { cells.push('<span>' + t + '</span><span class="v">' + (v ? money(v) : "—") + '</span>'); };
       if (r1 || r0) { add("1BR", r1); add("Studio", r0); } else if (r2) { add("2BR", r2); }
       li.innerHTML = '<span class="dot ' + p.role + (p.vs ? " " + p.vs : "") + '"></span>' +
-        '<span class="name">' + esc(p.name) + '<small>' + (p.role === "sub" ? (INPL ? "Subject · in-place" : "Subject") : p.dist.toFixed(1) + " mi") + (p.addr ? " · " + esc(p.addr.replace(/,\s*[^,]+$/, "")) : "") + '</small></span>' +
+        '<span class="name">' + esc(p.name) + '<small>' + (p.role === "sub" ? "Subject · our ask" : p.dist.toFixed(1) + " mi") + (p.addr ? " · " + esc(p.addr.replace(/,\s*[^,]+$/, "")) : "") + '</small></span>' +
         '<span class="rent">' + (cells.join("") || '<span class="v">—</span>') + '</span>';
       var go = function () { map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 15), { duration: 0.6 }); markers[p.id].openPopup(); setActive(p.id); };
       li.addEventListener("click", go);

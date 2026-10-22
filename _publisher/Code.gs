@@ -46,10 +46,9 @@
  * v2.12: the Summary PDF gets a second fixed page break, at the "10-YEAR IRR" title (page 2 = rate sensitivity and the
  * interest-only lane with its waterfall; page 3 = IRR, exit, scorecard, flags). Each break is found by its title; a
  * missing title is skipped.
- * v2.13: one rent basis. The comp map compares our IN-PLACE rent (Rent Comps summary: in-place median and in-place $/SF)
- * with each comp, same as the Summary scorecard; our advertised ask is shown as a reference. Map data gains
- * subject_inplace ([type, SF, rent]) and, on the subject, ask_confirmed (Rent Comps column "Ask confirmed", filled by a
- * person, never by Claude or this script).
+ * v2.13: the comp map compares our ASK with each comp's ask (what a renter sees), on rent and $/SF, same as the Summary
+ * scorecard. Map data gains subject_inplace ([type, SF, rent]; shown on our pin as the new-lease trend, ask vs in-place)
+ * and, on the subject, ask_confirmed (Rent Comps column "Ask confirmed", filled by a person, never by Claude or this script).
  */
 
 var PUB = {
@@ -553,7 +552,7 @@ function buildCompMap_(ss, cfg, token) {
     if (!mappable.some(function (p) { return p.role === 'sub'; })) { out.warnings.push('the subject rows (In comp median? = Subject) have no coordinates, so no map.'); return out; }
     if (mappable.length < 2) { out.warnings.push('fewer than two mappable properties, so no map.'); return out; }
     var shell = fetchRepoFile_(PUB.SHELL_DIR + '/' + PUB.MAP_SHELL, token);
-    var rcRaw = rentCompFigures_(ss).raw, inplace = [];   // v2.13: our in-place rent per unit type, the basis for the map colors
+    var rcRaw = rentCompFigures_(ss).raw, inplace = [];   // v2.13: our in-place rent per unit type, for the new-lease trend on our pin
     for (var rk in rcRaw) { var f = rcRaw[rk]; if (f.INPLACE > 0 && f.INPLACE_SF > 0) inplace.push([rk === 'STUDIO' ? 'Studio' : rk, Math.round(f.INPLACE / f.INPLACE_SF), Math.round(f.INPLACE)]); }
     var data = { deal: cfg.name, city: comps.city, median_1br: comps.median_1br, median_studio: comps.median_studio, pulled: comps.pulled, subject_inplace: inplace,
                  properties: mappable.map(function (p) { var o = { id: p.id, name: p.name, role: p.role, addr: p.addr, lat: p.lat, lng: p.lng, units: p.units, note: p.note, listing: p.listing, site: p.site }; if (p.role === 'sub') o.ask_confirmed = p.confirmed || {}; return o; }) };
