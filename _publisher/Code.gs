@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.12  (2026-10-21)
+ * DEAL MEMO PUBLISHER  v2.13  (2026-10-21)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -46,6 +46,10 @@
  * v2.12: the Summary PDF gets a second fixed page break, at the "10-YEAR IRR" title (page 2 = rate sensitivity and the
  * interest-only lane with its waterfall; page 3 = IRR, exit, scorecard, flags). Each break is found by its title; a
  * missing title is skipped.
+ * v2.13: one rent basis. The comp map compares our IN-PLACE rent (Rent Comps summary: in-place median and in-place $/SF)
+ * with each comp, same as the Summary scorecard; our advertised ask is shown as a reference. Map data gains
+ * subject_inplace ([type, SF, rent]) and, on the subject, ask_confirmed (Rent Comps column "Ask confirmed", filled by a
+ * person, never by Claude or this script).
  */
 
 var PUB = {
@@ -469,7 +473,7 @@ function narrativeDrift_(cfg, m, rc) {
  *  "2BR", …; rows marked "(n/a)" are skipped). Annual-rent block: the row whose A starts "ANNUAL RENT AT COMP MEDIAN"
  *  holds its headers. Returns { tokens: { RC_1BR_COMP: '$1,199', … }, dir: { '1BR_INPLACE': 'above', … } }. */
 function rentCompFigures_(ss) {
-  var out = { tokens: {}, dir: {} };
+  var out = { tokens: {}, dir: {}, raw: {} };
   var sh = ss.getSheetByName(PUB.COMPS); if (!sh) return out;
   var v = sh.getDataRange().getValues();
   if (!v.length || !/RENT COMP SUMMARY/i.test(String(v[0][0]))) return out;
@@ -493,6 +497,7 @@ function rentCompFigures_(ss) {
     if (!k) { if (String(v[r][0]).length > 40) break; continue; }   // the long note row ends the block
     var f = {};
     for (var c in C) if (C[c] >= 0) { var n = num(v[r][C[c]]); if (n !== null) f[c] = n; }
+    out.raw[k] = f;   // v2.13: numbers for the comp map
     if (f.INPLACE !== undefined) out.tokens['RC_' + k + '_INPLACE'] = money_(f.INPLACE);
     if (f.ASK !== undefined) out.tokens['RC_' + k + '_ASK'] = money_(f.ASK);
     if (f.ANCHOR !== undefined) out.tokens['RC_' + k + '_ANCHOR'] = money_(f.ANCHOR);
@@ -548,8 +553,10 @@ function buildCompMap_(ss, cfg, token) {
     if (!mappable.some(function (p) { return p.role === 'sub'; })) { out.warnings.push('the subject rows (In comp median? = Subject) have no coordinates, so no map.'); return out; }
     if (mappable.length < 2) { out.warnings.push('fewer than two mappable properties, so no map.'); return out; }
     var shell = fetchRepoFile_(PUB.SHELL_DIR + '/' + PUB.MAP_SHELL, token);
-    var data = { deal: cfg.name, city: comps.city, median_1br: comps.median_1br, median_studio: comps.median_studio, pulled: comps.pulled,
-                 properties: mappable.map(function (p) { return { id: p.id, name: p.name, role: p.role, addr: p.addr, lat: p.lat, lng: p.lng, units: p.units, note: p.note, listing: p.listing, site: p.site }; }) };
+    var rcRaw = rentCompFigures_(ss).raw, inplace = [];   // v2.13: our in-place rent per unit type, the basis for the map colors
+    for (var rk in rcRaw) { var f = rcRaw[rk]; if (f.INPLACE > 0 && f.INPLACE_SF > 0) inplace.push([rk === 'STUDIO' ? 'Studio' : rk, Math.round(f.INPLACE / f.INPLACE_SF), Math.round(f.INPLACE)]); }
+    var data = { deal: cfg.name, city: comps.city, median_1br: comps.median_1br, median_studio: comps.median_studio, pulled: comps.pulled, subject_inplace: inplace,
+                 properties: mappable.map(function (p) { var o = { id: p.id, name: p.name, role: p.role, addr: p.addr, lat: p.lat, lng: p.lng, units: p.units, note: p.note, listing: p.listing, site: p.site }; if (p.role === 'sub') o.ask_confirmed = p.confirmed || {}; return o; }) };
     var json = JSON.stringify(data).replace(/<\//g, '<\\/');
     var html = shell.split('{{COMP_DATA}}').join(json);
     if (/\{\{[A-Z0-9_]+\}\}/.test(html)) throw new Error('map shell still has unfilled placeholders');
@@ -602,7 +609,7 @@ function readComps_(sh) {
   };
   var C = { name: col('property', true), city: col('city', true), bed: col('bed', true), sf: col('sq ft', true), rent: col('rent', true),
             url: col('url', true), pulled: col('date pulled'), flag: col('in comp median', true), notes: col('notes'),
-            site: col('property website'), lat: col('lat'), lng: col('lng') };
+            site: col('property website'), lat: col('lat'), lng: col('lng'), confirmed: col('ask confirmed') };
   if (C.lat < 0 || C.lng < 0) throw new Error('Rent Comps needs Lat and Lng columns after Property website (template v3.9).');
   var summaryOk = /RENT COMP SUMMARY/i.test(String(vals[0][0]));
   var num = function (x) { var n = typeof x === 'number' ? x : Number(String(x).replace(/[$,\s]/g, '')); return isFinite(n) && n > 0 ? n : null; };
@@ -642,6 +649,7 @@ function readComps_(sh) {
     p.rows.push(r + 1);
     var bed = Number(vals[r][C.bed]), type = bed === 0 ? 'Studio' : bed >= 1 ? Math.round(bed) + 'BR' : String(vals[r][C.bed]);
     if (!p.units.some(function (u) { return u[0] === type; })) p.units.push([type, num(vals[r][C.sf]) || 0, num(vals[r][C.rent]) || 0]);
+    if (isSub && C.confirmed >= 0) { var cv = vals[r][C.confirmed]; cv = cv instanceof Date ? Utilities.formatDate(cv, PUB.TZ, 'M/d/yyyy') : String(cv == null ? '' : cv).trim(); if (cv) { p.confirmed = p.confirmed || {}; p.confirmed[type] = cv; } }
     if (C.pulled >= 0 && vals[r][C.pulled] instanceof Date && (!latest || vals[r][C.pulled] > latest)) latest = vals[r][C.pulled];
   }
   if (latest) res.pulled = Utilities.formatDate(latest, PUB.TZ, 'M/d/yyyy');
