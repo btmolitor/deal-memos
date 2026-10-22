@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.13  (2026-10-21)
+ * DEAL MEMO PUBLISHER  v2.14  (2026-10-22)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -49,6 +49,13 @@
  * v2.13: the comp map compares our ASK with each comp's ask (what a renter sees), on rent and $/SF, same as the Summary
  * scorecard. Map data gains subject_inplace ([type, SF, rent]; shown on our pin as the new-lease trend, ask vs in-place)
  * and, on the subject, ask_confirmed (Rent Comps column "Ask confirmed", filled by a person, never by Claude or this script).
+ * v2.14: averages, not medians, and the redesigned Rent Comps tab. RC_ tokens come from the block titled "Figures read by
+ * the Deal Memo publisher" (found by its title anywhere on the tab; headers Our ask, Our ask $/SF, Rent roll average,
+ * Rent roll average $/SF, Comps' ask, Comps' ask $/SF, Size-adjusted gap ($/yr)). The older RENT COMP SUMMARY layout in A1
+ * is still read the same way. The comp list header is the "Property" row that also has a City column, and its flag column
+ * is any header starting "In comp" (median or average). The map header shows comps' ask as the average of counted (Y)
+ * rows, worked out here from the list, for either layout. On the new layout the comp-map link goes in column A of the row
+ * above the figures block title.
  */
 
 var PUB = {
@@ -100,7 +107,7 @@ function run_(publish) {
     var tokens = buildTokens_(m, ui_);
     var rc = rentCompFigures_(ss);   // v2.9: rent-comp figures for the written sections
     var rcUsed = parsed.html.match(/\{\{RC_[A-Z0-9_]+\}\}/g) || [];
-    for (var u = 0; u < rcUsed.length; u++) { var rcName = rcUsed[u].slice(2, -2); if (!(rcName in rc.tokens)) throw new Error('The memo text uses ' + rcUsed[u] + ' but that Rent Comps figure is blank or missing. Fill the Rent Comps summary block, or ask Claude to "render this deal". Nothing was saved or published.'); }
+    for (var u = 0; u < rcUsed.length; u++) { var rcName = rcUsed[u].slice(2, -2); if (!(rcName in rc.tokens)) throw new Error('The memo text uses ' + rcUsed[u] + ' but that Rent Comps figure is blank or missing. Fill the publisher figures block on Rent Comps, or ask Claude to "render this deal". Nothing was saved or published.'); }
     for (var rk in rc.tokens) tokens[rk] = rc.tokens[rk];
     if (m.additional && parsed.html.indexOf('{{DUAL_ADDITIONAL_CASH}}') === -1) throw new Error('Financials!C19 (Additional Down Payment) is ' + money_(m.additional) + ' but this memo shell predates publisher v2.11 and would leave it out of cash in. Ask Claude to update the shell (render spec v1.10). Nothing was saved or published.');
     for (var tk in tokens) if (/NaN|undefined|Infinity/.test(tokens[tk])) throw new Error('Computed value ' + tk + ' came out blank or invalid. Nothing was saved or published.');
@@ -452,8 +459,8 @@ function narrativeDrift_(cfg, m, rc) {
   var b = cfg.narrative_basis, out = [];
   if (!b) return out;
   if (b.rc_directions && rc) {   // v2.9: the numbers refresh; the words around them ("above", "below") do not
-    var names = { INPLACE: 'in-place rent vs comp median', ASK: 'ask vs comp median', INPLACE_SF: 'in-place $/SF vs comp median $/SF',
-                  ASK_SF: 'ask $/SF vs comp median $/SF', SIZEADJ: 'size-adjusted annual rent vs current' };
+    var names = { INPLACE: "rent roll average vs comps' ask", ASK: "our ask vs comps' ask", INPLACE_SF: "rent roll average $/SF vs comps' ask $/SF",
+                  ASK_SF: "our ask $/SF vs comps' ask $/SF", SIZEADJ: 'size-adjusted annual rent vs rent roll' };
     for (var dk in b.rc_directions) {
       var now = rc.dir[dk], was = b.rc_directions[dk];
       if (now === undefined) { out.push(dk.replace(/_/g, ' ') + ': no longer on Rent Comps'); continue; }
@@ -475,9 +482,33 @@ function rentCompFigures_(ss) {
   var out = { tokens: {}, dir: {}, raw: {} };
   var sh = ss.getSheetByName(PUB.COMPS); if (!sh) return out;
   var v = sh.getDataRange().getValues();
-  if (!v.length || !/RENT COMP SUMMARY/i.test(String(v[0][0]))) return out;
+  if (!v.length) return out;
   var cols = function (hdr) { return hdr.map(function (h) { return String(h).trim().toLowerCase(); }); };
   var find = function (H, test) { for (var i = 1; i < H.length; i++) if (test(H[i])) return i; return -1; };
+  var unitKey = function (a) { a = String(a == null ? '' : a).trim(); if (/\(n\/a\)/i.test(a)) return ''; var mm = /^(studio|[1-4]\s*br)\b/i.exec(a); return mm ? mm[1].replace(/\s+/g, '').toUpperCase() : ''; };
+  var num = function (x) { if (x === '' || x == null) return null; var n = typeof x === 'number' ? x : Number(String(x).replace(/[$,\s]/g, '')); return isFinite(n) ? n : null; };
+  var sf = function (n) { return '$' + n.toFixed(2); };
+  var side = function (a, b) { return a > b ? 'above' : a < b ? 'below' : 'equal'; };
+  var r, k;
+  var fb = !/RENT COMP SUMMARY/i.test(String(v[0][0])) ? figuresBlock_(v) : null;
+  if (!fb && !/RENT COMP SUMMARY/i.test(String(v[0][0]))) return out;
+  if (fb) {   // v2.14 layout: title row, header row, then one row per unit type (unit label in the title's column)
+    var c0 = fb.col, FH = cols(v[fb.row + 1].slice(c0));
+    var at = function (name) { for (var i = 1; i < FH.length; i++) if (FH[i] === name) return c0 + i; return -1; };
+    var FC = { INPLACE: at('rent roll average'), ASK: at('our ask'), COMP: at("comps' ask"),
+               INPLACE_SF: at('rent roll average $/sf'), ASK_SF: at('our ask $/sf'), COMP_SF: at("comps' ask $/sf"), GAP: at('size-adjusted gap ($/yr)') };
+    for (r = fb.row + 2; r < v.length; r++) {
+      k = unitKey(v[r][c0]); if (!k) break;
+      var g2 = {};
+      for (var c2 in FC) if (FC[c2] >= 0) { var n2 = num(v[r][FC[c2]]); if (n2 !== null) g2[c2] = n2; }
+      fillRc_(out, k, g2, money_, sf, side);
+      if (g2.GAP !== undefined) {
+        out.tokens['RC_' + k + '_SIZEADJ_GAP'] = money_(Math.round(Math.abs(g2.GAP) / 100) * 100);
+        out.dir[k + '_SIZEADJ'] = g2.GAP > 0 ? 'gain' : g2.GAP < 0 ? 'loss' : 'none';
+      }
+    }
+    return out;
+  }
   var H = cols(v[0]);
   var C = { INPLACE: find(H, function (h) { return h.indexOf('subject in-place median') === 0; }),
             ASK: find(H, function (h) { return h.indexOf('subject ask') === 0 || h.indexOf('subject advertised ask') === 0; }),
@@ -486,28 +517,12 @@ function rentCompFigures_(ss) {
             INPLACE_SF: find(H, function (h) { return h === 'in-place $/sf' || h === 'subject in-place $/sf'; }),
             ASK_SF: find(H, function (h) { return h === 'ask $/sf' || h === 'subject ask $/sf'; }),
             COMP_SF: find(H, function (h) { return h === 'comp median $/sf'; }) };
-  var unitKey = function (a) { a = String(a == null ? '' : a).trim(); if (/\(n\/a\)/i.test(a)) return ''; var mm = /^(studio|[1-4]\s*br)\b/i.exec(a); return mm ? mm[1].replace(/\s+/g, '').toUpperCase() : ''; };
-  var num = function (x) { if (x === '' || x == null) return null; var n = typeof x === 'number' ? x : Number(String(x).replace(/[$,\s]/g, '')); return isFinite(n) ? n : null; };
-  var sf = function (n) { return '$' + n.toFixed(2); };
-  var side = function (a, b) { return a > b ? 'above' : a < b ? 'below' : 'equal'; };
-  var r, k;
   for (r = 1; r < v.length; r++) {
     k = unitKey(v[r][0]);
     if (!k) { if (String(v[r][0]).length > 40) break; continue; }   // the long note row ends the block
     var f = {};
     for (var c in C) if (C[c] >= 0) { var n = num(v[r][C[c]]); if (n !== null) f[c] = n; }
-    out.raw[k] = f;   // v2.13: numbers for the comp map
-    if (f.INPLACE !== undefined) out.tokens['RC_' + k + '_INPLACE'] = money_(f.INPLACE);
-    if (f.ASK !== undefined) out.tokens['RC_' + k + '_ASK'] = money_(f.ASK);
-    if (f.ANCHOR !== undefined) out.tokens['RC_' + k + '_ANCHOR'] = money_(f.ANCHOR);
-    if (f.COMP !== undefined) out.tokens['RC_' + k + '_COMP'] = money_(f.COMP);
-    if (f.INPLACE_SF !== undefined) out.tokens['RC_' + k + '_INPLACE_SF'] = sf(f.INPLACE_SF);
-    if (f.ASK_SF !== undefined) out.tokens['RC_' + k + '_ASK_SF'] = sf(f.ASK_SF);
-    if (f.COMP_SF !== undefined) out.tokens['RC_' + k + '_COMP_SF'] = sf(f.COMP_SF);
-    if (f.INPLACE !== undefined && f.COMP !== undefined) out.dir[k + '_INPLACE'] = side(Math.round(f.INPLACE), Math.round(f.COMP));
-    if (f.ASK !== undefined && f.COMP !== undefined) out.dir[k + '_ASK'] = side(Math.round(f.ASK), Math.round(f.COMP));
-    if (f.INPLACE_SF !== undefined && f.COMP_SF !== undefined) out.dir[k + '_INPLACE_SF'] = side(round_(f.INPLACE_SF, 2), round_(f.COMP_SF, 2));
-    if (f.ASK_SF !== undefined && f.COMP_SF !== undefined) out.dir[k + '_ASK_SF'] = side(round_(f.ASK_SF, 2), round_(f.COMP_SF, 2));
+    fillRc_(out, k, f, money_, sf, side);
   }
   for (r = 1; r < v.length; r++) if (/^ANNUAL RENT AT COMP MEDIAN/i.test(String(v[r][0]))) break;
   if (r < v.length) {
@@ -520,6 +535,30 @@ function rentCompFigures_(ss) {
     }
   }
   return out;
+}
+
+/** v2.14: one unit type's figures into tokens, directions and raw numbers (shared by both Rent Comps layouts). */
+function fillRc_(out, k, f, money, sf, side) {
+  out.raw[k] = f;   // v2.13: numbers for the comp map
+  if (f.INPLACE !== undefined) out.tokens['RC_' + k + '_INPLACE'] = money(f.INPLACE);
+  if (f.ASK !== undefined) out.tokens['RC_' + k + '_ASK'] = money(f.ASK);
+  if (f.ANCHOR !== undefined) out.tokens['RC_' + k + '_ANCHOR'] = money(f.ANCHOR);
+  if (f.COMP !== undefined) out.tokens['RC_' + k + '_COMP'] = money(f.COMP);
+  if (f.INPLACE_SF !== undefined) out.tokens['RC_' + k + '_INPLACE_SF'] = sf(f.INPLACE_SF);
+  if (f.ASK_SF !== undefined) out.tokens['RC_' + k + '_ASK_SF'] = sf(f.ASK_SF);
+  if (f.COMP_SF !== undefined) out.tokens['RC_' + k + '_COMP_SF'] = sf(f.COMP_SF);
+  if (f.INPLACE !== undefined && f.COMP !== undefined) out.dir[k + '_INPLACE'] = side(Math.round(f.INPLACE), Math.round(f.COMP));
+  if (f.ASK !== undefined && f.COMP !== undefined) out.dir[k + '_ASK'] = side(Math.round(f.ASK), Math.round(f.COMP));
+  if (f.INPLACE_SF !== undefined && f.COMP_SF !== undefined) out.dir[k + '_INPLACE_SF'] = side(round_(f.INPLACE_SF, 2), round_(f.COMP_SF, 2));
+  if (f.ASK_SF !== undefined && f.COMP_SF !== undefined) out.dir[k + '_ASK_SF'] = side(round_(f.ASK_SF, 2), round_(f.COMP_SF, 2));
+}
+
+/** v2.14: finds the cell titled "Figures read by the Deal Memo publisher…" on the Rent Comps tab. Returns { row, col } (0-based) or null. */
+function figuresBlock_(v) {
+  for (var r = 0; r < Math.min(v.length, 60); r++)
+    for (var c = 0; c < v[r].length; c++)
+      if (/^Figures read by the Deal Memo publisher/i.test(String(v[r][c]).trim()) && r + 1 < v.length) return { row: r, col: c };
+  return null;
 }
 
 function fillShell_(shell, tokens) {
@@ -549,34 +588,35 @@ function buildCompMap_(ss, cfg, token) {
     out.geocoded = geocodeBlanks_(sh, comps);
     var mappable = comps.props.filter(function (p) { return isFinite(p.lat) && isFinite(p.lng); });
     comps.props.forEach(function (p) { if (!(isFinite(p.lat) && isFinite(p.lng))) out.warnings.push(p.name + ' has no coordinates (add a street address in parentheses in column A, or fill Lat/Lng), so it is not pinned.'); });
-    if (!mappable.some(function (p) { return p.role === 'sub'; })) { out.warnings.push('the subject rows (In comp median? = Subject) have no coordinates, so no map.'); return out; }
+    if (!mappable.some(function (p) { return p.role === 'sub'; })) { out.warnings.push('the subject rows (In comp average? = Subject) have no coordinates, so no map.'); return out; }
     if (mappable.length < 2) { out.warnings.push('fewer than two mappable properties, so no map.'); return out; }
     var shell = fetchRepoFile_(PUB.SHELL_DIR + '/' + PUB.MAP_SHELL, token);
     var rcRaw = rentCompFigures_(ss).raw, inplace = [];   // v2.13: our in-place rent per unit type, for the new-lease trend on our pin
     for (var rk in rcRaw) { var f = rcRaw[rk]; if (f.INPLACE > 0 && f.INPLACE_SF > 0) inplace.push([rk === 'STUDIO' ? 'Studio' : rk, Math.round(f.INPLACE / f.INPLACE_SF), Math.round(f.INPLACE)]); }
-    var data = { deal: cfg.name, city: comps.city, median_1br: comps.median_1br, median_studio: comps.median_studio, pulled: comps.pulled, subject_inplace: inplace,
+    var data = { deal: cfg.name, city: comps.city, avg_1br: comps.avg_1br, avg_studio: comps.avg_studio, pulled: comps.pulled, subject_inplace: inplace,
                  properties: mappable.map(function (p) { var o = { id: p.id, name: p.name, role: p.role, addr: p.addr, lat: p.lat, lng: p.lng, units: p.units, note: p.note, listing: p.listing, site: p.site }; if (p.role === 'sub') o.ask_confirmed = p.confirmed || {}; return o; }) };
     var json = JSON.stringify(data).replace(/<\//g, '<\\/');
     var html = shell.split('{{COMP_DATA}}').join(json);
     if (/\{\{[A-Z0-9_]+\}\}/.test(html)) throw new Error('map shell still has unfilled placeholders');
     out.html = html; out.pins = mappable.length;
-    writeCompMapCell_(sh, comps.hdrRow, '=HYPERLINK("' + PUB.SITE_BASE + cfg.slug + '_comps.html","Comp map: ' + out.pins + ' properties pinned; each pin links to its listing and its own website →")');
+    writeCompMapCell_(sh, comps.linkRow, '=HYPERLINK("' + PUB.SITE_BASE + cfg.slug + '_comps.html","Comp map: ' + out.pins + ' properties pinned; each pin links to its listing and its own website →")');
   } catch (e) {
     out.html = ''; out.warnings.push('not built (' + (e && e.message ? e.message : e) + '). The memo was published without the map link.');
-    try { var sh2 = ss.getSheetByName(PUB.COMPS); if (sh2) writeCompMapCell_(sh2, readComps_(sh2).hdrRow, 'Comp map: not built on the last refresh (see the Deal Memo dialog).'); } catch (e2) {}
+    try { var sh2 = ss.getSheetByName(PUB.COMPS); if (sh2) writeCompMapCell_(sh2, readComps_(sh2).linkRow, 'Comp map: not built on the last refresh (see the Deal Memo dialog).'); } catch (e2) {}
   }
   return out;
 }
 
-/** Writes the comp-map link into column A of the row above the "Property" header (the caption row). Only touches a cell that is blank or already holds the comp-map caption. */
-function writeCompMapCell_(sh, hdrRow, value) {
-  if (!hdrRow || hdrRow < 2) return;
-  var cell = sh.getRange(hdrRow - 1, 1);
+/** Writes the comp-map link into column A of linkRow (1-based): the row above the "Property" header on the older layout,
+ *  the row above the publisher figures block title on the v2.14 layout. Only touches a cell that is blank or already holds the comp-map caption. */
+function writeCompMapCell_(sh, linkRow, value) {
+  if (!linkRow || linkRow < 1) return;
+  var cell = sh.getRange(linkRow, 1);
   var cur = String(cell.getValue() || '').trim();
   if (cur && !/^Comp map/i.test(cur)) return;   // someone put something else there; leave it alone
   if (value.charAt(0) === '=') cell.setFormula(value); else cell.setValue(value);
   cell.setFontSize(9).setFontStyle('italic').setHorizontalAlignment('left').setVerticalAlignment('middle').setWrap(false);
-  if (sh.getRowHeight(hdrRow - 1) < 22) sh.setRowHeight(hdrRow - 1, 22);
+  if (sh.getRowHeight(linkRow) < 22) sh.setRowHeight(linkRow, 22);
 }
 
 /** Comp median for one unit type from the Rent Comps summary block: row found by the unit label in column A,
@@ -597,9 +637,8 @@ function summaryMedian_(vals, unit, num) {
 /** Reads the Rent Comps tab into one record per property. Layout is found by header text, not row numbers. */
 function readComps_(sh) {
   var vals = sh.getDataRange().getValues();
-  var hdr = -1;
-  for (var r = 0; r < vals.length; r++) if (String(vals[r][0]).trim() === 'Property') { hdr = r; break; }
-  if (hdr < 0) throw new Error('no header row starting with "Property" in ' + PUB.COMPS);
+  var hdr = compHeaderRow_(vals);
+  if (hdr < 0) throw new Error('no header row starting with "Property" (with a City column) in ' + PUB.COMPS);
   var H = vals[hdr].map(function (h) { return String(h).toLowerCase(); });
   var col = function (needle, required) {
     for (var i = 0; i < H.length; i++) if (H[i].indexOf(needle) !== -1) return i;
@@ -607,10 +646,10 @@ function readComps_(sh) {
     return -1;
   };
   var C = { name: col('property', true), city: col('city', true), bed: col('bed', true), sf: col('sq ft', true), rent: col('rent', true),
-            url: col('url', true), pulled: col('date pulled'), flag: col('in comp median', true), notes: col('notes'),
+            url: col('url', true), pulled: col('date pulled'), flag: col('in comp', true), notes: col('notes'),
             site: col('property website'), lat: col('lat'), lng: col('lng'), confirmed: col('ask confirmed') };
   if (C.lat < 0 || C.lng < 0) throw new Error('Rent Comps needs Lat and Lng columns after Property website (template v3.9).');
-  var summaryOk = /RENT COMP SUMMARY/i.test(String(vals[0][0]));
+  var fb = figuresBlock_(vals);
   var num = function (x) { var n = typeof x === 'number' ? x : Number(String(x).replace(/[$,\s]/g, '')); return isFinite(n) && n > 0 ? n : null; };
   var link = function (x) {
     var s = String(x || '').replace(/\s*\([^)]*\)\s*$/, '').trim();   // drop a trailing "(unverified)"-style tag
@@ -618,8 +657,9 @@ function readComps_(sh) {
     return /^[a-z]+:\/\//i.test(s) ? s : 'https://' + s;
   };
   var res = { props: [], byName: {}, city: '', pulled: '', warnings: [], hdrRow: hdr + 1,
-              median_1br: summaryOk ? summaryMedian_(vals, '1BR', num) : null, median_studio: summaryOk ? summaryMedian_(vals, 'STUDIO', num) : null };
-  var subjectZone = false, latest = null;
+              linkRow: fb && !/RENT COMP SUMMARY/i.test(String(vals[0][0])) ? fb.row : hdr,   // 1-based row above the figures title, or above the header
+              avg_1br: null, avg_studio: null };
+  var subjectZone = false, latest = null, sums = {};   // v2.14: comps' ask = average of counted (Y) rows, per unit type
   for (r = hdr + 1; r < vals.length; r++) {
     var a = String(vals[r][0] == null ? '' : vals[r][0]).trim();
     if (!a) continue;
@@ -648,19 +688,32 @@ function readComps_(sh) {
     p.rows.push(r + 1);
     var bed = Number(vals[r][C.bed]), type = bed === 0 ? 'Studio' : bed >= 1 ? Math.round(bed) + 'BR' : String(vals[r][C.bed]);
     if (!p.units.some(function (u) { return u[0] === type; })) p.units.push([type, num(vals[r][C.sf]) || 0, num(vals[r][C.rent]) || 0]);
+    if (!isSub && flag === 'Y' && num(vals[r][C.rent])) { var sm = sums[type] = sums[type] || [0, 0]; sm[0] += num(vals[r][C.rent]); sm[1]++; }
     if (isSub && C.confirmed >= 0) { var cv = vals[r][C.confirmed]; cv = cv instanceof Date ? Utilities.formatDate(cv, PUB.TZ, 'M/d/yyyy') : String(cv == null ? '' : cv).trim(); if (cv) { p.confirmed = p.confirmed || {}; p.confirmed[type] = cv; } }
     if (C.pulled >= 0 && vals[r][C.pulled] instanceof Date && (!latest || vals[r][C.pulled] > latest)) latest = vals[r][C.pulled];
   }
   if (latest) res.pulled = Utilities.formatDate(latest, PUB.TZ, 'M/d/yyyy');
   if (!res.city) res.city = res.props.length ? res.props[0].city : '';
-  if (!summaryOk) res.warnings.push('comp medians not shown (Rent Comps!A1 is not the RENT COMP SUMMARY block).');
+  if (sums['1BR']) res.avg_1br = Math.round(sums['1BR'][0] / sums['1BR'][1]);
+  if (sums.Studio) res.avg_studio = Math.round(sums.Studio[0] / sums.Studio[1]);
   return res;
+}
+
+/** v2.14: the comp list header is the first row whose column A is "Property" and that also has a "City" column
+ *  (the redesigned tab has shorter "Property" tables above the list). Returns a 0-based row, or -1. */
+function compHeaderRow_(vals) {
+  for (var r = 0; r < vals.length; r++) {
+    if (String(vals[r][0]).trim() !== 'Property') continue;
+    if (vals[r].some(function (h) { return String(h).trim().toLowerCase() === 'city'; })) return r;
+  }
+  return -1;
 }
 
 /** Fills blank Lat/Lng cells from the Census Bureau geocoder (free, no key). Writes back to every row of the property. Returns the count geocoded. */
 function geocodeBlanks_(sh, comps) {
   var done = 0, H = sh.getDataRange().getValues();
-  var hdr = -1; for (var r = 0; r < H.length; r++) if (String(H[r][0]).trim() === 'Property') { hdr = r; break; }
+  var hdr = compHeaderRow_(H);
+  if (hdr < 0) return 0;
   var latCol = -1, lngCol = -1;
   for (var i = 0; i < H[hdr].length; i++) { var h = String(H[hdr][i]).toLowerCase(); if (h === 'lat') latCol = i + 1; if (h === 'lng') lngCol = i + 1; }
   comps.props.forEach(function (p) {

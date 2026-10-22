@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Rent comps map</title>
 <!--
-  COMP MAP SHELL  v1.0  (2026-10-20)
+  COMP MAP SHELL  v1.1  (2026-10-22)
   Filled by the Deal Memo publisher (_publisher/Code.gs v2.6+) from the deal Sheet's Rent Comps tab.
+  v1.1 (publisher v2.14): comps' ask is the average of counted rows (avg_1br / avg_studio); pin colors use the Rent Comps
+  Read rule and the Summary scorecard colors: within 5% = in line; green = under on rent and $/SF, red = over on both, yellow = mixed.
   One token, COMP_DATA (double-brace placeholder in the script block below) — a JSON object (see render spec v1.8, "Comp map"). Nothing in this file is deal-specific.
   Published as <slug>_comps.html next to the memo. Leaflet 1.9.4 and OpenStreetMap tiles; no keys, no accounts.
 -->
@@ -686,7 +688,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   --subject: #1a4d8f;     /* blue: the subject */
   --comp: #2c5f4a;        /* pine: links and counted comps with no shared unit type */
   --below: #2e7d32;       /* green: subject ask below this comp */
-  --mixed: #c99700;       /* amber: below on one unit type, above on another */
+  --mixed: #c99700;       /* yellow: mixed (not under or over on both rent and $/SF) */
   --above: #c0392b;       /* red: subject ask above this comp */
   --excl: #9a9c93;        /* ash: excluded rows */
   --accent-soft: #e7eee9;
@@ -804,7 +806,7 @@ ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction
       <label><input type="checkbox" id="showExcl" checked> Show excluded rows</label>
       <label id="anchorWrap" hidden><input type="checkbox" id="showAnchor"> Show out-of-market anchor</label>
     </div>
-    <div class="legend"><span class="l-sub">Subject</span><span class="l-below">We're below</span><span class="l-mixed">Mixed</span><span class="l-above">We're above</span><span class="l-excl">Excluded from median</span><span class="l-note">Comp colors compare our ask with each comp's ask, what a renter sees when shopping, on monthly rent and on $/SF: green = we're below on both, red = above on both, amber = the two disagree. Our pin also shows in-place rent and the new-lease trend (ask vs what current tenants pay).</span></div>
+    <div class="legend"><span class="l-sub">Subject</span><span class="l-below">Under market</span><span class="l-mixed">Mixed</span><span class="l-above">Over market</span><span class="l-excl">Excluded from average</span><span class="l-note">Colors compare our ask with each comp's ask on monthly rent and on $/SF; within 5% reads as in line. Green = under on both, red = over on both, yellow = mixed. Our pin also shows our rent roll average.</span></div>
     <ul class="list" id="list"></ul>
   </aside>
   <div id="map"></div>
@@ -830,7 +832,7 @@ var DATA = {{COMP_DATA}};
   document.title = DATA.deal + " — Rent comps map";
   document.getElementById("title").textContent = DATA.deal + " rent comps";
   var metaBits = [DATA.city];
-  if (DATA.median_1br) metaBits.push("comp medians <b>1BR $" + DATA.median_1br.toLocaleString("en-US") + "</b>" + (DATA.median_studio ? " · <b>studio $" + DATA.median_studio.toLocaleString("en-US") + "</b>" : "") + " (counted rows only)");
+  if (DATA.avg_1br || DATA.avg_studio) metaBits.push("comps' ask " + [DATA.avg_1br ? "<b>1BR $" + DATA.avg_1br.toLocaleString("en-US") + "</b>" : "", DATA.avg_studio ? "<b>studio $" + DATA.avg_studio.toLocaleString("en-US") + "</b>" : ""].filter(Boolean).join(" · ") + " (average of counted comps)");
   if (DATA.pulled) metaBits.push("pulled " + DATA.pulled);
   document.getElementById("meta").innerHTML = metaBits.join(" · ");
 
@@ -867,28 +869,34 @@ var DATA = {{COMP_DATA}};
   L.control.scale({ imperial: true, metric: false }).addTo(map);
 
   // Our ASK vs each counted comp's ask (what a renter sees), on the unit types both have, two ways: monthly rent and $/SF.
-  // Green = we are below on both for every shared type; red = above on both; amber = the two disagree somewhere.
-  // In-place rent (subject_inplace, publisher v2.13+) shows only on our own pin, as the new-lease trend.
+  // Same rule as the Rent Comps Read column and the Summary scorecard: within 5% = in line; green = under on both for every
+  // shared type, red = over on both for every shared type, yellow = anything else.
   var SUBJ0 = P.filter(function (q) { return q.role === "sub"; })[0];
   var INPL = DATA.subject_inplace && DATA.subject_inplace.length ? DATA.subject_inplace : null;
   var SUBJ_BASE = SUBJ0 ? SUBJ0.units : [], SUBJ_LABEL = "Our ask";
-  var dir = function (a, b) { return a < b ? "below" : a > b ? "above" : "even"; };
+  var band = function (a, b) { return Math.abs(a / b - 1) <= 0.05 ? 0 : a > b ? 1 : -1; };
+  var readWords = function (a, s) {
+    if (a === s) return ["Under market", "In line with market", "Over market"][a + 1];
+    if (a === 1 && s === -1) return "More a month, more space";
+    if (a === -1 && s === 1) return "Less a month, less space";
+    return ["Less a month", "In line a month", "More a month"][a + 1] + ", " + ["under per SF", "in line per SF", "over per SF"][s + 1];
+  };
   P.forEach(function (p) {
     if (p.role !== "comp" || !SUBJ0) return;
-    var seen = {}, lines = [];
+    var rates = [], lines = [];
     SUBJ_BASE.forEach(function (s) {
       var c = p.units.filter(function (x) { return x[0] === s[0]; })[0];
       var ss = Number(s[1]), sr = Number(s[2]), cs = c ? Number(c[1]) : 0, cr = c ? Number(c[2]) : 0;
       if (!(sr > 0 && cr > 0 && ss > 0 && cs > 0)) return;
-      var r = dir(sr, cr), f = dir(Math.round(sr / ss * 100), Math.round(cr / cs * 100));
-      seen[r] = 1; seen[f] = 1;
-      lines.push(s[0] + ": " + (r === f ? r + " on rent and $/SF" : r + " on rent, " + f + " on $/SF"));
+      var a = band(sr, cr), f = band(sr / ss, cr / cs);
+      rates.push(a === -1 && f === -1 ? "below" : a === 1 && f === 1 ? "above" : "mixed");
+      lines.push(s[0] + ": " + readWords(a, f));
     });
     if (!lines.length) return;
-    p.vs = seen.below && !seen.above && !seen.even ? "below" : seen.above && !seen.below && !seen.even ? "above" : "mixed";
+    p.vs = rates.every(function (x) { return x === "below"; }) ? "below" : rates.every(function (x) { return x === "above"; }) ? "above" : "mixed";
     p.vsLines = lines;
   });
-  var VS_TEXT = { below: "Our ask is below this comp on rent and $/SF: a renter sees us as the better price", above: "Our ask is above this comp on rent and $/SF: a renter sees us as the pricier option", mixed: "Mixed: our ask is not above or below this comp on both rent and $/SF" };
+  var VS_TEXT = { below: "Under market: our ask is below this comp on rent and $/SF", above: "Over market: our ask is above this comp on rent and $/SF", mixed: "Mixed: our ask is not below or above this comp on both rent and $/SF" };
 
   var markers = {};
   function style(p) {
@@ -909,15 +917,15 @@ var DATA = {{COMP_DATA}};
         var ip = INPL ? INPL.filter(function (x) { return x[0] === u[0]; })[0] : null, trend = "";
         if (ip) {
           var d = Number(u[2]) - Number(ip[2]);
-          trend = d > 0 ? "Rising: new leases " + money(d) + " above what current tenants pay" : d < 0 ? "Falling: new leases " + money(-d) + " below what current tenants pay" : "Flat: new leases match what current tenants pay";
+          trend = d > 0 ? "Ask above rent roll" : d < 0 ? "Ask below rent roll" : "Ask equals rent roll";
         }
-        return row + (ip ? '<tr class="subj"><td>In-place</td>' + cells(Number(ip[1]), Number(ip[2]), false) + "</tr>" : "") +
+        return row + (ip ? '<tr class="subj"><td>Rent roll average</td>' + cells(Number(ip[1]), Number(ip[2]), false) + "</tr>" : "") +
           (trend ? '<tr class="subj"><td colspan="4">' + trend + "</td></tr>" : "") +
           '<tr class="subj"><td colspan="4">' + (conf ? "Ask confirmed: " + esc(conf) : "Ask not confirmed yet") + "</td></tr>";
       }
       return row + (s ? '<tr class="subj"><td>' + SUBJ_LABEL + '</td>' + cells(Number(s[1]), Number(s[2]), false) + "</tr>" : "");
     }).join("");
-    var flag = p.role === "sub" ? '<span class="flag sub">Subject</span>' : p.role === "comp" ? '<span class="flag comp">In comp median</span>' : '<span class="flag excl">Excluded from median</span>';
+    var flag = p.role === "sub" ? '<span class="flag sub">Subject</span>' : p.role === "comp" ? '<span class="flag comp">In comp average</span>' : '<span class="flag excl">Excluded from average</span>';
     var dist = p.role === "sub" ? "" : " · " + p.dist.toFixed(1) + " mi";
     var links = [];
     if (p.listing) links.push('<a href="' + esc(p.listing) + '" target="_blank" rel="noopener">Listing</a>');
