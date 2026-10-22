@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Rent comps map</title>
 <!--
-  COMP MAP SHELL  v1.1  (2026-10-22)
+  COMP MAP SHELL  v1.2  (2026-10-22)
   Filled by the Deal Memo publisher (_publisher/Code.gs v2.6+) from the deal Sheet's Rent Comps tab.
+  v1.2 (publisher v2.14.1): popups show our ask, theirs and the comps' average (comp_avg) together; our pin adds the Read vs the average.
   v1.1 (publisher v2.14): comps' ask is the average of counted rows (avg_1br / avg_studio); pin colors use the Rent Comps
   Read rule and the Summary scorecard colors: within 5% = in line; green = under on rent and $/SF, red = over on both, yellow = mixed.
   One token, COMP_DATA (double-brace placeholder in the script block below) — a JSON object (see render spec v1.8, "Comp map"). Nothing in this file is deal-specific.
@@ -772,6 +773,8 @@ ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction
 .pop .flag { display: inline-block; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; margin-bottom: 6px; }
 .pop .flag.comp { background: var(--accent-soft); color: var(--comp); }
 .pop .vs { font-size: 12px; font-weight: 600; margin: 4px 0 2px; }
+.pop tr.avg td { color: var(--muted, #6b6b6b); font-size: 12px; padding-bottom: 4px; }
+.pop tr.avg td:first-child { padding-left: 10px; }
 .pop .vs.below { color: var(--below); } .pop .vs.mixed { color: var(--mixed); } .pop .vs.above { color: var(--above); }
 .pop .flag.excl { border: 1px solid var(--excl); color: var(--muted); }
 .pop .flag.sub { background: var(--subject); color: #fff; }
@@ -874,6 +877,8 @@ var DATA = {{COMP_DATA}};
   var SUBJ0 = P.filter(function (q) { return q.role === "sub"; })[0];
   var INPL = DATA.subject_inplace && DATA.subject_inplace.length ? DATA.subject_inplace : null;
   var SUBJ_BASE = SUBJ0 ? SUBJ0.units : [], SUBJ_LABEL = "Our ask";
+  var AVG = DATA.comp_avg && DATA.comp_avg.length ? DATA.comp_avg : [];
+  var avgOf = function (t) { return AVG.filter(function (x) { return x[0] === t; })[0] || null; };
   var band = function (a, b) { return Math.abs(a / b - 1) <= 0.05 ? 0 : a > b ? 1 : -1; };
   var readWords = function (a, s) {
     if (a === s) return ["Under market", "In line with market", "Over market"][a + 1];
@@ -908,6 +913,7 @@ var DATA = {{COMP_DATA}};
   var SUBJ = P.filter(function (q) { return q.role === "sub"; })[0];
   function popup(p) {
     var cells = function (sf, rent, bold) { return "<td>" + (sf ? sf + " SF" : "") + "</td><td>" + (rent ? (bold ? "<b>" + money(rent) + "</b>" : money(rent)) : "—") + "</td><td>" + (sf && rent ? "$" + (rent / sf).toFixed(2) + "/SF" : "") + "</td>"; };
+    var avgRow = function (t) { var a = avgOf(t); return a ? '<tr class="avg"><td>Comps\' average</td><td></td><td>' + money(a[1]) + "</td><td>" + (a[2] ? "$" + Number(a[2]).toFixed(2) + "/SF" : "") + "</td></tr>" : ""; };
     var rows = p.units.map(function (u) {
       var isSub = SUBJ && SUBJ === p;
       var row = "<tr><td>" + esc(u[0]) + (isSub ? " ask" : "") + "</td>" + cells(Number(u[1]), Number(u[2]), true) + "</tr>";
@@ -919,11 +925,13 @@ var DATA = {{COMP_DATA}};
           var d = Number(u[2]) - Number(ip[2]);
           trend = d > 0 ? "Ask above rent roll" : d < 0 ? "Ask below rent roll" : "Ask equals rent roll";
         }
-        return row + (ip ? '<tr class="subj"><td>Rent roll average</td>' + cells(Number(ip[1]), Number(ip[2]), false) + "</tr>" : "") +
+        var a0 = avgOf(u[0]), rd = "";
+        if (a0 && a0[2] && Number(u[1]) > 0 && Number(u[2]) > 0) rd = '<tr class="avg"><td colspan="4">Read vs comps\' average: ' + readWords(band(Number(u[2]), a0[1]), band(Number(u[2]) / Number(u[1]), a0[2])) + "</td></tr>";
+        return row + avgRow(u[0]) + rd + (ip ? '<tr class="subj"><td>Rent roll average</td>' + cells(Number(ip[1]), Number(ip[2]), false) + "</tr>" : "") +
           (trend ? '<tr class="subj"><td colspan="4">' + trend + "</td></tr>" : "") +
           '<tr class="subj"><td colspan="4">' + (conf ? "Ask confirmed: " + esc(conf) : "Ask not confirmed yet") + "</td></tr>";
       }
-      return row + (s ? '<tr class="subj"><td>' + SUBJ_LABEL + '</td>' + cells(Number(s[1]), Number(s[2]), false) + "</tr>" : "");
+      return row + (s ? '<tr class="subj"><td>' + SUBJ_LABEL + '</td>' + cells(Number(s[1]), Number(s[2]), false) + "</tr>" + avgRow(u[0]) : "");
     }).join("");
     var flag = p.role === "sub" ? '<span class="flag sub">Subject</span>' : p.role === "comp" ? '<span class="flag comp">In comp average</span>' : '<span class="flag excl">Excluded from average</span>';
     var dist = p.role === "sub" ? "" : " · " + p.dist.toFixed(1) + " mi";

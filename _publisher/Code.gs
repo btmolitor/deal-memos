@@ -56,6 +56,8 @@
  * is any header starting "In comp" (median or average). The map header shows comps' ask as the average of counted (Y)
  * rows, worked out here from the list, for either layout. On the new layout the comp-map link goes in column A of the row
  * above the figures block title.
+ * v2.14.1: map data also carries comp_avg ([type, average ask, average $/SF] of counted rows) so each pin can show
+ * our ask, theirs and the comps' average side by side. Average $/SF = average of each comp's ask / SF (same as Rent Comps K6:K7).
  */
 
 var PUB = {
@@ -593,7 +595,7 @@ function buildCompMap_(ss, cfg, token) {
     var shell = fetchRepoFile_(PUB.SHELL_DIR + '/' + PUB.MAP_SHELL, token);
     var rcRaw = rentCompFigures_(ss).raw, inplace = [];   // v2.13: our in-place rent per unit type, for the new-lease trend on our pin
     for (var rk in rcRaw) { var f = rcRaw[rk]; if (f.INPLACE > 0 && f.INPLACE_SF > 0) inplace.push([rk === 'STUDIO' ? 'Studio' : rk, Math.round(f.INPLACE / f.INPLACE_SF), Math.round(f.INPLACE)]); }
-    var data = { deal: cfg.name, city: comps.city, avg_1br: comps.avg_1br, avg_studio: comps.avg_studio, pulled: comps.pulled, subject_inplace: inplace,
+    var data = { deal: cfg.name, city: comps.city, avg_1br: comps.avg_1br, avg_studio: comps.avg_studio, comp_avg: comps.comp_avg, pulled: comps.pulled, subject_inplace: inplace,
                  properties: mappable.map(function (p) { var o = { id: p.id, name: p.name, role: p.role, addr: p.addr, lat: p.lat, lng: p.lng, units: p.units, note: p.note, listing: p.listing, site: p.site }; if (p.role === 'sub') o.ask_confirmed = p.confirmed || {}; return o; }) };
     var json = JSON.stringify(data).replace(/<\//g, '<\\/');
     var html = shell.split('{{COMP_DATA}}').join(json);
@@ -658,7 +660,7 @@ function readComps_(sh) {
   };
   var res = { props: [], byName: {}, city: '', pulled: '', warnings: [], hdrRow: hdr + 1,
               linkRow: fb && !/RENT COMP SUMMARY/i.test(String(vals[0][0])) ? fb.row : hdr,   // 1-based row above the figures title, or above the header
-              avg_1br: null, avg_studio: null };
+              avg_1br: null, avg_studio: null, comp_avg: [] };
   var subjectZone = false, latest = null, sums = {};   // v2.14: comps' ask = average of counted (Y) rows, per unit type
   for (r = hdr + 1; r < vals.length; r++) {
     var a = String(vals[r][0] == null ? '' : vals[r][0]).trim();
@@ -688,7 +690,7 @@ function readComps_(sh) {
     p.rows.push(r + 1);
     var bed = Number(vals[r][C.bed]), type = bed === 0 ? 'Studio' : bed >= 1 ? Math.round(bed) + 'BR' : String(vals[r][C.bed]);
     if (!p.units.some(function (u) { return u[0] === type; })) p.units.push([type, num(vals[r][C.sf]) || 0, num(vals[r][C.rent]) || 0]);
-    if (!isSub && flag === 'Y' && num(vals[r][C.rent])) { var sm = sums[type] = sums[type] || [0, 0]; sm[0] += num(vals[r][C.rent]); sm[1]++; }
+    if (!isSub && flag === 'Y' && num(vals[r][C.rent])) { var sm = sums[type] = sums[type] || [0, 0, 0, 0]; sm[0] += num(vals[r][C.rent]); sm[1]++; if (num(vals[r][C.sf])) { sm[2] += num(vals[r][C.rent]) / num(vals[r][C.sf]); sm[3]++; } }
     if (isSub && C.confirmed >= 0) { var cv = vals[r][C.confirmed]; cv = cv instanceof Date ? Utilities.formatDate(cv, PUB.TZ, 'M/d/yyyy') : String(cv == null ? '' : cv).trim(); if (cv) { p.confirmed = p.confirmed || {}; p.confirmed[type] = cv; } }
     if (C.pulled >= 0 && vals[r][C.pulled] instanceof Date && (!latest || vals[r][C.pulled] > latest)) latest = vals[r][C.pulled];
   }
@@ -696,6 +698,7 @@ function readComps_(sh) {
   if (!res.city) res.city = res.props.length ? res.props[0].city : '';
   if (sums['1BR']) res.avg_1br = Math.round(sums['1BR'][0] / sums['1BR'][1]);
   if (sums.Studio) res.avg_studio = Math.round(sums.Studio[0] / sums.Studio[1]);
+  for (var ty in sums) res.comp_avg.push([ty, round_(sums[ty][0] / sums[ty][1], 2), sums[ty][3] ? round_(sums[ty][2] / sums[ty][3], 4) : null]);
   return res;
 }
 
