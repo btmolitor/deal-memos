@@ -1,5 +1,5 @@
 /**
- * DEAL MEMO PUBLISHER  v2.14  (2026-10-22)
+ * DEAL MEMO PUBLISHER  v2.14.2  (2026-10-29)
  * Bound to the deal model Sheet (lives in the master template; every copy inherits it).
  *
  * What it does: "Deal Memo > Refresh numbers & publish" re-reads the model, refills the
@@ -12,7 +12,7 @@
  * from the ones the narrative was written on.
  *
  * Nothing in this file is deal-specific. Deal settings travel inside the shell file.
- * Token math mirrors render spec v1.10 (v1.7 + v1.8 + v1.9 + v1.10 addenda; dual lane, template 10c). Do not edit one without the other.
+ * Token math mirrors render spec v1.11 (v1.7 + v1.8 + v1.9 + v1.10 + v1.11 addenda; dual lane, template 10c). Do not edit one without the other.
  *
  * v2.3: exit cap (Summary, Exit Assumption row), selling costs (next row), closing % (Financials!C18 / C4) and tax bracket
  * (Financials!C31) are read from the Sheet instead of fixed in this file. New tokens DUAL_EXIT_CAP_LABEL and
@@ -58,6 +58,9 @@
  * above the figures block title.
  * v2.14.1: map data also carries comp_avg ([type, average ask, average $/SF] of counted rows) so each pin can show
  * our ask, theirs and the comps' average side by side. Average $/SF = average of each comp's ask / SF (same as Rent Comps K6:K7).
+ * v2.14.2 (render spec v1.11): capital-slider tick labels carry their position on the track (style="--f:…") so they line up
+ * with the thumb; shells need the v1.11 .slider-ticks CSS. Partner tile "Accumulated Equity (Y10)" is now
+ * "Your equity in the building (Y10)" (label only, in the shell).
  */
 
 var PUB = {
@@ -826,8 +829,13 @@ function buildTokens_(m, ui) {
   btns.push('          <button class="preset-btn" data-val="' + num_(half) + '">' + compact_(half) + ' (half)</button>');
   btns.push('          <button class="preset-btn" data-val="' + tcl + '">' + compact_(tcl) + ' (100%)</button>');
   var presetsHtml = '<div class="preset-buttons">\n' + btns.join('\n') + '\n        </div>';
-  var ticksHtml = '<div class="slider-ticks">\n            <span>' + kfmt_(cap.min) + '</span><span>' + kfmt_(500000) + '</span><span>' + kfmt_(1000000) +
-                  '</span><span>' + compact_(half) + '</span><span>' + compact_(tcl) + ' (full)</span>\n          </div>';
+  // v2.14.2: each tick carries --f, its place on the slider track (0 at min, 1 at full), so the labels line up with the thumb
+  var tickVals = [[cap.min, kfmt_(cap.min)], [500000, kfmt_(500000)], [1000000, kfmt_(1000000)], [half, compact_(half)], [tcl, compact_(tcl) + ' (full)']], ticks = [];
+  for (i = 0; i < tickVals.length; i++) {
+    var tf = tcl > cap.min ? (tickVals[i][0] - cap.min) / (tcl - cap.min) : 0;
+    ticks.push('<span style="--f:' + num_(round_(Math.min(1, Math.max(0, tf)), 4)) + '">' + tickVals[i][1] + '</span>');
+  }
+  var ticksHtml = '<div class="slider-ticks">\n            ' + ticks.join('') + '\n          </div>';
   return {
     DUAL_BASE_PRICE: String(price), DUAL_BASE_PRICE_COMPACT: compact_(price),
     DUAL_PRICE_MIN: String(ui.price_min), DUAL_PRICE_MAX: String(ui.price_max), DUAL_PRICE_STEP: String(ui.price_step),

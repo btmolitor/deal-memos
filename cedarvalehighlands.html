@@ -178,11 +178,15 @@ body {
   box-shadow: 0 0 0 4px rgba(247,244,237,0.15);
 }
 .slider-ticks {
-  display: flex; justify-content: space-between;
+  position: relative; height: 14px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px; color: var(--accent-soft); letter-spacing: 0.1em;
-  margin-top: 8px; padding: 0 2px;
+  margin-top: 8px;
 }
+/* v1.11: each tick sits where its value falls on the track (thumb is 20px wide, so the track runs 10px in from each end) */
+.slider-ticks span { position: absolute; top: 0; left: calc(10px + (100% - 20px) * var(--f)); transform: translateX(-50%); white-space: nowrap; }
+.slider-ticks span:first-child { transform: translateX(-10px); }
+.slider-ticks span:last-child { transform: translateX(calc(-100% + 10px)); }
 .preset-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .preset-btn {
   background: transparent; color: var(--paper);
@@ -641,7 +645,7 @@ body {
         <div class="slider-wrap">
           <input type="range" min="100000" max="3711500" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks">
-            <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.86M</span><span>$3.71M (full)</span>
+            <span style="--f:0">$100K</span><span style="--f:0.1108">$500K</span><span style="--f:0.2492">$1M</span><span style="--f:0.4862">$1.86M</span><span style="--f:1">$3.71M (full)</span>
           </div>
         </div>
         <div class="preset-buttons">
@@ -659,7 +663,7 @@ body {
         <div class="partner-cell"><div class="partner-label">10-yr Cash Return + Dep Shield <span class="partner-note">35% tax bracket</span></div><div class="partner-value" id="outBenefits">—</div></div>
         <div class="partner-cell"><div class="partner-label">Cash + Dep Shield (10-yr avg) <span class="partner-note">35% tax bracket</span></div><div class="partner-value featured" id="outSimpleYield">—</div></div>
         <div class="partner-cell"><div class="partner-label">Principal Paydown (Y10)</div><div class="partner-value" id="outPrincPaydown">—</div></div>
-        <div class="partner-cell"><div class="partner-label">Accumulated Equity (Y10)</div><div class="partner-value" id="outAccumEquity">—</div></div>
+        <div class="partner-cell"><div class="partner-label">Your equity in the building (Y10)</div><div class="partner-value" id="outAccumEquity">—</div></div>
         <div class="partner-cell"><div class="partner-label">Simple Sale Return (10-yr avg) <span class="partner-note">net of 2% sale fees</span></div><div class="partner-value" id="outIRR">—</div></div>
       </div>
     </div>
@@ -1126,7 +1130,7 @@ function renderPartner(D, capital, scenario) {
   const netCash = totalCashOut - capital;
   const simpleReturn = netCash / 10 / capital;
 
-  // Accumulated Equity (Y10) — pro-rata share of total Y10 equity in property
+  // Your equity in the building (Y10) — pro-rata share of total Y10 equity in property (includes the cash put in)
   // Toggles with A/B scenario via netEquity (already scenario-aware)
   // Note: For partner-cell display, we use Y10 PV from the active scenario
   const y10PV_active = scenario === 'A' ? (BASE.noi[9] / BASE.exitCap) : D.propertyValue[9];
