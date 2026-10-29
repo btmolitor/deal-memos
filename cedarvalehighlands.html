@@ -581,11 +581,11 @@ body {
     <h2 class="section-title">Deal analyzer</h2>
     <div class="price-control">
       <div class="price-control-header">
-        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $11.60M baseline</span></div>
-        <div class="price-control-value" id="priceDisplay">$11.60M</div>
+        <div class="price-control-label">Purchase price<span class="reset-baseline" id="resetBaseline">reset to $11.65M baseline</span></div>
+        <div class="price-control-value" id="priceDisplay">$11.65M</div>
       </div>
-      <input type="range" id="priceSlider" min="9500000" max="12500000" step="25000" value="11600000" class="price-slider" />
-      <div class="price-control-ticks"><span>$9.50M</span><span>baseline $11.60M</span><span>$12.50M</span></div>
+      <input type="range" id="priceSlider" min="9500000" max="12500000" step="25000" value="11650000" class="price-slider" />
+      <div class="price-control-ticks"><span>$9.50M</span><span>baseline $11.65M</span><span>$12.50M</span></div>
       <div class="price-control-note">Drag to test bid scenarios. Everything below recalculates — loan, debt service, cash flow, DSCR, exit, refi, partner math. Operating income, expenses, and growth assumptions stay fixed: same building, different price.</div>
       <div class="price-dscr-warn" id="priceDscrWarn"></div>
     </div>
@@ -636,12 +636,12 @@ body {
       <div class="lever-control">
         <div class="lever-display">
           <div class="lever-amount" id="leverAmount">$500,000</div>
-          <div class="lever-share">YOUR SHARE<strong id="leverShare">13.53%</strong></div>
+          <div class="lever-share">YOUR SHARE<strong id="leverShare">13.47%</strong></div>
         </div>
         <div class="slider-wrap">
-          <input type="range" min="100000" max="3696000" step="10000" value="500000" class="slider" id="capitalSlider">
+          <input type="range" min="100000" max="3711500" step="10000" value="500000" class="slider" id="capitalSlider">
           <div class="slider-ticks">
-            <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.85M</span><span>$3.70M (full)</span>
+            <span>$100K</span><span>$500K</span><span>$1M</span><span>$1.86M</span><span>$3.71M (full)</span>
           </div>
         </div>
         <div class="preset-buttons">
@@ -650,8 +650,8 @@ body {
           <button class="preset-btn active" data-val="500000">$500K</button>
           <button class="preset-btn" data-val="750000">$750K</button>
           <button class="preset-btn" data-val="1000000">$1M</button>
-          <button class="preset-btn" data-val="1848000">$1.85M (half)</button>
-          <button class="preset-btn" data-val="3696000">$3.70M (100%)</button>
+          <button class="preset-btn" data-val="1855750">$1.86M (half)</button>
+          <button class="preset-btn" data-val="3711500">$3.71M (100%)</button>
         </div>
       </div>
       <div class="partner-outputs">
@@ -877,7 +877,7 @@ body {
 // ================================================================
 const BASE = {
   // Baseline & slider state
-  basePrice: 11600000,
+  basePrice: 11650000,
   units: 108,
 
   // Ratios applied to purchase price
@@ -886,22 +886,22 @@ const BASE = {
   loanPct: 0.7,              // = 1 - downPct
   cashInPct: 0.31,           // = down + closing/reserves
   additionalCash: 100000,  // owner cash outside the loan (Financials!C19), fixed dollars
-  depShieldPerDollar: 132872.73 / 11600000,  // annual dep tax shield per $ of price
+  depShieldPerDollar: 133445.45 / 11650000,  // annual dep tax shield per $ of price
 
   // Ratios applied to LOAN — debt service changes after Y5 refi
-  dsRatioY1Y5: 628759 / 8120000,   // 0.07002877828
-  dsRatioY6Y10: 589923 / 8120000,  // 0.06495109502
+  dsRatioY1Y5: 631469 / 8155000,   // 0.07002877828
+  dsRatioY6Y10: 592466 / 8155000,  // 0.06495109502
 
   // Mortgage balance decay — Y1-Y10 balance ÷ initial loan
   balRatios: [0.989240213, 0.977736966, 0.965438887, 0.952291057, 0.938234762, 0.928139556, 0.917346810, 0.905808325, 0.893472574, 0.880284469],
 
   // Waterfall principal paydown ratios (% of cash in per year) at the base price. Reference only since v1.10:
   // derive() computes the layer from the balances, because fixed owner cash makes cash in not purely price-scaled
-  wfPrincRatios: [0.023638926, 0.025272286, 0.027018506, 0.028885383, 0.030881254, 0.022178862, 0.023711338, 0.025349702, 0.027101271, 0.028973866],
+  wfPrincRatios: [0.023641671, 0.025275221, 0.027021644, 0.028888738, 0.030884841, 0.022181437, 0.023714091, 0.025352646, 0.027104418, 0.028977231],
 
   // I/O VARIANT ARRAYS (for side-by-side comparison)
   ioBalRatios: [1.000000000, 1.000000000, 0.987421895, 0.973974689, 0.959598333, 0.949273259, 0.938234762, 0.926433547, 0.913816911, 0.900328514],
-  ioWfPrincRatios: [0.000000000, 0.000000000, 0.027633717, 0.029543102, 0.031584419, 0.022683874, 0.024251244, 0.025926913, 0.027718366, 0.029633600],
+  ioWfPrincRatios: [0.000000000, 0.000000000, 0.027636926, 0.029546533, 0.031588087, 0.022686508, 0.024254060, 0.025929924, 0.027721585, 0.029637042],
   ioDsByYearRatios: [0.067000000, 0.067000000, 0.079196512, 0.079196512, 0.079196512, 0.074304921, 0.074304921, 0.074304921, 0.074304921, 0.074304921],
 
   // FIXED operating data — does NOT scale with price (same building)
