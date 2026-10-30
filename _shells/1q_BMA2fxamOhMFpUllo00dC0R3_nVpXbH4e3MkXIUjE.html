@@ -1153,10 +1153,10 @@ function renderPartner(D, capital, scenario) {
   // Note: For partner-cell display, we use Y10 PV from the active scenario
   const y10PV_active = scenario === 'A' ? (BASE.noi[9] / BASE.exitCap) : D.propertyValue[9];
   const accumulatedEquity = (y10PV_active - D.balance[9]) * share;
-  // Principal Paydown (Y10) — total principal retired over 10-year hold (10-yr projection, not refi-driven)
+  // Principal paid (Y10) — total principal retired over 10-year hold (10-yr projection, not refi-driven)
   const principalPaydown = (D.loan - D.balance[9]) * share;
 
-  // 1st Year Monthly Draw — partner's pro-rata Y1 monthly cash flow + Y1 cash-on-cash %
+  // 1st year monthly cash flow, your share — partner's pro-rata Y1 monthly cash flow + Y1 cash-on-cash %
   // Both values are tied to Y1 operations only; do not toggle with A/B scenario
   const y1MonthlyDraw = (D.cashFlow[0] * share) / 12;
   const y1CashOnCash = D.cashFlow[0] / D.cashIn;
